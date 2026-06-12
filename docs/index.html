@@ -131,6 +131,7 @@ function parse(line){
   let x=parseInt(p[0]),y=parseInt(p[1]),z=parseInt(p[2]); if(isNaN(x))return;
   if(calStep>0){calTouch(x,y,z);return}
   if(z===0)return;
+  if(z>3500)return;
   document.getElementById('tbar').style.width='100%';clearTimeout(tbarTimer);tbarTimer=setTimeout(()=>document.getElementById('tbar').style.width='0',200);
   let now=Date.now(); if(now-lastSent<COOLDOWN)return;
   for(let i=0;i<config.zones.length;i++){
