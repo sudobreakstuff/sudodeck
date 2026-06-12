@@ -273,7 +273,7 @@ async function connect(){
     await disconnect();
   }
   try{
-    port=await navigator.serial.requestPort({filters:[{usbVendorId:0x1a86}]});
+    port=await navigator.serial.requestPort();
     await port.open({baudRate:115200});
     setStatus('wait','Connected — syncing labels...');
     document.getElementById('connectBtn').textContent='Disconnect';
