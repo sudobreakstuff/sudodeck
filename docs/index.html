@@ -322,10 +322,10 @@ async function readLoop(){
           buf=buf.slice(idx+1);
           if(!line)continue;
           let parts=line.split(' ');
-          if(parts.length<2)continue;
-          let x=parseInt(parts[0]),y=parseInt(parts[1]);
+          if(parts.length<3)continue;
+          let x=parseInt(parts[0]),y=parseInt(parts[1]),z=parseInt(parts[2]);
           if(isNaN(x))continue;
-          processTouch(x,y);
+          processTouch(x,y,z);
         }
         if(buf.length>4096)buf=buf.slice(-2048);
       }
@@ -339,22 +339,23 @@ async function readLoop(){
   }
 }
 
-let calibStep=0,calibTL=null,calibBR=null;
+let calibStep=0,calibTL=null,calibBR=null,calibBlock=0;
 
 function startCalibrate(){
-  calibStep=1;calibTL=null;calibBR=null;
+  calibStep=1;calibTL=null;calibBR=null;calibBlock=Date.now()+500;
   setStatus(true,'CALIBRATE: Tap TOP-LEFT corner');
   toast('Tap top-left corner');
 }
 
-function processTouch(x,y){
+function processTouch(x,y,z){
   if(calibStep>0){
-    if(calibStep===1){calibTL={x,y};calibStep=2;setStatus(true,'CALIBRATE: Now tap BOTTOM-RIGHT corner');toast('Now bottom-right');return}
+    if(Date.now()<calibBlock)return;
+    if(z===0)return;
+    if(calibStep===1){calibTL={x,y};calibStep=2;calibBlock=Date.now()+800;setStatus(true,'Now tap BOTTOM-RIGHT corner');toast('Now bottom-right');return}
     if(calibStep===2){calibBR={x,y};calibStep=0;finishCalibrate();return}
     return;
   }
-  let touching=(x<4000&&y<4000);
-  if(touching){
+  if(z>0){
     document.getElementById('touchBar').style.width='100%';
     clearTimeout(touchTimeout);
     touchTimeout=setTimeout(()=>{document.getElementById('touchBar').style.width='0';setStatus(true,`Idle: ${x},${y}`)},300);
