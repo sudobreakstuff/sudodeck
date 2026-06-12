@@ -3,30 +3,34 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SudoDeck</title>
 <style>
-:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#58a6ff;--green:#3fb950;--text:#c9d1d9;--muted:#8b949e}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--text:#c9d1d9;--muted:#8b949e}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font:13px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .wrap{max-width:600px;margin:0 auto;padding:16px}
-h1{text-align:center;font-size:22px;font-weight:600}
-h1 span{color:var(--muted);font-size:12px}
-.topbar{display:flex;gap:8px;margin:12px 0}
-.topbar button{flex:1;padding:10px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
-.topbar button:disabled{opacity:.5}
-.btn-connect{background:var(--accent);color:#fff}
-.btn-calib{background:var(--card);color:var(--text);border:1px solid var(--border)}
-.btn-reset{background:var(--card);color:var(--muted);border:1px solid var(--border);max-width:90px}
-.status{text-align:center;font-size:12px;padding:6px;margin-bottom:8px;border-radius:4px;background:var(--card);border:1px solid var(--border)}
-.status.on{color:var(--green);border-color:var(--green)}
-.status.off{color:var(--muted)}
-.status.wait{color:#d2991d;border-color:#d2991d}
-.touchbar{height:3px;background:var(--card);border-radius:2px;margin-bottom:12px;overflow:hidden}
-.touchbar div{height:100%;width:0;background:var(--green);transition:width .15s}
+h1{text-align:center;font-size:22px;font-weight:600}h1 span{color:var(--muted);font-size:12px}
+.bar{display:flex;gap:8px;margin:12px 0}
+.bar button{flex:1;padding:10px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
+.bar button:disabled{opacity:.5}
+.btn-conn{background:var(--accent);color:#fff}
+.btn-cal{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-def{background:var(--card);color:var(--muted);border:1px solid var(--border);max-width:90px}
+.st{display:flex;gap:8px;margin-bottom:8px}
+.st>div{flex:1;text-align:center;font-size:11px;padding:6px 8px;border-radius:4px;background:var(--card);border:1px solid var(--border)}
+.st .ok{color:var(--green);border-color:var(--green)}.st .no{color:var(--red);border-color:var(--red)}.st .w{color:#d2991d;border-color:#d2991d}
+.setup{display:none;background:var(--card);border:1px solid #d2991d40;border-radius:6px;padding:12px;margin-bottom:8px;font-size:11px}
+.setup.on{display:block}
+.setup b{color:#d2991d}
+.setup code{display:block;background:#0d1117;padding:6px 8px;border-radius:4px;margin:4px 0;font-size:11px;cursor:pointer;word-break:break-all}
+.setup code:hover{background:#1a1a2e}
+.setup .os{display:flex;gap:4px;margin:4px 0}
+.setup .os span{padding:2px 8px;border-radius:3px;cursor:pointer;background:var(--bg);border:1px solid var(--border);font-size:10px}
+.setup .os span.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tbar{height:3px;background:var(--card);border-radius:2px;margin-bottom:12px;overflow:hidden}
+.tbar div{height:100%;width:0;background:var(--green);transition:width .15s}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
 .cell{background:var(--card);border:2px solid var(--border);border-radius:6px;padding:12px 6px;cursor:pointer;text-align:center;transition:border-color .12s}
-.cell:hover{border-color:var(--accent)}
-.cell.flash{border-color:var(--green)!important;box-shadow:0 0 10px rgba(63,185,80,.3)}
-.cell .n{font-size:15px;font-weight:600}
-.cell .k{font-size:10px;color:var(--muted)}
+.cell:hover{border-color:var(--accent)}.cell.flash{border-color:var(--green)!important;box-shadow:0 0 10px rgba(63,185,80,.3)}
+.cell .n{font-size:15px;font-weight:600}.cell .k{font-size:10px;color:var(--muted)}
 .log{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;color:var(--muted);max-height:120px;overflow-y:auto;margin-bottom:12px;display:none}
 .log .lh{display:flex;justify-content:space-between;margin-bottom:4px}
 .log .lh span{color:var(--accent);font-weight:600}
@@ -42,22 +46,35 @@ h1 span{color:var(--muted);font-size:12px}
 .tags{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0;min-height:24px}
 .tag{display:inline-flex;align-items:center;gap:3px;background:var(--accent);color:#fff;padding:2px 6px;border-radius:3px;font-size:10px}
 .tag .x{cursor:pointer;opacity:.7}.tag .x:hover{opacity:1}
-.combos button{display:block;width:100%;padding:5px;margin:3px 0;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:11px;text-align:left;cursor:pointer}
-.combos button:hover{border-color:var(--accent)}
-.modal .btns{display:flex;gap:6px;margin-top:12px}
-.modal .btns button{flex:1;padding:8px;border:none;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer}
-.bsave{background:var(--accent);color:#fff}.bcancel{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.cbx button{display:block;width:100%;padding:5px;margin:3px 0;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:11px;text-align:left;cursor:pointer}
+.cbx button:hover{border-color:var(--accent)}
+.mbtns{display:flex;gap:6px;margin-top:12px}
+.mbtns button{flex:1;padding:8px;border:none;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer}
+.bs{background:var(--accent);color:#fff}.bc{background:var(--card);color:var(--muted);border:1px solid var(--border)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:8px 18px;border-radius:5px;font-weight:600;font-size:12px;z-index:200;display:none}
 </style></head><body>
 <div class="wrap">
 <h1>SudoDeck <span>landscape</span></h1>
-<div class="topbar">
-  <button class="btn-connect" id="btnConn" onclick="connect()">Connect CYD</button>
-  <button class="btn-calib" id="btnCal" onclick="startCalib()" disabled>Calibrate</button>
-  <button class="btn-reset" onclick="resetAll()">Defaults</button>
+<div class="bar">
+  <button class="btn-conn" id="btnConn" onclick="toggleCYD()">Connect CYD</button>
+  <button class="btn-cal" id="btnCal" onclick="startCalib()" disabled>Calibrate</button>
+  <button class="btn-def" onclick="resetAll()">Defaults</button>
 </div>
-<div class="touchbar"><div id="tbar"></div></div>
-<div class="status off" id="status">Not connected</div>
+<div class="st">
+  <div id="stCYD" class="no">CYD: not connected</div>
+  <div id="stDaemon" class="no">Daemon: checking...</div>
+</div>
+<div class="setup" id="setup">
+  <b>Daemon not running</b> — needed for keystrokes. Install once:
+  <div class="os">
+    <span class="sel" onclick="showOS('linux')">Linux</span>
+    <span onclick="showOS('win')">Windows</span>
+  </div>
+  <code id="cmdLinux" onclick="copyCode(this)">curl -sSL https://sudobreakstuff.github.io/sudodeck/install.sh | bash</code>
+  <code id="cmdWin" onclick="copyCode(this)" style="display:none">powershell -c "iwr https://sudobreakstuff.github.io/sudodeck/install_win.bat -OutFile install_win.bat; .\install_win.bat"</code>
+  <span style="font-size:10px;color:var(--muted)">Run in terminal, then refresh this page</span>
+</div>
+<div class="tbar"><div id="tbar"></div></div>
 <div class="grid" id="grid"></div>
 <div class="log" id="log"><div class="lh"><span>Touch Log</span><button onclick="copyLog()">Copy</button></div><pre id="logPre"></pre></div>
 </div>
@@ -66,50 +83,64 @@ h1 span{color:var(--muted);font-size:12px}
 <h3>Edit Zone</h3>
 <label>Name</label><input id="eN">
 <div class="row">
-  <div><label>X Min</label><input id="eX1" type="number"></div>
-  <div><label>X Max</label><input id="eX2" type="number"></div>
-  <div><label>Y Min</label><input id="eY1" type="number"></div>
-  <div><label>Y Max</label><input id="eY2" type="number"></div>
+  <div><label>X Min</label><input id="eX1" type="number"></div><div><label>X Max</label><input id="eX2" type="number"></div>
+  <div><label>Y Min</label><input id="eY1" type="number"></div><div><label>Y Max</label><input id="eY2" type="number"></div>
 </div>
 <label>Keycodes</label>
 <div class="tags" id="tags"></div>
 <select id="ksel" onchange="addKey()"><option value="">+ Add key</option></select>
-<div class="combos" id="combos"></div>
-<div class="btns">
-  <button class="bcancel" onclick="closeModal()">Cancel</button>
-  <button class="bsave" onclick="saveZone()">Save</button>
-</div>
+<div class="cbx" id="combos"></div>
+<div class="mbtns"><button class="bc" onclick="closeModal()">Cancel</button><button class="bs" onclick="saveZone()">Save</button></div>
 </div></div>
 <script>
 const DAEMON='http://localhost:8092',COOLDOWN=300;
 const KEYDB={Media:[['VolUp',115],['VolDown',114],['Mute',113],['Play',164],['Prev',165],['Next',163],['Stop',166]],Modifiers:[['Ctrl',29],['Alt',56],['Shift',42],['Super',125]],Nav:[['Up',103],['Down',108],['Left',105],['Right',106],['Enter',28],['Space',57],['Tab',15],['Esc',1],['Bksp',14],['Del',111],['Home',102],['End',107]],Letters:[['A',30],['B',48],['C',46],['D',32],['E',18],['F',33],['G',34],['H',35],['I',23],['J',36],['K',37],['L',38],['M',50],['N',49],['O',24],['P',25],['Q',16],['R',19],['S',31],['T',20],['U',22],['V',47],['W',17],['X',45],['Y',21],['Z',44]],Numbers:[['0',11],['1',2],['2',3],['3',4],['4',5],['5',6],['6',7],['7',8],['8',9],['9',10]]};
 const COMBOS=[['Alt+Left',[56,105]],['Alt+Right',[56,106]],['Ctrl+R',[29,19]],['Ctrl+T',[29,20]],['Ctrl+W',[29,25]],['Ctrl+C',[29,46]],['Ctrl+V',[29,47]],['Ctrl+Z',[29,44]],['Super',[125]]];
 const DZONES=[{name:'PREV',x1:400,y1:400,x2:1600,y2:1200,keycodes:[165]},{name:'PLAY',x1:1700,y1:400,x2:2800,y2:1200,keycodes:[164]},{name:'NEXT',x1:2900,y1:400,x2:3900,y2:1200,keycodes:[163]},{name:'VOL+',x1:400,y1:1300,x2:1600,y2:2100,keycodes:[115]},{name:'MUTE',x1:1700,y1:1300,x2:2800,y2:2100,keycodes:[113]},{name:'VOL-',x1:2900,y1:1300,x2:3900,y2:2100,keycodes:[114]},{name:'BACK',x1:400,y1:2200,x2:1600,y2:3000,keycodes:[56,105]},{name:'RELOAD',x1:1700,y1:2200,x2:2800,y2:3000,keycodes:[29,19]},{name:'FORWD',x1:2900,y1:2200,x2:3900,y2:3000,keycodes:[56,106]}];
-let port=null,reader=null,keep=false,config=null,editIdx=-1,lastSent=0,lastZone='',tbarTimer=null;
-let calStep=0,calPts=[],calBlock=0;
+let port=null,reader=null,keep=false,config=null,editIdx=-1,lastSent=0,lastZone='',tbarTimer=null,daemonOk=false;
+let calStep=0,calPts=[],calBlock=0,curOS='linux';
 
-function load(){try{let r=localStorage.getItem('sudodeck_v3');if(r){config=JSON.parse(r);return}}catch(e){}config={zones:DZONES.map(z=>({...z}))};save()}
-function save(){localStorage.setItem('sudodeck_v3',JSON.stringify(config));render()}
+// ── init ──
+function load(){try{let r=localStorage.getItem('sudodeck_v4');if(r){config=JSON.parse(r);return}}catch(e){}config={zones:DZONES.map(z=>({...z}))};save()}
+function save(){localStorage.setItem('sudodeck_v4',JSON.stringify(config));render()}
 function render(){document.getElementById('grid').innerHTML=config.zones.map((z,i)=>`<div class="cell" id="c${i}" onclick="openMod(${i})"><div class="n">${z.name}</div><div class="k">${kLabel(z.keycodes)}</div></div>`).join('');buildKeys();buildCombos()}
 function kLabel(cs){if(!cs||!cs.length)return'--';return cs.map(k=>{for(let g in KEYDB)for(let[n,c]of KEYDB[g])if(c===k)return n;return'#'+k}).join('+')}
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',1500)}
+function copyCode(el){navigator.clipboard.writeText(el.textContent.trim());toast('Copied! Paste in terminal')}
+function showOS(os){curOS=os;document.querySelectorAll('.os span').forEach(s=>s.classList.toggle('sel',s.textContent.toLowerCase().startsWith(os)));document.getElementById('cmdLinux').style.display=os==='linux'?'block':'none';document.getElementById('cmdWin').style.display=os==='win'?'block':'none'}
 
-async function connect(){
-  if(port){keep=false;try{reader?.cancel();reader?.releaseLock()}catch(e){}try{await port.close()}catch(e){}port=null;reader=null;setStat(false,'Not connected');document.getElementById('btnConn').textContent='Connect CYD';document.getElementById('btnCal').disabled=true;return}
+// ── daemon check ──
+async function checkDaemon(){
+  try{let r=await fetch(DAEMON+'/ping');if(r.ok){daemonOk=true;document.getElementById('stDaemon').textContent='Daemon: ready';document.getElementById('stDaemon').className='ok';document.getElementById('setup').classList.remove('on');return}}
+  catch(e){}
+  daemonOk=false;document.getElementById('stDaemon').textContent='Daemon: not installed';document.getElementById('stDaemon').className='no';document.getElementById('setup').classList.add('on');
+}
+
+// ── CYD connect ──
+async function toggleCYD(){
+  if(port){keep=false;try{reader?.cancel();reader?.releaseLock()}catch(e){}try{await port.close()}catch(e){}port=null;reader=null;setCYD('no','not connected');document.getElementById('btnConn').textContent='Connect CYD';document.getElementById('btnCal').disabled=true;return}
+  await doConnect();
+}
+async function doConnect(p){
   try{
-    port=await navigator.serial.requestPort();
+    port=p||await navigator.serial.requestPort();
     await port.open({baudRate:115200});
-    setStat('wait','Connected');
+    setCYD('w','connected');
     document.getElementById('btnConn').textContent='Disconnect';
     document.getElementById('btnCal').disabled=false;
     keep=true;readLoop();
-  }catch(e){if(e.message.indexOf('cancel')<0)setStat(false,'Error: '+e.message)}
+  }catch(e){if(!e.message.includes('cancel'))setCYD('no','error: '+e.message)}
+}
+function setCYD(s,msg){document.getElementById('stCYD').textContent='CYD: '+msg;document.getElementById('stCYD').className=s}
+
+// ── auto-reconnect ──
+async function autoConnect(){
+  if(!navigator.serial)return;
+  let ports=await navigator.serial.getPorts();
+  if(ports.length)await doConnect(ports[0]);
 }
 
-function setStat(s,msg){
-  let el=document.getElementById('status');
-  el.textContent=msg;el.className='status '+s;
-}
-
+// ── read loop ──
 async function readLoop(){
   let buf='';
   while(port&&keep){
@@ -122,47 +153,45 @@ async function readLoop(){
         if(buf.length>2048)buf=buf.slice(-1024);
       }
     }catch(e){if(!e.message.includes('cancel'))console.log(e)}finally{try{reader?.releaseLock()}catch(e){}}
+    if(keep){setCYD('no','disconnected — click Connect');document.getElementById('btnConn').textContent='Connect CYD';document.getElementById('btnCal').disabled=true;port=null;keep=false;break}
     await new Promise(r=>setTimeout(r,50));
   }
 }
 
+// ── parse touch ──
 function parse(line){
-  let p=line.split(' '); if(p.length<3)return;
-  let x=parseInt(p[0]),y=parseInt(p[1]),z=parseInt(p[2]); if(isNaN(x))return;
+  let p=line.split(' ');if(p.length<3)return;
+  let x=parseInt(p[0]),y=parseInt(p[1]),z=parseInt(p[2]);if(isNaN(x))return;
   if(x>8000||y>8000||z===0)return;
   if(calStep>0){calTouch(x,y,z);return}
   document.getElementById('tbar').style.width='100%';clearTimeout(tbarTimer);tbarTimer=setTimeout(()=>document.getElementById('tbar').style.width='0',200);
-  let now=Date.now(); if(now-lastSent<COOLDOWN)return;
+  let now=Date.now();if(now-lastSent<COOLDOWN)return;
   for(let i=0;i<config.zones.length;i++){
     let zz=config.zones[i];
     if(x>=zz.x1&&x<=zz.x2&&y>=zz.y1&&y<=zz.y2){
       document.getElementById('c'+i)?.classList.add('flash');setTimeout(()=>document.getElementById('c'+i)?.classList.remove('flash'),250);
       if(zz.name!==lastZone||now-lastSent>1000){
         sendKeys(zz.keycodes||[]);lastZone=zz.name;lastSent=now;
-        setStat('on',`${zz.name} [x:${x} y:${y}]`);addLog(zz.name,x,y,kLabel(zz.keycodes));
+        setCYD('ok',`${zz.name} [x:${x} y:${y}]`);addLog(zz.name,x,y,kLabel(zz.keycodes));
       }
       return;
     }
   }
-  setStat('on',`x:${x} y:${y} (unmapped)`);addLog('?',x,y,'');
+  setCYD('ok',`x:${x} y:${y} (unmapped)`);addLog('?',x,y,'');
 }
-
 function addLog(nm,x,y,keys){
   let el=document.getElementById('log'),pre=document.getElementById('logPre');el.style.display='block';
-  let t=new Date().toLocaleTimeString();
-  pre.textContent=`[${t}] ${nm} x:${x} y:${y} ${keys}\n`+pre.textContent;
+  pre.textContent=`[${new Date().toLocaleTimeString()}] ${nm} x:${x} y:${y} ${keys}\n`+pre.textContent;
   let ls=pre.textContent.split('\n').filter(l=>l);if(ls.length>30)pre.textContent=ls.slice(0,30).join('\n');
 }
-
-async function sendKeys(cs){if(!cs||!cs.length)return;try{await fetch(DAEMON+'/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keys:cs})})}catch(e){}}
-
+async function sendKeys(cs){if(!cs||!cs.length||!daemonOk)return;try{await fetch(DAEMON+'/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keys:cs})})}catch(e){}}
 function copyLog(){navigator.clipboard.writeText(document.getElementById('logPre').textContent);toast('Copied')}
-function toast(m){let t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',1500)}
 
-function startCalib(){calStep=1;calPts=[];calBlock=Date.now()+800;setStat('wait','Tap TOP-LEFT corner');toast('Tap top-left')}
+// ── calibration ──
+function startCalib(){calStep=1;calPts=[];calBlock=Date.now()+800;setCYD('w','Tap TOP-LEFT corner');toast('Tap top-left')}
 function calTouch(x,y,z){if(Date.now()<calBlock)return;calPts.push({x,y});calBlock=Date.now()+800;
-  let corners=['TOP-LEFT','TOP-RIGHT','BOTTOM-RIGHT','BOTTOM-LEFT'];
-  if(calStep<4){calStep++;setStat('wait',`Tap ${corners[calStep-1]} (${calStep}/4)`);toast(`Now ${corners[calStep-1]}`)}else{calStep=0;finishCal()}}
+  let c=['TOP-LEFT','TOP-RIGHT','BOTTOM-RIGHT','BOTTOM-LEFT'];
+  if(calStep<4){calStep++;setCYD('w',`Tap ${c[calStep-1]} (${calStep}/4)`);toast(`Now ${c[calStep-1]}`)}else{calStep=0;finishCal()}}
 function finishCal(){
   let xs=calPts.map(p=>p.x),ys=calPts.map(p=>p.y),x1=Math.min(...xs),x2=Math.max(...xs),y1=Math.min(...ys),y2=Math.max(...ys);
   let xd=(x2-x1)/3,yd=(y2-y1)/3,m=Math.max(xd,yd)*0.15;
@@ -177,11 +206,11 @@ function finishCal(){
     {name:'RELOAD',x1:x1+xd-m,y1:y1+2*yd-m,x2:x1+2*xd+m,y2:y2+m,keycodes:[29,19]},
     {name:'FORWD',x1:x1+2*xd-m,y1:y1+2*yd-m,x2:x2+m,y2:y2+m,keycodes:[56,106]}
   ]};
-  save();setStat('on','Calibrated! Tap to test');toast('Done! Test buttons')
+  save();setCYD('ok','Calibrated! Tap to test');toast('Done! Test buttons')
 }
-
 function resetAll(){config={zones:DZONES.map(z=>({...z}))};save();toast('Defaults loaded')}
 
+// ── zone editor ──
 function openMod(i){editIdx=i;let z=config.zones[i];document.getElementById('eN').value=z.name;document.getElementById('eX1').value=z.x1;document.getElementById('eX2').value=z.x2;document.getElementById('eY1').value=z.y1;document.getElementById('eY2').value=z.y2;if(!z.keycodes)z.keycodes=[];renderTags();document.getElementById('modal').classList.add('on')}
 function closeModal(){document.getElementById('modal').classList.remove('on');editIdx=-1}
 function renderTags(){let cs=config.zones[editIdx].keycodes||[];document.getElementById('tags').innerHTML=cs.map((k,j)=>`<span class="tag">${kName(k)}<span class="x" onclick="delKey(${j})">&times;</span></span>`).join('')}
@@ -192,5 +221,5 @@ function buildKeys(){let s=document.getElementById('ksel');s.innerHTML='<option 
 function buildCombos(){let el=document.getElementById('combos');el.innerHTML='';for(let[n,ks]of COMBOS){let b=document.createElement('button');b.textContent=n;b.onclick=()=>{config.zones[editIdx].keycodes=[...ks];renderTags()};el.appendChild(b)}}
 function saveZone(){let z=config.zones[editIdx];z.name=document.getElementById('eN').value||'BTN';z.x1=parseInt(document.getElementById('eX1').value)||0;z.x2=parseInt(document.getElementById('eX2').value)||0;z.y1=parseInt(document.getElementById('eY1').value)||0;z.y2=parseInt(document.getElementById('eY2').value)||0;save();closeModal();toast('Saved')}
 
-load();render();buildKeys();buildCombos();
+load();render();buildKeys();buildCombos();checkDaemon();autoConnect();
 </script></body></html>
