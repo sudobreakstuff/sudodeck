@@ -1,0 +1,13 @@
+{
+  "zones": [
+    {"name": "PREV",    "x1": 0,    "y1": 0,    "x2": 1365, "y2": 1365,  "keys": ["XF86AudioPrev"]},
+    {"name": "PLAY",    "x1": 1366, "y1": 0,    "x2": 2730, "y2": 1365,  "keys": ["XF86AudioPlay"]},
+    {"name": "NEXT",    "x1": 2731, "y1": 0,    "x2": 4095, "y2": 1365,  "keys": ["XF86AudioNext"]},
+    {"name": "VOLUP",   "x1": 0,    "y1": 1366, "x2": 1365, "y2": 2730,  "keys": ["XF86AudioRaiseVolume"]},
+    {"name": "MUTE",    "x1": 1366, "y1": 1366,"x2": 2730, "y2": 2730,  "keys": ["XF86AudioMute"]},
+    {"name": "VOLDOWN", "x1": 2731, "y1": 1366,"x2": 4095, "y2": 2730,  "keys": ["XF86AudioLowerVolume"]},
+    {"name": "BACK",    "x1": 0,    "y1": 2731, "x2": 1365, "y2": 4095,  "keys": ["Alt_L", "Left"]},
+    {"name": "RELOAD",  "x1": 1366, "y1": 2731,"x2": 2730, "y2": 4095,  "keys": ["Control_L", "r"]},
+    {"name": "FORW",    "x1": 2731, "y1": 2731,"x2": 4095, "y2": 4095,  "keys": ["Alt_L", "Right"]}
+  ]
+}
