@@ -58,13 +58,36 @@ void setup() {
 
   tft.begin();
   tft.setRotation(2);
-  tft.fillScreen(TFT_DARKGREY);
-  tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
-  tft.setTextSize(2);
-  tft.drawString("CYD Controller", 30, 10);
+  tft.fillScreen(TFT_BLACK);
+  int cw = 106;
+  int rh = 80;
+
+  // Row 0: PREV, PLAY, NEXT
+  tft.fillRect(0, 0, cw, rh, TFT_RED);
+  tft.fillRect(cw, 0, cw, rh, TFT_GREEN);
+  tft.fillRect(cw*2, 0, cw, rh, TFT_BLUE);
+
+  // Row 1: VOLUP, MUTE, VOLDOWN
+  tft.fillRect(0, rh, cw, rh, TFT_ORANGE);
+  tft.fillRect(cw, rh, cw, rh, TFT_PURPLE);
+  tft.fillRect(cw*2, rh, cw, rh, TFT_CYAN);
+
+  // Row 2: BACK, RELOAD, FORW
+  tft.fillRect(0, rh*2, cw, rh, TFT_YELLOW);
+  tft.fillRect(cw, rh*2, cw, rh, TFT_PINK);
+  tft.fillRect(cw*2, rh*2, cw, rh, TFT_DARKGREEN);
+
+  tft.setTextColor(TFT_WHITE);
   tft.setTextSize(1);
-  tft.drawString("Touch to send commands", 20, 60);
-  tft.drawString("Configure at cyd.local", 40, 100);
+  tft.drawString("PREV", 25, 30);
+  tft.drawString("PLAY", 140, 30);
+  tft.drawString("NEXT", 255, 30);
+  tft.drawString("VOL+", 25, 110);
+  tft.drawString("MUTE", 140, 110);
+  tft.drawString("VOL-", 255, 110);
+  tft.drawString("BACK", 25, 190);
+  tft.drawString("RLD", 145, 190);
+  tft.drawString("FORW", 250, 190);
 
   Serial.println("CYD");
 }
