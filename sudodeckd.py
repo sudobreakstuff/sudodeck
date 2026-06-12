@@ -50,8 +50,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 data = json.loads(body)
                 keys = data.get("keys", [])
                 fire_keys(keys)
+                print(f"KEY: {keys}", flush=True)
                 return self._reply({"ok": True, "keys": keys})
             except Exception as e:
+                print(f"KEY ERR: {e}", flush=True)
                 return self._reply({"error": str(e)}, 500)
         self._reply({"error": "not found"}, 404)
 

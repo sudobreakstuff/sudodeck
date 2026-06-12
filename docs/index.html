@@ -72,9 +72,10 @@ header p{color:var(--muted);font-size:13px;margin-top:4px}
   <div class="grid" id="grid"></div>
 
   <div class="help">
-    <a href="#" onclick="showHelp(event)">Setup instructions</a> &bull;
-    <a href="#" onclick="exportConfig()">Export config</a> &bull;
-    <a href="#" onclick="importConfig()">Import config</a>
+    <a href="#" onclick="showHelp(event)">Setup</a> &bull;
+    <a href="#" onclick="resetAll()">Reset defaults</a> &bull;
+    <a href="#" onclick="exportConfig()">Export</a> &bull;
+    <a href="#" onclick="importConfig()">Import</a>
   </div>
 </div>
 
@@ -345,13 +346,12 @@ function processTouch(x,y,z){
         if(zz.name!==lastZone||now-lastSent>1000){
           sendKeystroke(zz.keycodes||[]);
           lastZone=zz.name;lastSent=now;
-          setStatus(true,`Touched: ${zz.name}`);
+          setStatus(true,`${zz.name} [${x},${y}] → ${keyLabel(zz.keycodes)}`);
         }
         return;
       }
     }
-    // no zone matched
-    setStatus(true,`Touch: ${x},${y} (unmapped)`);
+    setStatus(true,`${x},${y} (unmapped)`);
   }else{
     if(!touchTimeout)document.getElementById('touchBar').style.width='0';
   }
@@ -369,6 +369,14 @@ async function sendKeystroke(codes){
     setStatus(true,'Keystroke: install daemon (click Setup)');
     console.log('Daemon not reachable:',e.message);
   }
+}
+
+function resetAll(){
+  if(!confirm('Reset all buttons to factory defaults?'))return;
+  config={zones:DEFAULT_ZONES.map(z=>({...z}))};
+  saveConfig();
+  syncCYD();
+  toast('Reset to defaults');
 }
 
 function showHelp(e){
