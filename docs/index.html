@@ -134,20 +134,20 @@ const COMBOS=[
 ];
 
 const DEFAULT_ZONES=[
-  {name:"NEXT",x1:779,y1:2507,x2:1641,y2:3407,keycodes:[163]},
-  {name:"PLAY",x1:779,y1:1606,x2:1641,y2:2506,keycodes:[164]},
-  {name:"PREV",x1:779,y1:704,x2:1641,y2:1605,keycodes:[165]},
-  {name:"VOL-",x1:1642,y1:2507,x2:2503,y2:3407,keycodes:[114]},
-  {name:"MUTE",x1:1642,y1:1606,x2:2503,y2:2506,keycodes:[113]},
-  {name:"VOL+",x1:1642,y1:704,x2:2503,y2:1605,keycodes:[115]},
-  {name:"FORWD",x1:2504,y1:2507,x2:3381,y2:3407,keycodes:[56,106]},
-  {name:"RELOAD",x1:2504,y1:1606,x2:3381,y2:2506,keycodes:[29,19]},
-  {name:"BACK",x1:2504,y1:704,x2:3381,y2:1605,keycodes:[56,105]}
+  {name:"NEXT",x1:2380,y1:600,x2:3400,y2:1580,keycodes:[163]},
+  {name:"PLAY",x1:1550,y1:600,x2:2480,y2:1580,keycodes:[164]},
+  {name:"PREV",x1:700,y1:600,x2:1650,y2:1580,keycodes:[165]},
+  {name:"VOL-",x1:2380,y1:1530,x2:3400,y2:2480,keycodes:[114]},
+  {name:"MUTE",x1:1550,y1:1530,x2:2480,y2:2480,keycodes:[113]},
+  {name:"VOL+",x1:700,y1:1530,x2:1650,y2:2480,keycodes:[115]},
+  {name:"FORWD",x1:2380,y1:2430,x2:3400,y2:3380,keycodes:[56,106]},
+  {name:"RELOAD",x1:1550,y1:2430,x2:2480,y2:3380,keycodes:[29,19]},
+  {name:"BACK",x1:700,y1:2430,x2:1650,y2:3380,keycodes:[56,105]}
 ];
 
 function loadConfig(){
   try{
-    let raw=localStorage.getItem('sudodeck_config');
+    let raw=localStorage.getItem('sudodeck_v2');
     if(raw){config=JSON.parse(raw);return}
   }catch(e){}
   config={zones:DEFAULT_ZONES.map(z=>({...z}))};
@@ -155,7 +155,7 @@ function loadConfig(){
 }
 
 function saveConfig(){
-  localStorage.setItem('sudodeck_config',JSON.stringify(config));
+  localStorage.setItem('sudodeck_v2',JSON.stringify(config));
   renderGrid();
 }
 
