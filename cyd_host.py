@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-CYD Chrome Controller - Host Script
-Parses raw X Y touch coordinates from CYD and simulates keyboard shortcuts.
+CYD Controller Host
+Reads raw X Y touch coordinates from CYD and simulates keyboard shortcuts.
 """
 import serial
 import serial.tools.list_ports
@@ -9,56 +9,43 @@ import subprocess
 import time
 import sys
 import os
-
-CMD_MAP = {
-    "PLAY":    ["XF86AudioPlay"],
-    "NEXT":    ["XF86AudioNext"],
-    "PREV":    ["XF86AudioPrev"],
-    "VOLUP":   ["XF86AudioRaiseVolume"],
-    "VOLDOWN": ["XF86AudioLowerVolume"],
-    "MUTE":    ["XF86AudioMute"],
-    "BACK":    ["Alt_L", "Left"],
-    "FORW":    ["Alt_L", "Right"],
-    "RELOAD":  ["Control_L", "r"],
-    "HOME":    ["Alt_L", "Home"],
-    "NTAB":    ["Control_L", "t"],
-    "CTAB":    ["Control_L", "w"],
-    "FSCR":    ["F11"],
-}
-
-# 3x3 zone layout (top-left to bottom-right, in raw touch coords 0-4095)
-# Column 0: PREV, VOLUP, BACK
-# Column 1: PLAY, MUTE, RELOAD
-# Column 2: NEXT, VOLDOWN, FORW
-ZONES = [
-    ((0, 0),      (1365, 1365),   "PREV"),
-    ((1366, 0),   (2730, 1365),   "PLAY"),
-    ((2731, 0),   (4095, 1365),   "NEXT"),
-    ((0, 1366),   (1365, 2730),   "VOLUP"),
-    ((1366, 1366),(2730, 2730),   "MUTE"),
-    ((2731, 1366),(4095, 2730),   "VOLDOWN"),
-    ((0, 2731),   (1365, 4095),   "BACK"),
-    ((1366, 2731),(2730, 4095),   "RELOAD"),
-    ((2731, 2731),(4095, 4095),   "FORW"),
-]
+import json
 
 NO_TOUCH = 4095
 COOLDOWN = 0.3
+DEFAULT_CFG = {
+    "zones": [
+        {"name": "PREV",    "x1": 0,    "y1": 0,    "x2": 1365, "y2": 1365,  "keys": ["XF86AudioPrev"]},
+        {"name": "PLAY",    "x1": 1366, "y1": 0,    "x2": 2730, "y2": 1365,  "keys": ["XF86AudioPlay"]},
+        {"name": "NEXT",    "x1": 2731, "y1": 0,    "x2": 4095, "y2": 1365,  "keys": ["XF86AudioNext"]},
+        {"name": "VOLUP",   "x1": 0,    "y1": 1366, "x2": 1365, "y2": 2730,  "keys": ["XF86AudioRaiseVolume"]},
+        {"name": "MUTE",    "x1": 1366, "y1": 1366,"x2": 2730, "y2": 2730,  "keys": ["XF86AudioMute"]},
+        {"name": "VOLDOWN", "x1": 2731, "y1": 1366,"x2": 4095, "y2": 2730,  "keys": ["XF86AudioLowerVolume"]},
+        {"name": "BACK",    "x1": 0,    "y1": 2731, "x2": 1365, "y2": 4095,  "keys": ["Alt_L", "Left"]},
+        {"name": "RELOAD",  "x1": 1366, "y1": 2731,"x2": 2730, "y2": 4095,  "keys": ["Control_L", "r"]},
+        {"name": "FORW",    "x1": 2731, "y1": 2731,"x2": 4095, "y2": 4095,  "keys": ["Alt_L", "Right"]},
+    ]
+}
 
 def xdotool(keys):
     subprocess.run(["xdotool", "key"] + keys)
 
+def load_config():
+    config_path = os.path.join(os.path.dirname(__file__), "cyd_config.json")
+    if os.path.exists(config_path):
+        with open(config_path) as f:
+            return json.load(f)
+    return DEFAULT_CFG
+
 def check_display():
     if "DISPLAY" not in os.environ:
-        print("[!] No DISPLAY set.")
-        print("[!] Try: export DISPLAY=:0")
+        print("[!] No DISPLAY set. Run: export DISPLAY=:0")
         return False
     try:
-        subprocess.run(["xdotool", "getmouselocation"],
-                       capture_output=True, timeout=2)
+        subprocess.run(["xdotool", "getmouselocation"], capture_output=True, timeout=2)
         return True
     except Exception:
-        print("[!] xdotool not working. Is it installed?")
+        print("[!] xdotool not working. Install: sudo apt install xdotool")
         return False
 
 def find_port():
@@ -68,30 +55,32 @@ def find_port():
             return p.device
     return "/dev/ttyUSB0"
 
-def zone_for(x, y):
-    for (x1, y1), (x2, y2), name in ZONES:
-        if x1 <= x <= x2 and y1 <= y <= y2:
-            return name
+def zone_for(x, y, zones):
+    for z in zones:
+        if z["x1"] <= x <= z["x2"] and z["y1"] <= y <= z["y2"]:
+            return z
     return None
 
 def main():
-    print("CYD Chrome Controller")
+    print("CYD Controller Host v2")
     print("=" * 40)
 
     if not check_display():
         sys.exit(1)
 
-    port = find_port()
-    print(f"[*] Port: {port}")
+    cfg = load_config()
+    zones = cfg["zones"]
 
+    port = find_port()
     ser = serial.Serial(port, 115200, timeout=0.1)
     time.sleep(1)
     ser.reset_input_buffer()
-    print("[*] Connected. Touch the screen to control Chrome.")
-    print("[*] Press Ctrl+C to exit.\n")
+    print(f"[*] Port: {port}")
+    print(f"[*] {len(zones)} zones loaded")
 
-    last_cmd = ""
+    last_name = ""
     last_time = 0
+    was_touching = False
 
     try:
         while True:
@@ -100,32 +89,33 @@ def main():
                 lines = data.decode("utf-8", errors="ignore").split("\n")
                 for line in lines:
                     line = line.strip()
-                    if not line or "V" in line or "RDY" in line:
+                    if not line or line == "CYD":
                         continue
-
                     parts = line.split()
                     if len(parts) < 2:
                         continue
-
                     try:
                         x, y = int(parts[0]), int(parts[1])
                     except ValueError:
                         continue
 
-                    if x >= NO_TOUCH and y >= NO_TOUCH:
-                        continue
+                    touching = (x < NO_TOUCH) and (y < NO_TOUCH)
+                    is_fresh = touching and not was_touching
 
-                    now = time.time()
-                    if now - last_time < COOLDOWN:
-                        continue
+                    if is_fresh:
+                        now = time.time()
+                        if now - last_time < COOLDOWN:
+                            continue
+                        z = zone_for(x, y, zones)
+                        if z and z["name"] != last_name:
+                            print(f"  [{x:4d},{y:4d}] -> {z['name']}")
+                            xdotool(z["keys"])
+                            last_name = z["name"]
+                            last_time = now
 
-                    name = zone_for(x, y)
-                    if name and name != last_cmd:
-                        print(f"  [{x:4d},{y:4d}] -> {name}")
-                        xdotool(CMD_MAP[name])
-                        last_cmd = name
-                        last_time = now
-            time.sleep(0.01)
+                    was_touching = touching
+
+            time.sleep(0.005)
     except KeyboardInterrupt:
         print("\n[*] Exiting.")
     except serial.SerialException as e:
