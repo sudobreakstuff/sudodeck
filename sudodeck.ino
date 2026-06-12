@@ -6,9 +6,9 @@ TFT_eSPI tft;
 SPIClass touchSPI(VSPI);
 XPT2046_Touchscreen ts(33, 36);
 
-char n0[9]="NEXT", n1[9]="PLAY", n2[9]="PREV";
-char n3[9]="VOL-", n4[9]="MUTE", n5[9]="VOL+";
-char n6[9]="FORW", n7[9]="RLD",  n8[9]="BACK";
+char n0[9]="PREV", n1[9]="PLAY", n2[9]="NEXT";
+char n3[9]="VOL+", n4[9]="MUTE", n5[9]="VOL-";
+char n6[9]="BACK", n7[9]="RLD",  n8[9]="FORW";
 
 int cw=80, rh=106;
 
