@@ -1,8 +1,10 @@
-// SudoDeck - dedicated VSPI touch, no library crashes
+// SudoDeck - library touch with debounce
 #include <TFT_eSPI.h>
+#include <XPT2046_Touchscreen.h>
 #include <SPI.h>
 TFT_eSPI tft;
 SPIClass touchSPI(VSPI);
+XPT2046_Touchscreen ts(33, 36);
 
 char n0[9]="PREV", n1[9]="PLAY", n2[9]="NEXT";
 char n3[9]="VOL+", n4[9]="MUTE", n5[9]="VOL-";
@@ -27,36 +29,24 @@ void setup() {
   tft.fillRect(cw*2,rh*2,cw,rh,TFT_DARKGREEN); tft.drawString(n8,245,190);
 
   touchSPI.begin();
+  ts.begin(touchSPI);
   pinMode(33, OUTPUT);
   digitalWrite(33, HIGH);
   Serial.println("SDK");
 }
 
 void loop() {
-  touchSPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  static unsigned long last = 0;
+  unsigned long now = millis();
+  unsigned long diff = now - last;
+  if (diff < 40) { delay(5); return; }
+  last = now;
 
-  digitalWrite(33, LOW);
-  delayMicroseconds(5);
-  touchSPI.transfer(0xD3);
-  uint16_t x = (((uint16_t)touchSPI.transfer(0x00)) << 4);
-  x = x | (touchSPI.transfer(0x00) >> 4);
-  digitalWrite(33, HIGH);
-
-  delayMicroseconds(5);
-
-  digitalWrite(33, LOW);
-  delayMicroseconds(5);
-  touchSPI.transfer(0x93);
-  uint16_t y = (((uint16_t)touchSPI.transfer(0x00)) << 4);
-  y = y | (touchSPI.transfer(0x00) >> 4);
-  digitalWrite(33, HIGH);
-
-  touchSPI.endTransaction();
-
-  Serial.print(x);
+  TS_Point p = ts.getPoint();
+  Serial.print(p.x);
   Serial.print(" ");
-  Serial.print(y);
+  Serial.print(p.y);
   Serial.print(" ");
-  Serial.println(8190 - x - y);
-  delay(30);
+  Serial.println(p.z);
+  delay(5);
 }
