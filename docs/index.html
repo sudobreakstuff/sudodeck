@@ -155,13 +155,14 @@ function parse(line){
     let zz=config.zones[i];
     if(x>=zz.x1&&x<=zz.x2&&y>=zz.y1&&y<=zz.y2){
       document.getElementById('c'+i)?.classList.add('flash');setTimeout(()=>document.getElementById('c'+i)?.classList.remove('flash'),250);
-      if(zz.name!==lastZone||now-lastSent>1000){lastZone=zz.name;lastSent=now;addLog(zz.name,x,y,kLabel(zz.keys||zz.keycodes||[]))}
+      if(zz.name!==lastZone||now-lastSent>1000){lastZone=zz.name;lastSent=now;sendKeys(zz.keys||zz.keycodes||[]);addLog(zz.name,x,y,kLabel(zz.keys||zz.keycodes||[]))}
       return;
     }
   }
   addLog('?',x,y,'');
 }
 function addLog(nm,x,y,keys){let el=document.getElementById('log'),pre=document.getElementById('logPre');el.style.display='block';pre.textContent=`[${new Date().toLocaleTimeString()}] ${nm} x:${x} y:${y} ${keys}\n`+pre.textContent;let ls=pre.textContent.split('\n').filter(l=>l);if(ls.length>30)pre.textContent=ls.slice(0,30).join('\n')}
+async function sendKeys(cs){if(!cs||!cs.length)return;if(!daemonOk){checkDaemon();return}try{await fetch(DAEMON+'/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keys:cs})})}catch(e){daemonOk=false;checkDaemon()}}
 
 function startCalib(){calStep=1;calPts=[];calBlock=Date.now()+800;toast('Tap top-left corner');document.getElementById('stCYD').textContent='Tap TOP-LEFT';document.getElementById('stCYD').className='w'}
 function calTouch(x,y,z){if(Date.now()<calBlock)return;calPts.push({x,y});calBlock=Date.now()+800;
