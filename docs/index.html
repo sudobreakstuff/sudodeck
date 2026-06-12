@@ -64,6 +64,14 @@ header p{color:var(--muted);font-size:13px;margin-top:4px}
 
   <div class="touch-indicator"><div class="bar" id="touchBar"></div></div>
 
+  <div id="touchLog" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;margin-bottom:16px;font-size:11px;color:#aaa;min-height:28px;max-height:160px;overflow-y:auto;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="color:var(--accent);font-weight:bold">Touch Log</span>
+      <button onclick="copyLog()" style="background:var(--accent);color:#fff;border:none;padding:2px 8px;border-radius:3px;font-size:10px;cursor:pointer">Copy</button>
+    </div>
+    <pre id="logPre" style="margin:0;white-space:pre-wrap;word-break:break-all"></pre>
+  </div>
+
   <div class="status">
     <span class="dot off" id="statusDot"></span>
     <span id="statusText">Not connected</span>
@@ -346,13 +354,31 @@ function processTouch(x,y,z){
         if(zz.name!==lastZone||now-lastSent>1000){
           sendKeystroke(zz.keycodes||[]);
           lastZone=zz.name;lastSent=now;
-          setStatus(true,`${zz.name} [${x},${y}] → ${keyLabel(zz.keycodes)}`);
+          let msg=`${zz.name} [x:${x} y:${y}] → ${keyLabel(zz.keycodes)}`;
+          setStatus(true,msg);
+          addLog(msg);
         }
         return;
       }
     }
-    setStatus(true,`${x},${y} (unmapped — adjust zone)`);
+    let msg=`unmapped [x:${x} y:${y}]`;
+    setStatus(true,msg);
+    addLog(msg);
   }
+}
+
+function addLog(msg){
+  let el=document.getElementById('touchLog'),pre=document.getElementById('logPre');
+  el.style.display='block';
+  let t=new Date().toLocaleTimeString();
+  pre.textContent=`[${t}] ${msg}\n`+pre.textContent;
+  let lines=pre.textContent.split('\n').filter(l=>l);
+  if(lines.length>20) pre.textContent=lines.slice(0,20).join('\n');
+}
+
+function copyLog(){
+  navigator.clipboard.writeText(document.getElementById('logPre').textContent);
+  toast('Copied!');
 }
 
 async function sendKeystroke(codes){
