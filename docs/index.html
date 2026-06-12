@@ -24,6 +24,7 @@ header p{color:var(--muted);font-size:13px;margin-top:4px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
 .cell{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:16px 8px;cursor:pointer;text-align:center;transition:border-color .15s}
 .cell:hover{border-color:var(--accent)}
+.cell.flash{border-color:var(--green);box-shadow:0 0 16px rgba(63,185,80,.4)}
 .cell.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.2)}
 .cell.flash{border-color:var(--green);box-shadow:0 0 0 3px rgba(63,185,80,.25)}
 .cell .name{font-size:16px;font-weight:600;margin-bottom:2px}
@@ -339,20 +340,29 @@ async function readLoop(){
   }
 }
 
-let calibStep=0,calibTL=null,calibBR=null,calibBlock=0;
+let calibStep=0,calibPts=[],calibBlock=0;
+const CALIB_CORNERS=['TOP-LEFT','TOP-RIGHT','BOTTOM-RIGHT','BOTTOM-LEFT'];
 
 function startCalibrate(){
-  calibStep=1;calibTL=null;calibBR=null;calibBlock=Date.now()+500;
-  setStatus(true,'CALIBRATE: Tap TOP-LEFT corner');
-  toast('Tap top-left corner');
+  calibStep=1;calibPts=[];calibBlock=Date.now()+600;
+  setStatus(true,`Tap ${CALIB_CORNERS[0]}`);
+  toast(`Tap ${CALIB_CORNERS[0]}`);
 }
 
 function processTouch(x,y,z){
   if(calibStep>0){
     if(Date.now()<calibBlock)return;
     if(z===0)return;
-    if(calibStep===1){calibTL={x,y};calibStep=2;calibBlock=Date.now()+800;setStatus(true,'Now tap BOTTOM-RIGHT corner');toast('Now bottom-right');return}
-    if(calibStep===2){calibBR={x,y};calibStep=0;finishCalibrate();return}
+    calibPts.push({x,y});
+    calibBlock=Date.now()+800;
+    if(calibStep<4){
+      calibStep++;
+      setStatus(true,`Tap ${CALIB_CORNERS[calibStep-1]} (${calibStep}/4)`);
+      toast(`Now ${CALIB_CORNERS[calibStep-1]}`);
+    }else{
+      calibStep=0;
+      finishCalibrate();
+    }
     return;
   }
   if(z>0){
@@ -419,18 +429,19 @@ function resetAll(){
 }
 
 function finishCalibrate(){
-  let x1=calibTL.x,x2=calibBR.x,y1=calibTL.y,y2=calibBR.y;
-  let xd=(x2-x1)/3,yd=(y2-y1)/3;
+  let xs=calibPts.map(p=>p.x),ys=calibPts.map(p=>p.y);
+  let x1=Math.min(...xs),x2=Math.max(...xs),y1=Math.min(...ys),y2=Math.max(...ys);
+  let xd=(x2-x1)/3,yd=(y2-y1)/3,m=30;
   config={zones:[
-    {name:"PREV",x1:x1-100,y1:y1-100,x2:x1+xd+100,y2:y1+yd+100,keycodes:[165]},
-    {name:"PLAY",x1:x1+xd-100,y1:y1-100,x2:x1+2*xd+100,y2:y1+yd+100,keycodes:[164]},
-    {name:"NEXT",x1:x1+2*xd-100,y1:y1-100,x2:x2+100,y2:y1+yd+100,keycodes:[163]},
-    {name:"VOL+",x1:x1-100,y1:y1+yd-100,x2:x1+xd+100,y2:y1+2*yd+100,keycodes:[115]},
-    {name:"MUTE",x1:x1+xd-100,y1:y1+yd-100,x2:x1+2*xd+100,y2:y1+2*yd+100,keycodes:[113]},
-    {name:"VOL-",x1:x1+2*xd-100,y1:y1+yd-100,x2:x2+100,y2:y1+2*yd+100,keycodes:[114]},
-    {name:"BACK",x1:x1-100,y1:y1+2*yd-100,x2:x1+xd+100,y2:y2+100,keycodes:[56,105]},
-    {name:"RELOAD",x1:x1+xd-100,y1:y1+2*yd-100,x2:x1+2*xd+100,y2:y2+100,keycodes:[29,19]},
-    {name:"FORWD",x1:x1+2*xd-100,y1:y1+2*yd-100,x2:x2+100,y2:y2+100,keycodes:[56,106]}
+    {name:"PREV",x1:x1-m,y1:y1-m,x2:x1+xd+m,y2:y1+yd+m,keycodes:[165]},
+    {name:"PLAY",x1:x1+xd-m,y1:y1-m,x2:x1+2*xd+m,y2:y1+yd+m,keycodes:[164]},
+    {name:"NEXT",x1:x1+2*xd-m,y1:y1-m,x2:x2+m,y2:y1+yd+m,keycodes:[163]},
+    {name:"VOL+",x1:x1-m,y1:y1+yd-m,x2:x1+xd+m,y2:y1+2*yd+m,keycodes:[115]},
+    {name:"MUTE",x1:x1+xd-m,y1:y1+yd-m,x2:x1+2*xd+m,y2:y1+2*yd+m,keycodes:[113]},
+    {name:"VOL-",x1:x1+2*xd-m,y1:y1+yd-m,x2:x2+m,y2:y1+2*yd+m,keycodes:[114]},
+    {name:"BACK",x1:x1-m,y1:y1+2*yd-m,x2:x1+xd+m,y2:y2+m,keycodes:[56,105]},
+    {name:"RELOAD",x1:x1+xd-m,y1:y1+2*yd-m,x2:x1+2*xd+m,y2:y2+m,keycodes:[29,19]},
+    {name:"FORWD",x1:x1+2*xd-m,y1:y1+2*yd-m,x2:x2+m,y2:y2+m,keycodes:[56,106]}
   ]};
   saveConfig();
   setStatus(true,'Calibrated! Tap buttons to test');
