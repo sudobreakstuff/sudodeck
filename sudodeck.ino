@@ -1,4 +1,4 @@
-// SudoDeck - library touch with debounce
+// SudoDeck - proven working config from earlier today
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 #include <SPI.h>
@@ -12,12 +12,9 @@ char n6[9]="BACK", n7[9]="RLD",  n8[9]="FORW";
 int cw=106, rh=80;
 
 void setup() {
-  Serial.begin(115200);
-  delay(200);
-  tft.begin();
-  tft.setRotation(1);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE); tft.setTextSize(1);
+  Serial.begin(115200);delay(200);
+  tft.begin();tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);tft.setTextColor(TFT_WHITE);tft.setTextSize(1);
   tft.fillRect(0,0,cw,rh,TFT_RED);        tft.drawString(n0,28,30);
   tft.fillRect(cw,0,cw,rh,TFT_GREEN);      tft.drawString(n1,134,30);
   tft.fillRect(cw*2,0,cw,rh,TFT_BLUE);     tft.drawString(n2,240,30);
@@ -27,26 +24,14 @@ void setup() {
   tft.fillRect(0,rh*2,cw,rh,TFT_YELLOW);   tft.drawString(n6,28,190);
   tft.fillRect(cw,rh*2,cw,rh,TFT_PINK);    tft.drawString(n7,140,190);
   tft.fillRect(cw*2,rh*2,cw,rh,TFT_DARKGREEN); tft.drawString(n8,245,190);
-
-  touchSPI.begin();
+  touchSPI.begin(25, 39, 32, 33);
   ts.begin(touchSPI);
-  pinMode(33, OUTPUT);
-  digitalWrite(33, HIGH);
+  pinMode(33,OUTPUT);digitalWrite(33,HIGH);
   Serial.println("SDK");
 }
 
 void loop() {
-  static unsigned long last = 0;
-  unsigned long now = millis();
-  unsigned long diff = now - last;
-  if (diff < 40) { delay(5); return; }
-  last = now;
-
-  TS_Point p = ts.getPoint();
-  Serial.print(p.x);
-  Serial.print(" ");
-  Serial.print(p.y);
-  Serial.print(" ");
-  Serial.println(p.z);
-  delay(5);
+  TS_Point p=ts.getPoint();
+  Serial.print(p.x);Serial.print(" ");Serial.print(p.y);Serial.print(" ");Serial.println(p.z);
+  delay(30);
 }
