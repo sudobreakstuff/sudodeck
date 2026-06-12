@@ -1,60 +1,51 @@
 #!/usr/bin/env bash
-# SudoDeck one-line installer
-# curl -sSL https://sudobreakstuff.github.io/sudodeck/install.sh | bash
 set -e
-
 echo "=== SudoDeck Installer ==="
 
-# 1. Install ydotool
+# ydotool
 if ! command -v ydotool &>/dev/null; then
   echo "Installing ydotool..."
-  sudo apt-get update -qq
-  sudo apt-get install -y ydotool
+  sudo apt-get update -qq && sudo apt-get install -y ydotool
   sudo usermod -aG input "$USER"
-  echo "NOTE: Log out and back in for input group to take effect."
+  echo "NOTE: log out and back in for input group"
 fi
 
-# 2. Ensure /dev/uinput is writable (udev rule)
+# uinput permissions
 if ! [ -w /dev/uinput ]; then
-  echo "Setting up uinput permissions..."
   echo 'KERNEL=="uinput", MODE="0666"' | sudo tee /etc/udev/rules.d/99-uinput.rules >/dev/null
-  sudo udevadm control --reload-rules
-  sudo udevadm trigger
+  sudo udevadm control --reload-rules && sudo udevadm trigger
   sudo chmod 666 /dev/uinput 2>/dev/null || true
 fi
 
-# 3. Copy daemon
+# sudodeck daemon
 mkdir -p ~/.local/bin
 cp "$(dirname "$0")/sudodeckd.py" ~/.local/bin/sudodeckd 2>/dev/null || true
 chmod +x ~/.local/bin/sudodeckd
 
-# 4. Create systemd user service
+# systemd user service
 mkdir -p ~/.config/systemd/user
-cat > ~/.config/systemd/user/sudodeckd.service << 'UNIT'
+cat > ~/.config/systemd/user/sudodeck.service << 'UNIT'
 [Unit]
-Description=SudoDeck keystroke daemon
+Description=SudoDeck touch daemon
 After=default.target
 
 [Service]
 ExecStart=%h/.local/bin/sudodeckd
 Restart=on-failure
-RestartSec=2
+RestartSec=3
 
 [Install]
 WantedBy=default.target
 UNIT
 
-# 5. Start daemon
 systemctl --user daemon-reload
-systemctl --user enable --now sudodeckd.service
+systemctl --user enable --now sudodeck.service
 
-# 6. Start ydotoold if not running
+# ydotoold
 pgrep ydotoold &>/dev/null || {
   ydotoold --socket-path="${XDG_RUNTIME_DIR}/.ydotool_socket" &
   sleep 0.5
 }
 
-echo ""
-echo "Done! SudoDeck is running."
-echo "Open https://sudobreakstuff.github.io/sudodeck in Chrome/Edge"
-echo "Connect your CYD and tap the screen."
+echo "Done. SudoDeck runs permanently in the background."
+echo "Open https://sudobreakstuff.github.io/sudodeck to configure."
