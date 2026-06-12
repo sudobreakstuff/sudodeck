@@ -1,102 +1,50 @@
 # SudoDeck
 
-A web-configurable touch macro pad built on the ESP32-2432S028R "Cheap Yellow Display" (CYD). Nine touch zones send configurable keystrokes to your computer — no terminal needed after initial setup.
+Web-configurable touch macro pad for the ESP32-2432S028R "Cheap Yellow Display" (CYD).
+
+**[sudobreakstuff.github.io/sudodeck](https://sudobreakstuff.github.io/sudodeck)**
+
+## Setup
+
+```bash
+curl -sSL https://sudobreakstuff.github.io/sudodeck/install.sh | bash
+```
+
+Then open **[the web app](https://sudobreakstuff.github.io/sudodeck)** in Chrome/Edge, connect your CYD, and configure.
 
 ## How it works
 
 ```
-┌─────────────┐     USB Serial     ┌──────────────┐     ydotool
-│  CYD (ESP32) │ ──── touch X/Y ──▷ │  sudodeck.py │ ──── keystrokes ──▷ OS
-└─────────────┘                    │  (localhost)  │
-                                   │ web :8090     │
-                                   └──────────────┘
-                                         │
-                                   ┌─────▼──────┐
-                                   │  Browser    │
-                                   │ config UI   │
-                                   └────────────┘
+┌──────────────┐  Web Serial API  ┌──────────────────┐  localhost:8091  ┌───────────┐
+│ Browser (UI) │ ◀── touch X/Y ──  │ CYD (ESP32+CH340)│                 │ sudodeckd │── ydotool ──▷ OS
+│ GitHub Pages │                  │ USB Serial        │                 │ (daemon)  │
+└──────────────┘                  └───────────────────┘                 └───────────┘
 ```
 
-The CYD streams raw touch coordinates over USB. `sudodeck.py` runs on your laptop, reads the serial data, maps touches to zones, and fires keystrokes via ydotool. Open `http://localhost:8090` in any browser to change button mappings — no restart required.
+The browser talks directly to the CYD via Web Serial API. When a touch lands in a configured zone, it sends the keycodes to a tiny local daemon which fires the keystrokes via ydotool.
 
 ## Requirements
 
-### Hardware
-- **ESP32-2432S028R** (Cheap Yellow Display / CYD) — ILI9341 display + XPT2046 touch
-- USB-C cable (data capable)
+- **Chrome or Edge** (Web Serial API support)
+- **ESP32-2432S028R** CYD with firmware flashed
+- **Linux** with Wayland (ydotool)
+- The one-liner above installs everything else
 
-### Laptop
-- **Linux** with Wayland (tested on Ubuntu 26.04)
-- Python 3.x with `pyserial`
-- `ydotool` for keystroke injection
-
-## Quick start
-
-### 1. Flash the CYD firmware
-
-```bash
-# Install Arduino CLI and ESP32 support first:
-#   arduino-cli core install esp32:esp32
-# Then flash:
-arduino-cli compile --fqbn esp32:esp32:esp32 sudodeck.ino
-arduino-cli upload --fqbn esp32:esp32:esp32 --port /dev/ttyUSB0 sudodeck.ino
-```
-
-### 2. Install dependencies
-
-```bash
-sudo apt install ydotool
-pip install pyserial
-```
-
-### 3. Start SudoDeck
-
-```bash
-python3 sudodeck.py
-```
-
-That's it. The server starts on port 8090 and the touch listener connects to the CYD automatically.
-
-### 4. Configure buttons
-
-Open **http://localhost:8090** — tap any button in the 3×3 grid to edit its name, touch zone boundaries, and keycodes. Save changes instantly; no restart needed.
-
-## Button layout
-
-```
-┌─────────┬─────────┬─────────┐
-│  PREV   │  PLAY   │  NEXT   │
-├─────────┼─────────┼─────────┤
-│  VOL+   │  MUTE   │  VOL-   │
-├─────────┼─────────┼─────────┤
-│  BACK   │ RELOAD  │  FORW   │
-└─────────┴─────────┴─────────┘
-```
-
-All nine zones are fully configurable from the web UI — labels, boundaries, and key sequences.
-
-## File reference
+## Files
 
 | File | Purpose |
 |------|---------|
-| `sudodeck.ino` | ESP32 firmware (display + touch reader) |
-| `sudodeck.py` | Host script (web server + touch listener + keystroke engine) |
-| `sudodeck_config.json` | Zone definitions and key mappings |
-| `sudodeck_host.py` | Standalone touch listener (no web UI, legacy) |
+| `docs/index.html` | Web app (GitHub Pages) |
+| `docs/install.sh` | One-liner installer |
+| `sudodeckd.py` | Keystroke daemon |
+| `sudodeck.ino` | ESP32 firmware |
+| `sudodeck_config.json` | Default zone config |
 
-## Troubleshooting
+## Firmware
 
-**Nothing happens when I tap**
-- Is the CYD connected via USB? Check `ls /dev/ttyUSB*`
-- Is `ydotoold` running? `pgrep ydotoold`
-- Check the log: `cat sudodeck.log`
+Flash the CYD once:
 
-**Port 8090 already in use**
-- `fuser -k 8090/tcp` then restart
-
-**Buttons fire wrong actions**
-- Open http://localhost:8090 and check zone boundaries — tap different spots and note the X/Y values in the log
-
-**CYD shows blank screen**
-- Power-cycle the CYD (unplug/replug USB)
-- Re-flash the firmware
+```bash
+arduino-cli compile --fqbn esp32:esp32:esp32 sudodeck.ino
+arduino-cli upload --fqbn esp32:esp32:esp32 --port /dev/ttyUSB0 sudodeck.ino
+```

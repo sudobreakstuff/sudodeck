@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SudoDeck</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#58a6ff;--danger:#f85149;--green:#3fb950;--text:#c9d1d9;--muted:#8b949e;--radius:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:560px;margin:0 auto;padding:24px 16px}
+header{text-align:center;margin-bottom:24px}
+header h1{font-size:28px;font-weight:600;letter-spacing:-0.5px}
+header p{color:var(--muted);font-size:13px;margin-top:4px}
+.status{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;font-size:13px}
+.status .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status .dot.off{background:var(--danger)}
+.status .dot.on{background:var(--green)}
+.status .dot.wait{background:#d2991d;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.connect-btn{display:block;width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:20px}
+.connect-btn:hover{opacity:.9}
+.connect-btn:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+.cell{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:16px 8px;cursor:pointer;text-align:center;transition:border-color .15s}
+.cell:hover{border-color:var(--accent)}
+.cell.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.2)}
+.cell.flash{border-color:var(--green);box-shadow:0 0 0 3px rgba(63,185,80,.25)}
+.cell .name{font-size:16px;font-weight:600;margin-bottom:2px}
+.cell .keys{font-size:10px;color:var(--muted)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:480px;max-width:90vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:18px;margin-bottom:16px;text-align:center}
+.modal label{display:block;color:var(--muted);font-size:11px;margin:8px 0 3px;text-transform:uppercase;letter-spacing:.5px}
+.modal input,.modal select{width:100%;padding:8px 10px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:14px}
+.modal .row{display:flex;gap:8px}
+.modal .row>div{flex:1}
+.key-tags{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;min-height:28px}
+.key-tag{display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:#fff;padding:3px 8px;border-radius:4px;font-size:11px}
+.key-tag .remove{cursor:pointer;font-weight:bold;margin-left:2px;opacity:.7}
+.key-tag .remove:hover{opacity:1}
+.combo-btn{display:block;width:100%;padding:6px;margin:4px 0;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;cursor:pointer;text-align:left}
+.combo-btn:hover{border-color:var(--accent)}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.modal-btns button{flex:1;padding:10px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer}
+.btn-save{background:var(--accent);color:#fff}
+.btn-cancel{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:10px 20px;border-radius:var(--radius);font-weight:600;font-size:13px;z-index:200;display:none}
+.help{text-align:center;color:var(--muted);font-size:11px;margin-top:24px;border-top:1px solid var(--border);padding-top:16px}
+.help a{color:var(--accent)}
+.touch-indicator{height:4px;background:var(--card);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.touch-indicator .bar{height:100%;width:0;background:var(--green);transition:width .3s}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>SudoDeck</h1>
+    <p>web-configurable touch controller</p>
+  </header>
+
+  <button class="connect-btn" id="connectBtn" onclick="connect()">Connect CYD</button>
+
+  <div class="touch-indicator"><div class="bar" id="touchBar"></div></div>
+
+  <div class="status">
+    <span class="dot off" id="statusDot"></span>
+    <span id="statusText">Not connected</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="help">
+    <a href="#" onclick="showHelp(event)">Setup instructions</a> &bull;
+    <a href="#" onclick="exportConfig()">Export config</a> &bull;
+    <a href="#" onclick="importConfig()">Import config</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>Edit Zone</h3>
+    <label>Name</label>
+    <input id="eName" placeholder="Button name">
+    <div class="row">
+      <div><label>X Min</label><input id="eX1" type="number"></div>
+      <div><label>X Max</label><input id="eX2" type="number"></div>
+      <div><label>Y Min</label><input id="eY1" type="number"></div>
+      <div><label>Y Max</label><input id="eY2" type="number"></div>
+    </div>
+    <label>Keystrokes</label>
+    <div class="key-tags" id="keyTags"></div>
+    <select id="keySelect"><option value="">+ Add key</option></select>
+    <div id="comboBtns"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveZone()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAEMON = 'http://localhost:8091';
+let port=null,reader=null,writeStream=null,keepReading=false;
+let config=null,editIdx=-1,touchTimeout=null;
+let lastSent=0,lastZone='';
+const COOLDOWN=300;
+
+const KEYDB={
+  "Media":[["VolUp",115],["VolDown",114],["Mute",113],["Play/Pause",164],["Prev",165],["Next",163],["Stop",166]],
+  "Modifiers":[["Ctrl",29],["Alt",56],["Shift",42],["Super",125]],
+  "Navigation":[["Up",103],["Down",108],["Left",105],["Right",106],["Home",102],["End",107],["PgUp",104],["PgDown",109],["Tab",15],["Esc",1],["Enter",28],["Space",57],["Bksp",14],["Del",111]],
+  "Letters":Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map((c,i)=>{return[c,c.charCodeAt(0)-65+30]}),
+  "Numbers":Array.from({length:10},(_,i)=>{return[String(i),i+1]})
+};
+
+const COMBOS=[
+  ["Alt+Left (Back)",[56,105]],["Alt+Right (Fwd)",[56,106]],["Ctrl+R (Reload)",[29,19]],
+  ["Ctrl+T (New Tab)",[29,20]],["Ctrl+W (Close)",[29,25]],["Ctrl+F (Find)",[29,33]],
+  ["Ctrl+C (Copy)",[29,46]],["Ctrl+V (Paste)",[29,47]],["Ctrl+Z (Undo)",[29,44]],
+  ["Ctrl+Shift+T",[29,42,20]],["Super/Meta",[125]]
+];
+
+const DEFAULT_ZONES=[
+  {name:"PREV",x1:780,y1:660,x2:1600,y2:1530,keycodes:[165]},
+  {name:"PLAY",x1:1601,y1:660,x2:2430,y2:1530,keycodes:[164]},
+  {name:"NEXT",x1:2431,y1:660,x2:3275,y2:1530,keycodes:[163]},
+  {name:"VOL+",x1:780,y1:1531,x2:1600,y2:2410,keycodes:[115]},
+  {name:"MUTE",x1:1601,y1:1531,x2:2430,y2:2410,keycodes:[113]},
+  {name:"VOL-",x1:2431,y1:1531,x2:3275,y2:2410,keycodes:[114]},
+  {name:"BACK",x1:780,y1:2411,x2:1600,y2:3325,keycodes:[56,105]},
+  {name:"RELOAD",x1:1601,y1:2411,x2:2430,y2:3325,keycodes:[29,19]},
+  {name:"FORWD",x1:2431,y1:2411,x2:3275,y2:3325,keycodes:[56,106]}
+];
+
+function loadConfig(){
+  try{
+    let raw=localStorage.getItem('sudodeck_config');
+    if(raw){config=JSON.parse(raw);return}
+  }catch(e){}
+  config={zones:DEFAULT_ZONES.map(z=>({...z}))};
+  saveConfig();
+}
+
+function saveConfig(){
+  localStorage.setItem('sudodeck_config',JSON.stringify(config));
+  renderGrid();
+}
+
+function renderGrid(){
+  document.getElementById('grid').innerHTML=config.zones.map((z,i)=>`<div class="cell" onclick="openZone(${i})" id="cell${i}"><div class="name">${z.name}</div><div class="keys">${keyLabel(z.keycodes)}</div></div>`).join('');
+}
+
+function keyLabel(codes){
+  if(!codes||!codes.length)return'--';
+  return codes.map(k=>{for(let g in KEYDB)for(let[n,c]of KEYDB[g])if(c===k)return n;return'#'+k}).join('+');
+}
+
+function openZone(i){
+  editIdx=i;let z=config.zones[i];
+  document.getElementById('eName').value=z.name;
+  document.getElementById('eX1').value=z.x1;
+  document.getElementById('eX2').value=z.x2;
+  document.getElementById('eY1').value=z.y1;
+  document.getElementById('eY2').value=z.y2;
+  if(!z.keycodes)z.keycodes=[];
+  renderKeyTags();
+  buildKeySelect();
+  buildComboBtns();
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+  editIdx=-1;
+}
+
+function renderKeyTags(){
+  let kc=config.zones[editIdx].keycodes||[];
+  document.getElementById('keyTags').innerHTML=kc.map((k,j)=>`<span class="key-tag">${keyName(k)}<span class="remove" onclick="removeKey(${j})">&times;</span></span>`).join('');
+}
+
+function removeKey(j){
+  config.zones[editIdx].keycodes.splice(j,1);
+  renderKeyTags();
+}
+
+function keyName(k){
+  for(let g in KEYDB)for(let[n,c]of KEYDB[g])if(c===k)return n;
+  return'#'+k;
+}
+
+function buildKeySelect(){
+  let s=document.getElementById('keySelect');
+  s.innerHTML='<option value="">+ Add key</option>';
+  for(let g in KEYDB){
+    let grp=document.createElement('optgroup');
+    grp.label=g;
+    for(let[n,k]of KEYDB[g]){
+      let o=document.createElement('option');
+      o.value=k;o.textContent=`${n} (${k})`;
+      grp.appendChild(o);
+    }
+    s.appendChild(grp);
+  }
+}
+
+function buildComboBtns(){
+  let el=document.getElementById('comboBtns');
+  el.innerHTML='';
+  for(let[n,keys]of COMBOS){
+    let b=document.createElement('button');
+    b.className='combo-btn';
+    b.textContent=n;
+    b.onclick=()=>{config.zones[editIdx].keycodes=[...keys];renderKeyTags()};
+    el.appendChild(b);
+  }
+}
+
+document.getElementById('keySelect').onchange=function(){
+  let v=parseInt(this.value);
+  if(v>=0){config.zones[editIdx].keycodes.push(v);renderKeyTags();this.value=''}
+};
+
+function saveZone(){
+  let z=config.zones[editIdx];
+  z.name=document.getElementById('eName').value||'BTN';
+  z.x1=parseInt(document.getElementById('eX1').value)||0;
+  z.x2=parseInt(document.getElementById('eX2').value)||0;
+  z.y1=parseInt(document.getElementById('eY1').value)||0;
+  z.y2=parseInt(document.getElementById('eY2').value)||0;
+  saveConfig();
+  closeModal();
+  toast('Saved');
+}
+
+function toast(msg){
+  let t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',1500);
+}
+
+function setStatus(on,msg){
+  let dot=document.getElementById('statusDot'),txt=document.getElementById('statusText');
+  dot.className='dot '+(on==='wait'?'wait':on?'on':'off');
+  txt.textContent=msg;
+}
+
+async function connect(){
+  if(port){
+    await disconnect();
+  }
+  try{
+    port=await navigator.serial.requestPort({filters:[{usbVendorId:0x1a86}]});
+    await port.open({baudRate:115200});
+    setStatus('wait','Connected, reading...');
+    document.getElementById('connectBtn').textContent='Disconnect';
+    keepReading=true;
+    readLoop();
+  }catch(e){
+    if(e.message!=='No port selected by the user.'){
+      setStatus(false,'Error: '+e.message);
+    }
+    port=null;
+  }
+}
+
+async function disconnect(){
+  keepReading=false;
+  try{reader?.cancel()}catch(e){}
+  try{reader?.releaseLock()}catch(e){}
+  try{await port?.close()}catch(e){}
+  port=null;reader=null;
+  setStatus(false,'Not connected');
+  document.getElementById('connectBtn').textContent='Connect CYD';
+}
+
+async function readLoop(){
+  let buf='';
+  while(port?.readable&&keepReading){
+    try{
+      reader=port.readable.getReader();
+      while(keepReading){
+        let{value,done}=await reader.read();
+        if(done)break;
+        if(!value)continue;
+        buf+=new TextDecoder().decode(value);
+        let idx;
+        while((idx=buf.indexOf('\n'))>=0){
+          let line=buf.slice(0,idx).trim();
+          buf=buf.slice(idx+1);
+          if(!line)continue;
+          let parts=line.split(' ');
+          if(parts.length<3)continue;
+          let x=parseInt(parts[0]),y=parseInt(parts[1]),z=parseInt(parts[2]);
+          if(isNaN(x))continue;
+          processTouch(x,y,z);
+        }
+        if(buf.length>4096)buf=buf.slice(-2048);
+      }
+    }catch(e){
+      if(e.message.includes('cancel'))break;
+      console.error('Read error:',e);
+    }finally{
+      try{reader?.releaseLock()}catch(e){}
+    }
+    await new Promise(r=>setTimeout(r,100));
+  }
+}
+
+function processTouch(x,y,z){
+  if(z>0){
+    document.getElementById('touchBar').style.width='100%';
+    clearTimeout(touchTimeout);
+    touchTimeout=setTimeout(()=>document.getElementById('touchBar').style.width='0',200);
+    let now=Date.now();
+    if(now-lastSent<COOLDOWN)return;
+    for(let i=0;i<config.zones.length;i++){
+      let zz=config.zones[i];
+      if(x>=zz.x1&&x<=zz.x2&&y>=zz.y1&&y<=zz.y2){
+        document.getElementById('cell'+i)?.classList.add('flash');
+        setTimeout(()=>document.getElementById('cell'+i)?.classList.remove('flash'),200);
+        if(zz.name!==lastZone||now-lastSent>1000){
+          sendKeystroke(zz.keycodes||[]);
+          lastZone=zz.name;lastSent=now;
+          setStatus(true,`Touched: ${zz.name}`);
+        }
+        return;
+      }
+    }
+    // no zone matched
+    setStatus(true,`Touch: ${x},${y} (unmapped)`);
+  }else{
+    if(!touchTimeout)document.getElementById('touchBar').style.width='0';
+  }
+}
+
+async function sendKeystroke(codes){
+  if(!codes||!codes.length)return;
+  try{
+    await fetch(DAEMON+'/key',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({keys:codes})
+    });
+  }catch(e){
+    setStatus(true,'Keystroke: install daemon (click Setup)');
+    console.log('Daemon not reachable:',e.message);
+  }
+}
+
+function showHelp(e){
+  e.preventDefault();
+  alert(`Setup (one-time):\n\n1. Open terminal, run:\n   curl -sSL https://sudobreakstuff.github.io/sudodeck/install.sh | bash\n\n2. Connect CYD via USB\n\n3. Click "Connect CYD" above\n   Select the CH340 serial device\n\n4. Tap the CYD — keystrokes work!\n\n5. Click any button above to configure\n   its zone and key bindings.`);
+}
+
+function exportConfig(){
+  let blob=new Blob([JSON.stringify(config,null,2)],{type:'application/json'});
+  let a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='sudodeck_config.json';
+  a.click();
+  toast('Config downloaded');
+}
+
+function importConfig(){
+  let inp=document.createElement('input');
+  inp.type='file';inp.accept='.json';
+  inp.onchange=()=>{
+    let f=inp.files[0];
+    if(!f)return;
+    let r=new FileReader();
+    r.onload=()=>{
+      try{
+        config=JSON.parse(r.result);
+        saveConfig();
+        toast('Config imported');
+      }catch(e){toast('Invalid file');}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+// init
+loadConfig();
+renderGrid();
+buildKeySelect();
+
+// check daemon
+fetch(DAEMON+'/ping').then(r=>r.ok&&setStatus(false,'Daemon ready — connect CYD')).catch(()=>{});
+</script>
+</body>
+</html>
