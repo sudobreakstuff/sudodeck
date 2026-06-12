@@ -233,16 +233,7 @@ async function saveZone(){
   z.y1=parseInt(document.getElementById('eY1').value)||0;
   z.y2=parseInt(document.getElementById('eY2').value)||0;
   saveConfig();
-  // Send to CYD if connected
-  if(port?.writable){
-    try{
-      const writer=port.writable.getWriter();
-      let name=z.name.slice(0,8);
-      let cmd='U'+editIdx+':'+name+'\n';
-      await writer.write(new TextEncoder().encode(cmd));
-      writer.releaseLock();
-    }catch(e){}
-  }
+  await syncCYD();
   closeModal();
   toast('Saved');
 }
@@ -259,6 +250,23 @@ function setStatus(on,msg){
   txt.textContent=msg;
 }
 
+async function syncCYD(){
+  if(!port?.writable)return;
+  try{
+    const writer=port.writable.getWriter();
+    let frame='S';
+    for(let i=0;i<9;i++){
+      let nm=(config.zones[i].name||'BTN').slice(0,8);
+      while(nm.length<8)nm+=' ';
+      frame+=nm;
+    }
+    frame+='\n';
+    await writer.write(new TextEncoder().encode(frame));
+    writer.releaseLock();
+    setStatus(true,'Connected & synced');
+  }catch(e){setStatus(true,'Connected (no write)')}
+}
+
 async function connect(){
   if(port){
     await disconnect();
@@ -270,21 +278,7 @@ async function connect(){
     document.getElementById('connectBtn').textContent='Disconnect';
     keepReading=true;
     readLoop();
-    // Get writer and send current zone names to CYD
-    if(port.writable){
-      const writer=port.writable.getWriter();
-      let encoder=new TextEncoder();
-      for(let i=0;i<config.zones.length;i++){
-        let name=(config.zones[i].name||'').slice(0,8);
-        let cmd='U'+i+':'+name+'\n';
-        await writer.write(encoder.encode(cmd));
-        await new Promise(r=>setTimeout(r,30));
-      }
-      writer.releaseLock();
-      setStatus(true,'Connected — CYD synced');
-    }else{
-      setStatus(true,'Connected (read-only)');
-    }
+    await syncCYD();
   }catch(e){
     if(e.message!=='No port selected by the user.'){
       setStatus(false,'Error: '+e.message);
