@@ -80,8 +80,8 @@ header p{color:var(--muted);font-size:13px;margin-top:4px}
   <div class="grid" id="grid"></div>
 
   <div class="help">
-    <a href="#" onclick="showHelp(event)">Setup</a> &bull;
-    <a href="#" onclick="resetAll()">Reset defaults</a> &bull;
+    <a href="#" onclick="startCalibrate()">Calibrate</a> &bull;
+    <a href="#" onclick="resetAll()">Defaults</a> &bull;
     <a href="#" onclick="exportConfig()">Export</a> &bull;
     <a href="#" onclick="importConfig()">Import</a>
   </div>
@@ -322,10 +322,10 @@ async function readLoop(){
           buf=buf.slice(idx+1);
           if(!line)continue;
           let parts=line.split(' ');
-          if(parts.length<3)continue;
-          let x=parseInt(parts[0]),y=parseInt(parts[1]),z=parseInt(parts[2]);
+          if(parts.length<2)continue;
+          let x=parseInt(parts[0]),y=parseInt(parts[1]);
           if(isNaN(x))continue;
-          processTouch(x,y,z);
+          processTouch(x,y);
         }
         if(buf.length>4096)buf=buf.slice(-2048);
       }
@@ -339,8 +339,22 @@ async function readLoop(){
   }
 }
 
-function processTouch(x,y,z){
-  if(z>0){
+let calibStep=0,calibTL=null,calibBR=null;
+
+function startCalibrate(){
+  calibStep=1;calibTL=null;calibBR=null;
+  setStatus(true,'CALIBRATE: Tap TOP-LEFT corner');
+  toast('Tap top-left corner');
+}
+
+function processTouch(x,y){
+  if(calibStep>0){
+    if(calibStep===1){calibTL={x,y};calibStep=2;setStatus(true,'CALIBRATE: Now tap BOTTOM-RIGHT corner');toast('Now bottom-right');return}
+    if(calibStep===2){calibBR={x,y};calibStep=0;finishCalibrate();return}
+    return;
+  }
+  let touching=(x<4000&&y<4000);
+  if(touching){
     document.getElementById('touchBar').style.width='100%';
     clearTimeout(touchTimeout);
     touchTimeout=setTimeout(()=>{document.getElementById('touchBar').style.width='0';setStatus(true,`Idle: ${x},${y}`)},300);
@@ -401,6 +415,25 @@ function resetAll(){
   saveConfig();
   syncCYD();
   toast('Reset to defaults');
+}
+
+function finishCalibrate(){
+  let x1=calibTL.x,x2=calibBR.x,y1=calibTL.y,y2=calibBR.y;
+  let xd=(x2-x1)/3,yd=(y2-y1)/3;
+  config={zones:[
+    {name:"PREV",x1:x1-100,y1:y1-100,x2:x1+xd+100,y2:y1+yd+100,keycodes:[165]},
+    {name:"PLAY",x1:x1+xd-100,y1:y1-100,x2:x1+2*xd+100,y2:y1+yd+100,keycodes:[164]},
+    {name:"NEXT",x1:x1+2*xd-100,y1:y1-100,x2:x2+100,y2:y1+yd+100,keycodes:[163]},
+    {name:"VOL+",x1:x1-100,y1:y1+yd-100,x2:x1+xd+100,y2:y1+2*yd+100,keycodes:[115]},
+    {name:"MUTE",x1:x1+xd-100,y1:y1+yd-100,x2:x1+2*xd+100,y2:y1+2*yd+100,keycodes:[113]},
+    {name:"VOL-",x1:x1+2*xd-100,y1:y1+yd-100,x2:x2+100,y2:y1+2*yd+100,keycodes:[114]},
+    {name:"BACK",x1:x1-100,y1:y1+2*yd-100,x2:x1+xd+100,y2:y2+100,keycodes:[56,105]},
+    {name:"RELOAD",x1:x1+xd-100,y1:y1+2*yd-100,x2:x1+2*xd+100,y2:y2+100,keycodes:[29,19]},
+    {name:"FORWD",x1:x1+2*xd-100,y1:y1+2*yd-100,x2:x2+100,y2:y2+100,keycodes:[56,106]}
+  ]};
+  saveConfig();
+  setStatus(true,'Calibrated! Tap buttons to test');
+  toast('Done! Tap to test');
 }
 
 function showHelp(e){

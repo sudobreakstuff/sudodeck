@@ -1,21 +1,28 @@
-// SudoDeck - simple touch reader (known working base)
+// SudoDeck - stable firmware, direct SPI, no library crashes
 #include <TFT_eSPI.h>
-#include <XPT2046_Touchscreen.h>
 #include <SPI.h>
 TFT_eSPI tft;
 SPIClass touchSPI(VSPI);
-XPT2046_Touchscreen ts(33, 36);
 
 char n0[9]="PREV", n1[9]="PLAY", n2[9]="NEXT";
 char n3[9]="VOL+", n4[9]="MUTE", n5[9]="VOL-";
 char n6[9]="BACK", n7[9]="RLD",  n8[9]="FORW";
-
 int cw=80, rh=106;
+
+uint16_t readXPT(uint8_t cmd) {
+  touchSPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  digitalWrite(33, LOW);
+  touchSPI.transfer(cmd);
+  uint8_t hi = touchSPI.transfer(0x00);
+  uint8_t lo = touchSPI.transfer(0x00);
+  digitalWrite(33, HIGH);
+  touchSPI.endTransaction();
+  return (((uint16_t)hi) << 4) | (lo >> 4);
+}
 
 void drawAll() {
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(1);
+  tft.setTextColor(TFT_WHITE); tft.setTextSize(1);
   tft.fillRect(0,0,cw,rh,TFT_RED);      tft.drawString(n0,18,45);
   tft.fillRect(80,0,cw,rh,TFT_GREEN);    tft.drawString(n1,105,45);
   tft.fillRect(160,0,cw,rh,TFT_BLUE);    tft.drawString(n2,192,45);
@@ -30,22 +37,20 @@ void drawAll() {
 void setup() {
   Serial.begin(115200);
   delay(200);
-
   tft.begin();
   tft.setRotation(0);
-
   touchSPI.begin(25, 39, 32, 33);
-  ts.begin(touchSPI);
   pinMode(33, OUTPUT);
   digitalWrite(33, HIGH);
-
   drawAll();
+  Serial.println("SDK");
 }
 
 void loop() {
-  TS_Point p = ts.getPoint();
-  Serial.print(p.x); Serial.print(" ");
-  Serial.print(p.y); Serial.print(" ");
-  Serial.println(p.z);
+  uint16_t x = readXPT(0xD0);
+  uint16_t y = readXPT(0x90);
+  Serial.print(x);
+  Serial.print(" ");
+  Serial.println(y);
   delay(10);
 }
