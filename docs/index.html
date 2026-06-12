@@ -335,7 +335,7 @@ function processTouch(x,y,z){
   if(z>0){
     document.getElementById('touchBar').style.width='100%';
     clearTimeout(touchTimeout);
-    touchTimeout=setTimeout(()=>document.getElementById('touchBar').style.width='0',200);
+    touchTimeout=setTimeout(()=>{document.getElementById('touchBar').style.width='0';setStatus(true,`Idle: ${x},${y}`)},300);
     let now=Date.now();
     if(now-lastSent<COOLDOWN)return;
     for(let i=0;i<config.zones.length;i++){
@@ -351,9 +351,7 @@ function processTouch(x,y,z){
         return;
       }
     }
-    setStatus(true,`${x},${y} (unmapped)`);
-  }else{
-    if(!touchTimeout)document.getElementById('touchBar').style.width='0';
+    setStatus(true,`${x},${y} (unmapped — adjust zone)`);
   }
 }
 
