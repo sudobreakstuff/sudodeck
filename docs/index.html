@@ -129,9 +129,8 @@ async function readLoop(){
 function parse(line){
   let p=line.split(' '); if(p.length<3)return;
   let x=parseInt(p[0]),y=parseInt(p[1]),z=parseInt(p[2]); if(isNaN(x))return;
+  if(z===0||z>3500)return;
   if(calStep>0){calTouch(x,y,z);return}
-  if(z===0)return;
-  if(z>3500)return;
   document.getElementById('tbar').style.width='100%';clearTimeout(tbarTimer);tbarTimer=setTimeout(()=>document.getElementById('tbar').style.width='0',200);
   let now=Date.now(); if(now-lastSent<COOLDOWN)return;
   for(let i=0;i<config.zones.length;i++){
@@ -161,7 +160,7 @@ function copyLog(){navigator.clipboard.writeText(document.getElementById('logPre
 function toast(m){let t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',1500)}
 
 function startCalib(){calStep=1;calPts=[];calBlock=Date.now()+800;setStat('wait','Tap TOP-LEFT corner');toast('Tap top-left')}
-function calTouch(x,y,z){if(Date.now()<calBlock||z===0)return;calPts.push({x,y});calBlock=Date.now()+800;
+function calTouch(x,y,z){if(Date.now()<calBlock||z===0||z>3500)return;calPts.push({x,y});calBlock=Date.now()+800;
   let corners=['TOP-LEFT','TOP-RIGHT','BOTTOM-RIGHT','BOTTOM-LEFT'];
   if(calStep<4){calStep++;setStat('wait',`Tap ${corners[calStep-1]} (${calStep}/4)`);toast(`Now ${corners[calStep-1]}`)}else{calStep=0;finishCal()}}
 function finishCal(){
