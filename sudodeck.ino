@@ -37,7 +37,7 @@ void loop() {
 
   digitalWrite(33, LOW);
   delayMicroseconds(5);
-  touchSPI.transfer(0xD0);
+  touchSPI.transfer(0xD3);
   uint16_t x = (((uint16_t)touchSPI.transfer(0x00)) << 4);
   x = x | (touchSPI.transfer(0x00) >> 4);
   digitalWrite(33, HIGH);
@@ -46,7 +46,7 @@ void loop() {
 
   digitalWrite(33, LOW);
   delayMicroseconds(5);
-  touchSPI.transfer(0x90);
+  touchSPI.transfer(0x93);
   uint16_t y = (((uint16_t)touchSPI.transfer(0x00)) << 4);
   y = y | (touchSPI.transfer(0x00) >> 4);
   digitalWrite(33, HIGH);
