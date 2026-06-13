@@ -1,8 +1,25 @@
 # SudoDeck
 
-**turns a $10 CYD display into a wireless macro deck. no subscriptions, no proprietary software, no bullshit.**
+<h1 align="center">
+  <br>
+  <a href="https://sudobreakstuff.github.io/sudodeck"><img src="https://sudobreakstuff.github.io/sudodeck/assets/logo.svg" alt="SudoDeck" width="200"></a>
+  <br>
+  SudoDeck
+  <br>
+</h1>
 
-built by **shahid singh**
+<h4 align="center">A $10 CYD display turned into a wireless macro deck — no subscriptions, no proprietary software, no bullshit.</h4>
+
+<p align="center">
+  <a href="https://sudobreakstuff.github.io/sudodeck">🌐 Web Config</a> •
+  <a href="#building-the-firmware">🔧 Build</a> •
+  <a href="#configure">⚙️ Configure</a> •
+  <a href="#license">📜 License</a>
+</p>
+
+<p align="center">
+  <strong>built by <a href="https://github.com/sudobreakstuff">shahid singh</a></strong>
+</p>
 
 ---
 
@@ -21,7 +38,7 @@ SudoDeck is a bluetooth macro keyboard built on a CYD (Cheap Yellow Display — 
 - **zero host setup** — pair once via bluetooth, works forever
 - **fully configurable** — edit buttons, labels, colors, actions from your browser
 - **self-contained** — all config lives on the device's flash memory. unplug it, take it anywhere
-- **open source** — modify it, remix it, build your own
+- **open source** — MIT licensed. modify it, remix it, build your own
 
 ---
 
