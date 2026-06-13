@@ -242,6 +242,13 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; saver_timeout = DEFAULT_TIMEOUT; if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
+  else if (!strcmp(cmd,"set_saver_preset")) {
+    const char* p = req["preset"]|"";
+    if (strcmp(p,"snake") && strcmp(p,"matrix") && strcmp(p,"circuit") && strcmp(p,"heart") && strcmp(p,"sudotext"))
+      { s_err("bad preset"); return; }
+    gen_saver_preset(p);
+    JsonDocument r; r["preset"] = p; s_ok(r);
+  }
   else if (!strcmp(cmd,"set_saver")) {
     int t = req["timeout"]|DEFAULT_TIMEOUT;
     if (t >= 5 && t <= 600) {
@@ -457,6 +464,77 @@ void load_saver_img() {
   if (!saver_img) { f.close(); return; }
   f.read((uint8_t*)saver_img, sz);
   f.close();
+}
+
+uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
+  return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+}
+
+void save_sprite_to_saver(TFT_eSprite& spr) {
+  if (saver_img) free(saver_img);
+  int sz = SAVER_W * SAVER_H * 2;
+  saver_img = (uint16_t*)malloc(sz);
+  if (!saver_img) return;
+  memcpy(saver_img, (uint16_t*)spr.getPointer(), sz);
+  fs::File f = SPIFFS.open("/saver.img", "w");
+  if (f) { f.write((uint8_t*)saver_img, sz); f.close(); }
+}
+
+void gen_saver_preset(const char* name) {
+  TFT_eSprite spr(&tft);
+  spr.setColorDepth(16);
+  spr.createSprite(SAVER_W, SAVER_H);
+  uint16_t bg = rgb565(10, 14, 23);
+  uint16_t fg = rgb565(0, 255, 136);
+  uint16_t wh = rgb565(200, 214, 229);
+  spr.fillSprite(bg);
+
+  if (!strcmp(name, "matrix")) {
+    for (int col = 0; col < 12; col++) {
+      for (int row = 0; row < 12; row++) {
+        if (random(10) > 4) continue;
+        int g = 40 + random(180);
+        spr.drawPixel(col * 4 + 2, row * 4 + 2, rgb565(0, g, 0));
+      }
+    }
+  } else if (!strcmp(name, "circuit")) {
+    for (int i = 0; i < 12; i++) {
+      int x1 = random(SAVER_W), y1 = random(SAVER_H);
+      int x2 = i + 1 < 12 ? random(SAVER_W) : SAVER_W / 2;
+      int y2 = i + 1 < 12 ? random(SAVER_H) : SAVER_H / 2;
+      spr.drawLine(x1, y1, x2, y2, fg);
+      spr.fillCircle(x1, y1, 1, fg);
+    }
+  } else if (!strcmp(name, "heart")) {
+    int cx = SAVER_W / 2, cy = SAVER_H / 2;
+    for (int y = -cy + 4; y < cy - 4; y++) {
+      for (int x = -cx; x < cx; x++) {
+        float fx = (float)x / (cx - 6) * 2.0, fy = (float)(y - 4) / (cy - 8) * 2.0;
+        float h = fx * fx + (fy - sqrt(fabs(fx))) * (fy - sqrt(fabs(fx))) * 0.6;
+        if (h < 1.0) spr.drawPixel(x + cx, y + cy, fg);
+      }
+    }
+  } else if (!strcmp(name, "sudotext")) {
+    spr.setTextColor(fg, bg);
+    spr.setTextSize(1);
+    spr.setCursor(6, 14);
+    spr.print("SUDO");
+  } else {
+    // snake (default)
+    int cx = SAVER_W / 2, cy = SAVER_H / 2;
+    for (int i = 0; i < 7; i++) {
+      float t = (float)i / 6.0 * 2.0 * PI;
+      int x = cx + (int)(14.0 * sin(t));
+      int y = cy - 8 + i * 5;
+      spr.fillCircle(x, y, 4, fg);
+    }
+    spr.fillCircle(cx, cy, 7, wh);
+    spr.fillCircle(cx + 4, cy - 2, 2, bg);
+    spr.fillCircle(cx + 4, cy + 2, 2, bg);
+  }
+
+  save_sprite_to_saver(spr);
+  spr.deleteSprite();
 }
 
 void enter_saver() {

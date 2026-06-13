@@ -1290,9 +1290,7 @@ document.addEventListener('mousemove', function(e) {
 // Screensaver
 var __saverHex = null;
 var SW = 48, SH = 48;
-function genCanvas(w, h) {
-  var c = document.createElement('canvas'); c.width = w; c.height = h; return c;
-}
+var presets = {snake:1, matrix:1, circuit:1, heart:1, sudotext:1};
 function canvToHex(c) {
   var d = c.getContext('2d').getImageData(0, 0, c.width, c.height);
   var hex = '';
@@ -1303,65 +1301,6 @@ function canvToHex(c) {
   }
   return hex;
 }
-function presetSnake() {
-  var c = genCanvas(SW, SH), ctx = c.getContext('2d');
-  var cx = SW/2, cy = SH/2;
-  ctx.fillStyle = '#0a0e17'; ctx.fillRect(0, 0, SW, SH);
-  for(var i = 0; i < 7; i++) {
-    var t = i / 6 * Math.PI * 2;
-    var x = cx + 14 * Math.sin(t), y = cy - 8 + i * 5;
-    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fillStyle = '#00ff88'; ctx.fill();
-  }
-  ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2); ctx.fillStyle = '#c8d6e5'; ctx.fill();
-  ctx.fillStyle = '#0a0e17';
-  ctx.beginPath(); ctx.arc(cx + 5, cy - 3, 2.5, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(cx + 5, cy + 3, 2.5, 0, Math.PI * 2); ctx.fill();
-  return canvToHex(c);
-}
-function presetMatrix() {
-  var c = genCanvas(SW, SH), ctx = c.getContext('2d');
-  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, SW, SH);
-  ctx.font = '6px monospace'; ctx.textAlign = 'center';
-  for(var col = 0; col < 12; col++) {
-    for(var row = 0; row < 12; row++) {
-      if(Math.random() > 0.6) continue;
-      var ch = String.fromCharCode(0x30A0 + Math.random() * 96);
-      var br = Math.floor(Math.random() * 180) + 40;
-      ctx.fillStyle = 'rgb(0,'+br+',0)'; ctx.fillText(ch, col*4+2, row*4+4);
-    }
-  }
-  return canvToHex(c);
-}
-function presetCircuit() {
-  var c = genCanvas(SW, SH), ctx = c.getContext('2d');
-  ctx.fillStyle = '#0a0e17'; ctx.fillRect(0, 0, SW, SH);
-  ctx.strokeStyle = '#00ff88'; ctx.lineWidth = 0.8;
-  var pts = [];
-  for(var i = 0; i < 12; i++) pts.push({x:Math.random()*SW, y:Math.random()*SH});
-  ctx.beginPath();
-  for(var i = 0; i < pts.length; i+=2) ctx.moveTo(pts[i].x, pts[i].y), ctx.lineTo(pts[i+1]?pts[i+1].x:SW/2, pts[i+1]?pts[i+1].y:SH/2);
-  ctx.stroke();
-  pts.forEach(function(p) { ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fillStyle='#00ff88'; ctx.fill(); });
-  return canvToHex(c);
-}
-function presetHeart() {
-  var c = genCanvas(SW, SH), ctx = c.getContext('2d');
-  ctx.fillStyle = '#0a0e17'; ctx.fillRect(0, 0, SW, SH);
-  ctx.fillStyle = '#00ff88';
-  ctx.beginPath(); ctx.moveTo(24, 38+Math.random()*2);
-  ctx.bezierCurveTo(6, 16, 2, 8, 24, 8+Math.random()*2);
-  ctx.bezierCurveTo(46, 8, 42, 16, 24, 38+Math.random()*2);
-  ctx.fill();
-  return canvToHex(c);
-}
-function presetSudoText() {
-  var c = genCanvas(SW, SH), ctx = c.getContext('2d');
-  ctx.fillStyle = '#0a0e17'; ctx.fillRect(0, 0, SW, SH);
-  ctx.fillStyle = '#00ff88'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('SUDO', SW/2, SH/2);
-  return canvToHex(c);
-}
-var presets = {snake:presetSnake, matrix:presetMatrix, circuit:presetCircuit, heart:presetHeart, sudotext:presetSudoText};
 document.getElementById('saverToggle').addEventListener('click', function() {
   var b = document.getElementById('saverBody');
   b.classList.toggle('open');
@@ -1398,12 +1337,11 @@ document.getElementById('saverFileInput').addEventListener('change', function(e)
   r.readAsDataURL(f);
   document.getElementById('saverPreset').value = '';
 });
-document.getElementById('btnSaverPresetApply').addEventListener('click', function() {
+document.getElementById('btnSaverPresetApply').addEventListener('click', async function() {
   var p = document.getElementById('saverPreset').value;
   if(!p || !presets[p]) { tm('Select a preset', 'ng'); return; }
-  var hex = presets[p]();
-  if(!dw) { __saverHex = hex; document.getElementById('saverEmpty').style.display = 'none'; document.getElementById('saverFname').textContent = p + ' preset'; tm('Preset generated. Click Upload to send to CYD.'); return; }
-  doSaverUpload(hex, p);
+  if(!dw) { tm('Connect to CYD first', 'ng'); return; }
+  try { var r = await sc({cmd:'set_saver_preset',preset:p}); if(r&&r.error) { tm('Preset error: '+r.error,'ng'); return; } tm('Preset: '+p); saverSync(); } catch(e) { tm('Preset command failed','ng'); }
 });
 function doSaverUpload(hex, label) {
   __saverHex = hex;
