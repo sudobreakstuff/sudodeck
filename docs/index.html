@@ -886,6 +886,8 @@
             <label>Mode</label>
             <select id="saverMode" style="flex:1">
               <option value="matrix">Matrix Rain</option>
+              <option value="particles">Particles</option>
+              <option value="stars">Stars</option>
               <option value="image">Bouncing Image</option>
             </select>
             <button class="btn pri" id="btnSaverModeSet" style="margin-left:auto">Set</button>
@@ -1075,7 +1077,7 @@ document.getElementById('btnRead').addEventListener('click', async function() {
 });
 document.getElementById('btnWrite').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
-  try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { tm('CYD error: '+r.error, 'ng'); return; } tm('Written to CYD'); } catch(e) { tm('Write failed', 'ng'); }
+  try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { console.log('Write ERR:',r); var s = r.got||''; tm('CYD: '+r.error+' (len:'+r.len+') "'+s.substring(0,60)+'"', 'ng'); return; } tm('Written to CYD'); } catch(e) { tm('Write failed', 'ng'); }
 });
 document.getElementById('btnExport').addEventListener('click', function() {
   var b = new Blob([JSON.stringify(cd,null,2)], {type:'application/json'});
@@ -1304,7 +1306,7 @@ async function saverSync() {
   if(!dw) return;
   try { var r = await sc({cmd:'get_saver'}); 
     document.getElementById('saverTimeout').value = r.timeout || 30;
-    document.getElementById('saverHint').textContent = r.timeout + 's' + (r.mode||'matrix');
+    document.getElementById('saverHint').textContent = r.timeout + 's ' + (r.mode||'matrix');
     if(r.mode) document.getElementById('saverMode').value = r.mode;
     document.getElementById('saverImgArea').style.display = r.mode === 'image' ? 'flex' : 'none';
   } catch(e) {}
@@ -1342,6 +1344,7 @@ document.getElementById('btnSaverModeSet').addEventListener('click', async funct
 document.getElementById('saverMode').addEventListener('change', function() {
   document.getElementById('saverImgArea').style.display = this.value === 'image' ? 'flex' : 'none';
 });
+document.getElementById('saverImgArea').style.display = 'none';
 function doSaverUpload(hex, label) {
   __saverHex = hex;
   document.getElementById('saverEmpty').style.display = 'none';

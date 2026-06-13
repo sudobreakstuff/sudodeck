@@ -45,7 +45,9 @@ int nav_dot_x = 0;
 #define SAVER_H 48
 #define DEFAULT_TIMEOUT 30
 #define SAVER_MATRIX 0
-#define SAVER_IMAGE 1
+#define SAVER_PARTICLES 1
+#define SAVER_STARS 2
+#define SAVER_IMAGE 3
 
 int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
@@ -56,6 +58,8 @@ uint16_t* saver_img = nullptr;
 float saver_x, saver_y, saver_vx, saver_vy;
 // Matrix rain state
 struct { int8_t x, y, len, spd; char ch[16]; } saver_drops[20];
+struct { float x, y, vx, vy; uint8_t life; } saver_parts[25];
+struct { uint8_t x, y, br; } saver_stars[40];
 unsigned long saver_last_frame = 0;
 
 JsonDocument config;
@@ -215,7 +219,7 @@ void apply_cfg() {
   int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
   if (t >= 5 && t <= 600) saver_timeout = t;
   int sm = config["saver"]["mode"]|SAVER_MATRIX;
-  if (sm == SAVER_MATRIX || sm == SAVER_IMAGE) saver_mode = sm;
+  if (sm >= SAVER_MATRIX && sm <= SAVER_IMAGE) saver_mode = sm;
 }
 
 void s_ok(JsonDocument& r) { r["ok"]=true; serializeJson(r,Serial); Serial.println(); }
@@ -261,6 +265,8 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"set_saver_mode")) {
     const char* m = req["mode"]|"";
     if (!strcmp(m,"matrix")) saver_mode = SAVER_MATRIX;
+    else if (!strcmp(m,"particles")) saver_mode = SAVER_PARTICLES;
+    else if (!strcmp(m,"stars")) saver_mode = SAVER_STARS;
     else if (!strcmp(m,"image")) saver_mode = SAVER_IMAGE;
     else { s_err("bad mode"); return; }
     config["saver"]["mode"] = saver_mode;
@@ -278,7 +284,10 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_saver")) {
     JsonDocument r; r["timeout"] = saver_timeout;
-    r["mode"] = saver_mode == SAVER_MATRIX ? "matrix" : "image";
+    if (saver_mode == SAVER_PARTICLES) r["mode"] = "particles";
+    else if (saver_mode == SAVER_STARS) r["mode"] = "stars";
+    else if (saver_mode == SAVER_IMAGE) r["mode"] = "image";
+    else r["mode"] = "matrix";
     r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");
     s_ok(r);
   }
@@ -558,7 +567,24 @@ void gen_saver_preset(const char* name) {
 
 void enter_saver() {
   saver_active = true;
-  if (saver_mode == SAVER_MATRIX) {
+  if (saver_mode == SAVER_PARTICLES) {
+    for (int i = 0; i < 25; i++) {
+      saver_parts[i].x = random(SCR_W);
+      saver_parts[i].y = random(SCR_H);
+      float a = (float)random(0, 628) / 100.0;
+      saver_parts[i].vx = cos(a) * 0.5;
+      saver_parts[i].vy = sin(a) * 0.3;
+      saver_parts[i].life = 50 + random(100);
+    }
+    saver_last_frame = millis();
+  } else if (saver_mode == SAVER_STARS) {
+    for (int i = 0; i < 40; i++) {
+      saver_stars[i].x = random(SCR_W);
+      saver_stars[i].y = random(SCR_H);
+      saver_stars[i].br = 30 + random(200);
+    }
+    saver_last_frame = millis();
+  } else if (saver_mode == SAVER_MATRIX) {
     for (int i = 0; i < 20; i++) {
       saver_drops[i].x = 1 + random(SCR_W / 6 - 2);
       saver_drops[i].y = -random(30);
@@ -584,7 +610,38 @@ void exit_saver() {
 }
 
 void draw_saver() {
-  if (saver_mode == SAVER_MATRIX) {
+  unsigned long now = millis();
+  if (saver_mode == SAVER_PARTICLES) {
+    if (now - saver_last_frame < 40) return;
+    saver_last_frame = now;
+    tft.fillScreen(C_BG);
+    for (int i = 0; i < 25; i++) {
+      saver_parts[i].x += saver_parts[i].vx;
+      saver_parts[i].y += saver_parts[i].vy;
+      if (saver_parts[i].x < -5 || saver_parts[i].x > SCR_W + 5) saver_parts[i].vx = -saver_parts[i].vx;
+      if (saver_parts[i].y < -5 || saver_parts[i].y > SCR_H + 5) saver_parts[i].vy = -saver_parts[i].vy;
+      saver_parts[i].life--;
+      if (saver_parts[i].life == 0) {
+        float a = (float)random(0, 628) / 100.0;
+        saver_parts[i].vx = cos(a) * 0.5;
+        saver_parts[i].vy = sin(a) * 0.3;
+        saver_parts[i].life = 80 + random(120);
+      }
+      int br = map(saver_parts[i].life, 0, 200, 20, 220);
+      if (br < 20) br = 20;
+      tft.fillCircle((int)saver_parts[i].x, (int)saver_parts[i].y, 2, rgb565(0, br, 0));
+    }
+  } else if (saver_mode == SAVER_STARS) {
+    if (now - saver_last_frame < 100) return;
+    saver_last_frame = now;
+    tft.fillScreen(C_BG);
+    for (int i = 0; i < 40; i++) {
+      saver_stars[i].br += random(-10, 11);
+      if (saver_stars[i].br < 20) saver_stars[i].br = 20;
+      if (saver_stars[i].br > 240) saver_stars[i].br = 240;
+      tft.drawPixel(saver_stars[i].x, saver_stars[i].y, rgb565(0, saver_stars[i].br, 0));
+    }
+  } else if (saver_mode == SAVER_MATRIX) {
     unsigned long now = millis();
     if (now - saver_last_frame < 60) return;
     saver_last_frame = now;
