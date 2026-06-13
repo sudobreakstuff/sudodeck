@@ -44,12 +44,19 @@ int nav_dot_x = 0;
 #define SAVER_W 48
 #define SAVER_H 48
 #define DEFAULT_TIMEOUT 30
+#define SAVER_MATRIX 0
+#define SAVER_IMAGE 1
 
+int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
 int saver_timeout = DEFAULT_TIMEOUT;
 unsigned long last_touch_ms = 0;
 uint16_t* saver_img = nullptr;
+// Image bounce state
 float saver_x, saver_y, saver_vx, saver_vy;
+// Matrix rain state
+struct { int8_t x, y, len, spd; char ch[16]; } saver_drops[20];
+unsigned long saver_last_frame = 0;
 
 JsonDocument config;
 String serial_buf;
@@ -207,6 +214,8 @@ void apply_cfg() {
   if (page >= num_pages) page = 0;
   int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
   if (t >= 5 && t <= 600) saver_timeout = t;
+  int sm = config["saver"]["mode"]|SAVER_MATRIX;
+  if (sm == SAVER_MATRIX || sm == SAVER_IMAGE) saver_mode = sm;
 }
 
 void s_ok(JsonDocument& r) { r["ok"]=true; serializeJson(r,Serial); Serial.println(); }
@@ -221,7 +230,14 @@ void s_serial() {
 void proc_serial(const String& l) {
   JsonDocument req;
   DeserializationError de = deserializeJson(req, l);
-  if (de) { s_err(de.c_str()); return; }
+  if (de) {
+    JsonDocument r; r["error"] = de.c_str();
+    int ml = l.length(); if (ml > 120) ml = 120;
+    r["got"] = l.substring(0, ml);
+    r["len"] = l.length();
+    s_ok(r);
+    return;
+  }
   if (saver_active) exit_saver();
   const char* cmd = req["cmd"]|"";
   if (!strcmp(cmd,"get_config")) { JsonDocument r; r["config"]=config; s_ok(r); }
@@ -242,12 +258,14 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; saver_timeout = DEFAULT_TIMEOUT; if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
-  else if (!strcmp(cmd,"set_saver_preset")) {
-    const char* p = req["preset"]|"";
-    if (strcmp(p,"snake") && strcmp(p,"matrix") && strcmp(p,"circuit") && strcmp(p,"heart") && strcmp(p,"sudotext"))
-      { s_err("bad preset"); return; }
-    gen_saver_preset(p);
-    JsonDocument r; r["preset"] = p; s_ok(r);
+  else if (!strcmp(cmd,"set_saver_mode")) {
+    const char* m = req["mode"]|"";
+    if (!strcmp(m,"matrix")) saver_mode = SAVER_MATRIX;
+    else if (!strcmp(m,"image")) saver_mode = SAVER_IMAGE;
+    else { s_err("bad mode"); return; }
+    config["saver"]["mode"] = saver_mode;
+    save_cfg();
+    JsonDocument r; r["mode"] = m; s_ok(r);
   }
   else if (!strcmp(cmd,"set_saver")) {
     int t = req["timeout"]|DEFAULT_TIMEOUT;
@@ -260,6 +278,7 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_saver")) {
     JsonDocument r; r["timeout"] = saver_timeout;
+    r["mode"] = saver_mode == SAVER_MATRIX ? "matrix" : "image";
     r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");
     s_ok(r);
   }
@@ -539,11 +558,23 @@ void gen_saver_preset(const char* name) {
 
 void enter_saver() {
   saver_active = true;
-  saver_x = random(10, SCR_W - SAVER_W - 10);
-  saver_y = random(10, SCR_H - SAVER_H - 10);
-  float a = (float)random(0, 628) / 100.0;
-  saver_vx = cos(a) * 1.5;
-  saver_vy = sin(a) * 1.5;
+  if (saver_mode == SAVER_MATRIX) {
+    for (int i = 0; i < 20; i++) {
+      saver_drops[i].x = 1 + random(SCR_W / 6 - 2);
+      saver_drops[i].y = -random(30);
+      saver_drops[i].len = 3 + random(8);
+      saver_drops[i].spd = 1 + random(3);
+      for (int j = 0; j < saver_drops[i].len && j < 16; j++)
+        saver_drops[i].ch[j] = 0x30A0 + random(96);
+    }
+    saver_last_frame = millis();
+  } else {
+    saver_x = random(10, SCR_W - SAVER_W - 10);
+    saver_y = random(10, SCR_H - SAVER_H - 10);
+    float a = (float)random(0, 628) / 100.0;
+    saver_vx = cos(a) * 1.5;
+    saver_vy = sin(a) * 1.5;
+  }
 }
 
 void exit_saver() {
@@ -553,29 +584,62 @@ void exit_saver() {
 }
 
 void draw_saver() {
-  saver_x += saver_vx;
-  saver_y += saver_vy;
+  if (saver_mode == SAVER_MATRIX) {
+    unsigned long now = millis();
+    if (now - saver_last_frame < 60) return;
+    saver_last_frame = now;
 
-  if (saver_x < 0) { saver_x = 0; saver_vx = -saver_vx; }
-  if (saver_x > SCR_W - SAVER_W) { saver_x = SCR_W - SAVER_W; saver_vx = -saver_vx; }
-  if (saver_y < 0) { saver_y = 0; saver_vy = -saver_vy; }
-  if (saver_y > SCR_H - SAVER_H) { saver_y = SCR_H - SAVER_H; saver_vy = -saver_vy; }
+    // Draw semi-transparent black to fade old chars
+    tft.fillRect(0, 0, SCR_W, SCR_H, 0x0001);
 
-  tft.fillScreen(C_BG);
-
-  if (saver_img) {
-    tft.pushImage((int)saver_x, (int)saver_y, SAVER_W, SAVER_H, saver_img);
-  } else {
-    int cx = (int)saver_x + SAVER_W/2, cy = (int)saver_y + SAVER_H/2;
-    for (int i = 0; i < 7; i++) {
-      float t = (float)i / 6.0 * 2.0 * PI;
-      int x = cx + (int)(14.0 * sin(t));
-      int y = cy - 8 + i * 5;
-      tft.fillCircle(x, y, 4, C_ACC);
+    for (int i = 0; i < 20; i++) {
+      int px = saver_drops[i].x * 8;
+      for (int j = 0; j < saver_drops[i].len && j < 16; j++) {
+        int py = (saver_drops[i].y + j) * 10;
+        if (py < -8 || py >= SCR_H) continue;
+        uint16_t col;
+        if (j == saver_drops[i].len - 1) col = C_ACC;
+        else col = rgb565(0, 40 + j * 24, 0);
+        tft.drawChar(px, py, saver_drops[i].ch[j], col, 0x0001, 1);
+      }
+      saver_drops[i].y += saver_drops[i].spd;
+      if (saver_drops[i].y * 10 > SCR_H + 20) {
+        saver_drops[i].x = 1 + random(SCR_W / 8 - 2);
+        saver_drops[i].y = -saver_drops[i].len;
+        saver_drops[i].len = 4 + random(10);
+        saver_drops[i].spd = 1 + random(3);
+        for (int j = 0; j < saver_drops[i].len && j < 16; j++) {
+          int r = random(62);
+          if (r < 10) saver_drops[i].ch[j] = '0' + r;
+          else if (r < 36) saver_drops[i].ch[j] = 'A' + r - 10;
+          else if (r < 52) saver_drops[i].ch[j] = 'a' + r - 36;
+          else if (r < 56) saver_drops[i].ch[j] = '!';
+          else saver_drops[i].ch[j] = '?';
+        }
+      }
     }
-    tft.fillCircle(cx, cy, 7, C_TXT);
-    tft.fillCircle(cx + 4, cy - 2, 2, C_BG);
-    tft.fillCircle(cx + 4, cy + 2, 2, C_BG);
+  } else {
+    saver_x += saver_vx;
+    saver_y += saver_vy;
+    if (saver_x < 0) { saver_x = 0; saver_vx = -saver_vx; }
+    if (saver_x > SCR_W - SAVER_W) { saver_x = SCR_W - SAVER_W; saver_vx = -saver_vx; }
+    if (saver_y < 0) { saver_y = 0; saver_vy = -saver_vy; }
+    if (saver_y > SCR_H - SAVER_H) { saver_y = SCR_H - SAVER_H; saver_vy = -saver_vy; }
+    tft.fillScreen(C_BG);
+    if (saver_img) {
+      tft.pushImage((int)saver_x, (int)saver_y, SAVER_W, SAVER_H, saver_img);
+    } else {
+      int cx = (int)saver_x + SAVER_W/2, cy = (int)saver_y + SAVER_H/2;
+      for (int i = 0; i < 7; i++) {
+        float t = (float)i / 6.0 * 2.0 * PI;
+        int x = cx + (int)(14.0 * sin(t));
+        int y = cy - 8 + i * 5;
+        tft.fillCircle(x, y, 4, C_ACC);
+      }
+      tft.fillCircle(cx, cy, 7, C_TXT);
+      tft.fillCircle(cx + 4, cy - 2, 2, C_BG);
+      tft.fillCircle(cx + 4, cy + 2, 2, C_BG);
+    }
   }
 }
 

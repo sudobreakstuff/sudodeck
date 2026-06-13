@@ -882,24 +882,20 @@
             <span style="font-size:0.7rem;color:var(--dim)">sec</span>
             <button class="btn pri" id="btnSaverSet" style="margin-left:auto">Set</button>
           </div>
-          <div class="saver-img-area">
+          <div class="er" style="margin-bottom:6px">
+            <label>Mode</label>
+            <select id="saverMode" style="flex:1">
+              <option value="matrix">Matrix Rain</option>
+              <option value="image">Bouncing Image</option>
+            </select>
+            <button class="btn pri" id="btnSaverModeSet" style="margin-left:auto">Set</button>
+          </div>
+          <div class="saver-img-area" id="saverImgArea">
             <div class="saver-preview">
-              <canvas id="saverCanvas" width="96" height="64"></canvas>
+              <canvas id="saverCanvas" width="48" height="48"></canvas>
               <span class="saver-empty" id="saverEmpty">no image</span>
             </div>
             <div class="saver-upload">
-              <div class="er" style="margin-bottom:4px">
-                <label>Preset</label>
-                <select id="saverPreset" style="flex:1">
-                  <option value="">Custom upload</option>
-                  <option value="snake">Snake</option>
-                  <option value="matrix">Matrix</option>
-                  <option value="circuit">Circuit</option>
-                  <option value="heart">Heart</option>
-                  <option value="sudotext">SudoText</option>
-                </select>
-                <button class="btn pri" id="btnSaverPresetApply" style="margin-left:auto">Apply</button>
-              </div>
               <input type="file" id="saverFileInput" accept="image/*">
               <label for="saverFileInput" class="btn" style="cursor:pointer">Choose Image</label>
               <span class="saver-fname" id="saverFname"></span>
@@ -1290,7 +1286,6 @@ document.addEventListener('mousemove', function(e) {
 // Screensaver
 var __saverHex = null;
 var SW = 48, SH = 48;
-var presets = {snake:1, matrix:1, circuit:1, heart:1, sudotext:1};
 function canvToHex(c) {
   var d = c.getContext('2d').getImageData(0, 0, c.width, c.height);
   var hex = '';
@@ -1309,7 +1304,9 @@ async function saverSync() {
   if(!dw) return;
   try { var r = await sc({cmd:'get_saver'}); 
     document.getElementById('saverTimeout').value = r.timeout || 30;
-    document.getElementById('saverHint').textContent = r.timeout + 's' + (r.has_img ? ' + img' : '');
+    document.getElementById('saverHint').textContent = r.timeout + 's' + (r.mode||'matrix');
+    if(r.mode) document.getElementById('saverMode').value = r.mode;
+    document.getElementById('saverImgArea').style.display = r.mode === 'image' ? 'flex' : 'none';
   } catch(e) {}
 }
 document.getElementById('btnSaverSet').addEventListener('click', async function() {
@@ -1337,11 +1334,13 @@ document.getElementById('saverFileInput').addEventListener('change', function(e)
   r.readAsDataURL(f);
   document.getElementById('saverPreset').value = '';
 });
-document.getElementById('btnSaverPresetApply').addEventListener('click', async function() {
-  var p = document.getElementById('saverPreset').value;
-  if(!p || !presets[p]) { tm('Select a preset', 'ng'); return; }
-  if(!dw) { tm('Connect to CYD first', 'ng'); return; }
-  try { var r = await sc({cmd:'set_saver_preset',preset:p}); if(r&&r.error) { tm('Preset error: '+r.error,'ng'); return; } tm('Preset: '+p); saverSync(); } catch(e) { tm('Preset command failed','ng'); }
+document.getElementById('btnSaverModeSet').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  var m = document.getElementById('saverMode').value;
+  try { var r = await sc({cmd:'set_saver_mode',mode:m}); if(r&&r.error) { tm('Mode error: '+r.error,'ng'); return; } tm('Saver mode: '+m); saverSync(); } catch(e) { tm('Mode command failed','ng'); }
+});
+document.getElementById('saverMode').addEventListener('change', function() {
+  document.getElementById('saverImgArea').style.display = this.value === 'image' ? 'flex' : 'none';
 });
 function doSaverUpload(hex, label) {
   __saverHex = hex;
