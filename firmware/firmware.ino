@@ -40,6 +40,17 @@ int cols = 4, rows = 3;
 int total_btns = 0;
 int nav_dot_x = 0;
 
+// Screensaver
+#define SAVER_W 48
+#define SAVER_H 48
+#define DEFAULT_TIMEOUT 30
+
+bool saver_active = false;
+int saver_timeout = DEFAULT_TIMEOUT;
+unsigned long last_touch_ms = 0;
+uint16_t* saver_img = nullptr;
+float saver_x, saver_y, saver_vx, saver_vy;
+
 JsonDocument config;
 String serial_buf;
 
@@ -227,6 +238,40 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
+  else if (!strcmp(cmd,"set_saver")) {
+    int t = req["timeout"]|DEFAULT_TIMEOUT;
+    if (t >= 5 && t <= 600) saver_timeout = t;
+    JsonDocument r; r["timeout"] = saver_timeout; s_ok(r);
+  }
+  else if (!strcmp(cmd,"get_saver")) {
+    JsonDocument r; r["timeout"] = saver_timeout;
+    if (saver_img) { r["has_img"] = true; r["w"] = SAVER_W; r["h"] = SAVER_H; }
+    else { r["has_img"] = false; }
+    s_ok(r);
+  }
+  else if (!strcmp(cmd,"upload_saver_img")) {
+    const char* data = req["data"]|"";
+    int len = strlen(data);
+    if (len != SAVER_W * SAVER_H * 4) { s_err("bad size"); return; }
+    uint16_t* buf = (uint16_t*)malloc(SAVER_W * SAVER_H * 2);
+    if (!buf) { s_err("oom"); return; }
+    for (int i = 0; i < SAVER_W * SAVER_H; i++) {
+      char tmp[5] = {data[i*4], data[i*4+1], data[i*4+2], data[i*4+3], 0};
+      buf[i] = (uint16_t)strtol(tmp, nullptr, 16);
+    }
+    fs::File f = SPIFFS.open("/saver.img", "w");
+    if (!f) { free(buf); s_err("write fail"); return; }
+    f.write((uint8_t*)buf, SAVER_W * SAVER_H * 2);
+    f.close();
+    if (saver_img) free(saver_img);
+    saver_img = buf;
+    JsonDocument r; s_ok(r);
+  }
+  else if (!strcmp(cmd,"clear_saver_img")) {
+    if (saver_img) { free(saver_img); saver_img = nullptr; }
+    if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img");
+    JsonDocument r; s_ok(r);
+  }
   else { s_err("unknown command"); }
 }
 
@@ -343,12 +388,12 @@ void draw_bottom() {
   tft.fillRect(0, SCR_H - BOT_H, SCR_W, BOT_H, C_HDR);
   int cy = SCR_H - BOT_H + 4;
 
-  int nav_l = 2, nav_w = 22;
+  int nav_l = 4, nav_w = 32;
 
   if (num_pages > 1) {
     tft.fillRoundRect(nav_l, cy - 2, nav_w, 18, 4, C_BTN_BG);
     tft.setTextColor(C_TXT, C_BTN_BG);
-    tft.setCursor(nav_l + 7, cy);
+    tft.setCursor(nav_l + 11, cy);
     tft.print("<");
   }
 
@@ -356,7 +401,7 @@ void draw_bottom() {
     int bx = SCR_W - nav_w - nav_l;
     tft.fillRoundRect(bx, cy - 2, nav_w, 18, 4, C_BTN_BG);
     tft.setTextColor(C_TXT, C_BTN_BG);
-    tft.setCursor(bx + 7, cy);
+    tft.setCursor(bx + 11, cy);
     tft.print(">");
   }
 
@@ -394,17 +439,74 @@ void draw_all() {
   draw_bottom();
 }
 
+void load_saver_img() {
+  if (saver_img) { free(saver_img); saver_img = nullptr; }
+  if (!SPIFFS.exists("/saver.img")) return;
+  fs::File f = SPIFFS.open("/saver.img", "r");
+  if (!f) return;
+  int sz = f.size();
+  if (sz != SAVER_W * SAVER_H * 2) { f.close(); return; }
+  saver_img = (uint16_t*)malloc(sz);
+  if (!saver_img) { f.close(); return; }
+  f.read((uint8_t*)saver_img, sz);
+  f.close();
+}
+
+void enter_saver() {
+  saver_active = true;
+  saver_x = random(10, SCR_W - SAVER_W - 10);
+  saver_y = random(10, SCR_H - SAVER_H - 10);
+  float a = (float)random(0, 628) / 100.0;
+  saver_vx = cos(a) * 1.5;
+  saver_vy = sin(a) * 1.5;
+}
+
+void exit_saver() {
+  saver_active = false;
+  last_touch_ms = millis();
+  draw_all();
+}
+
+void draw_saver() {
+  saver_x += saver_vx;
+  saver_y += saver_vy;
+
+  if (saver_x < 0) { saver_x = 0; saver_vx = -saver_vx; }
+  if (saver_x > SCR_W - SAVER_W) { saver_x = SCR_W - SAVER_W; saver_vx = -saver_vx; }
+  if (saver_y < 0) { saver_y = 0; saver_vy = -saver_vy; }
+  if (saver_y > SCR_H - SAVER_H) { saver_y = SCR_H - SAVER_H; saver_vy = -saver_vy; }
+
+  tft.fillScreen(C_BG);
+
+  if (saver_img) {
+    tft.pushImage((int)saver_x, (int)saver_y, SAVER_W, SAVER_H, saver_img);
+  } else {
+    int cx = (int)saver_x + SAVER_W/2, cy = (int)saver_y + SAVER_H/2;
+    for (int i = 0; i < 7; i++) {
+      float t = (float)i / 6.0 * 2.0 * PI;
+      int x = cx + (int)(14.0 * sin(t));
+      int y = cy - 8 + i * 5;
+      tft.fillCircle(x, y, 4, C_ACC);
+    }
+    tft.fillCircle(cx, cy, 7, C_TXT);
+    tft.fillCircle(cx + 4, cy - 2, 2, C_BG);
+    tft.fillCircle(cx + 4, cy + 2, 2, C_BG);
+  }
+}
+
 void handle_touch(int tx, int ty) {
+  if (saver_active) { exit_saver(); return; }
+  last_touch_ms = millis();
   if (tx < 0) tx = 0; if (tx >= SCR_W) tx = SCR_W - 1;
   if (ty < 0) ty = 0; if (ty >= SCR_H) ty = SCR_H - 1;
 
   if (ty >= SCR_H - BOT_H) {
-    int nav_l = 2, nav_w = 22;
-    if (num_pages > 1 && tx >= nav_l && tx <= nav_l + nav_w) {
+    int nav_l = 4, nav_w = 32;
+    if (num_pages > 1 && tx >= nav_l - 4 && tx <= nav_l + nav_w + 4) {
       if (page > 0) { page--; draw_grid(); draw_bottom(); }
       return;
     }
-    if (num_pages > 1 && tx >= SCR_W - nav_l - nav_w && tx <= SCR_W - nav_l) {
+    if (num_pages > 1 && tx >= SCR_W - nav_l - nav_w - 4 && tx <= SCR_W - nav_l + 4) {
       if (page < num_pages - 1) { page++; draw_grid(); draw_bottom(); }
       return;
     }
@@ -496,6 +598,8 @@ void setup() {
 
   load_cfg();
   apply_cfg();
+  load_saver_img();
+  last_touch_ms = millis();
   draw_all();
 
   ble.setLogLevel(HIDLogLevel::Normal);
@@ -511,8 +615,22 @@ void setup() {
 void loop() {
   s_serial();
 
-  static unsigned long last_hdr = 0;
-  if (millis() - last_hdr > 2000) { draw_header(); last_hdr = millis(); }
+  unsigned long now = millis();
+
+  if (!saver_active) {
+    static unsigned long last_hdr = 0;
+    if (now - last_hdr > 2000) { draw_header(); last_hdr = now; }
+
+    if (saver_timeout > 0 && now - last_touch_ms > (unsigned long)saver_timeout * 1000) {
+      enter_saver();
+    }
+  }
+
+  if (saver_active) {
+    draw_saver();
+    delay(33);
+    return;
+  }
 
   if (ts.tirqTouched() && ts.touched()) {
     TS_Point p = ts.getPoint();

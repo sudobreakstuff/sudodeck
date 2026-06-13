@@ -547,6 +547,44 @@
   .toast.ng { background: var(--surface); color: var(--danger); border: 1px solid rgba(255,68,102,0.25); }
   @keyframes si { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+  /* ─── screensaver ─── */
+  .saver-fold {
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .saver-hdr {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; cursor: pointer;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;
+    background: var(--surface); color: var(--text);
+    user-select: none; transition: background 0.15s;
+  }
+  .saver-hdr:hover { background: #141c2a; }
+  .saver-hint { font-size: 0.65rem; font-weight: 400; color: var(--dim); font-family: var(--mono); }
+  .saver-body {
+    padding: 12px 14px; display: none; flex-direction: column; gap: 10px;
+    background: var(--surface2); border-top: 1px solid var(--border);
+  }
+  .saver-body.open { display: flex; }
+  .saver-img-area {
+    display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap;
+  }
+  .saver-preview {
+    width: 64px; height: 64px; flex-shrink: 0;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: var(--bg); position: relative; overflow: hidden;
+  }
+  .saver-preview canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  .saver-empty {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; color: var(--dim);
+  }
+  .saver-upload { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+  .saver-upload input[type="file"] { display: none; }
+  .saver-fname { font-size: 0.65rem; color: var(--dim); }
+
   /* ─── about ─── */
   .abt {
     text-align: center;
@@ -831,6 +869,35 @@
           <input type="number" id="lp" min="1" max="12" value="3">
         </div>
         <button class="btn pri" id="bal">Apply Layout</button>
+      </div>
+      <div class="saver-fold">
+        <div class="saver-hdr" id="saverToggle">
+          <span>Screensaver</span>
+          <span class="saver-hint" id="saverHint">off</span>
+        </div>
+        <div class="saver-body" id="saverBody">
+          <div class="er">
+            <label>Timeout</label>
+            <input type="number" id="saverTimeout" min="5" max="600" value="30">
+            <span style="font-size:0.7rem;color:var(--dim)">sec</span>
+            <button class="btn pri" id="btnSaverSet" style="margin-left:auto">Set</button>
+          </div>
+          <div class="saver-img-area">
+            <div class="saver-preview">
+              <canvas id="saverCanvas" width="48" height="48"></canvas>
+              <span class="saver-empty" id="saverEmpty">no image</span>
+            </div>
+            <div class="saver-upload">
+              <input type="file" id="saverFileInput" accept="image/*">
+              <label for="saverFileInput" class="btn" style="cursor:pointer">Choose Image</label>
+              <span class="saver-fname" id="saverFname"></span>
+              <div class="br" style="margin-top:6px">
+                <button class="btn pri" id="btnSaverUpload" disabled>Upload</button>
+                <button class="btn dan" id="btnSaverClear">Clear Image</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1207,6 +1274,91 @@ document.addEventListener('mousemove', function(e) {
     hTicking = true;
   }
 });
+
+// Screensaver
+var __saverHex = null;
+document.getElementById('saverToggle').addEventListener('click', function() {
+  var b = document.getElementById('saverBody');
+  b.classList.toggle('open');
+});
+async function saverSync() {
+  if(!dw) return;
+  try { var r = await sc({cmd:'get_saver'}); 
+    document.getElementById('saverTimeout').value = r.timeout || 30;
+    document.getElementById('saverHint').textContent = r.timeout + 's' + (r.has_img ? ' + img' : '');
+  } catch(e) {}
+}
+document.getElementById('btnSaverSet').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  var t = parseInt(document.getElementById('saverTimeout').value) || 30;
+  if(t < 5) t = 5; if(t > 600) t = 600;
+  try { await sc({cmd:'set_saver',timeout:t}); tm('Timeout set to ' + t + 's'); saverSync(); } catch(e) { tm('Failed', 'ng'); }
+});
+document.getElementById('saverFileInput').addEventListener('change', function(e) {
+  var f = e.target.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var c = document.getElementById('saverCanvas');
+      var ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, 48, 48);
+      ctx.drawImage(img, 0, 0, 48, 48);
+      var d = ctx.getImageData(0, 0, 48, 48);
+      var hex = '';
+      for(var i = 0; i < d.data.length; i += 4) {
+        var r5 = d.data[i] >> 3, g6 = d.data[i+1] >> 2, b5 = d.data[i+2] >> 3;
+        var v = (r5 << 11) | (g6 << 5) | b5;
+        hex += v.toString(16).padStart(4, '0');
+      }
+      __saverHex = hex;
+      document.getElementById('saverEmpty').style.display = 'none';
+      document.getElementById('btnSaverUpload').disabled = false;
+      document.getElementById('saverFname').textContent = f.name + ' (48x48)';
+    };
+    img.src = ev.target.result;
+  };
+  r.readAsDataURL(f);
+});
+document.getElementById('btnSaverUpload').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  if(!__saverHex) { tm('No image', 'ng'); return; }
+  try {
+    await sc({cmd:'upload_saver_img',data:__saverHex});
+    tm('Screensaver image uploaded');
+    saverSync();
+  } catch(e) { tm('Upload failed', 'ng'); }
+});
+document.getElementById('btnSaverClear').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  try {
+    await sc({cmd:'clear_saver_img'});
+    __saverHex = null;
+    document.getElementById('saverEmpty').style.display = 'flex';
+    var c = document.getElementById('saverCanvas');
+    c.getContext('2d').clearRect(0, 0, 48, 48);
+    document.getElementById('btnSaverUpload').disabled = true;
+    document.getElementById('saverFname').textContent = '';
+    tm('Image cleared');
+    saverSync();
+  } catch(e) { tm('Clear failed', 'ng'); }
+});
+
+// Patch connect to also sync saver status
+(function() {
+  var btn = document.getElementById('btnConnect');
+  var clone = btn.cloneNode(true);
+  btn.parentNode.replaceChild(clone, btn);
+  clone.addEventListener('click', async function() {
+    try {
+      if (!('serial' in navigator)) { tm('Web Serial needs Chrome/Edge', 'ng'); return; }
+      var p = await navigator.serial.requestPort(); await p.open({baudRate:115200});
+      dp = p; dr = p.readable.getReader(); dw = p.writable.getWriter(); ss(true); tm('Connected');
+      try { var r = await sc({cmd:'get_info'}); tm(r.name+' v'+(r.version||'?')); } catch(e) {}
+      setTimeout(saverSync, 500);
+    } catch(e) { if(e.message!=='The device has been lost.') tm('Connection failed', 'ng'); ss(false); }
+  });
+})();
 
 ic(); ra();
 </script>
