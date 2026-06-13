@@ -834,6 +834,7 @@ void loop() {
 
   if (saver_active) {
     draw_saver();
+    s_serial();
     if (ts.tirqTouched() && ts.touched()) {
       TS_Point p = ts.getPoint();
       int tx = map(p.x, 200, 3700, 0, SCR_W);
@@ -841,7 +842,7 @@ void loop() {
       handle_touch(tx, ty);
       while (ts.touched()) delay(5);
     }
-    delay(33);
+    if (!Serial.available()) delay(33);
     return;
   }
 
@@ -853,5 +854,5 @@ void loop() {
     while (ts.touched()) delay(5);
   }
 
-  delay(10);
+  if (!Serial.available()) delay(10);
 }
