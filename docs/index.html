@@ -12,29 +12,80 @@
     --surface: #111827;
     --surface2: #1A2332;
     --border: #1E293B;
-    --accent: #00FF88;
-    --accent-dim: rgba(0,255,136,0.1);
-    --accent-glow: rgba(0,255,136,0.25);
-    --accent2: #00D4FF;
+    --acc: #00FF88;
+    --acc-dim: rgba(0,255,136,0.1);
+    --acc-glow: rgba(0,255,136,0.2);
     --danger: #FF4466;
-    --warn: #FFAA44;
     --text: #E2E8F0;
     --dim: #64748B;
     --radius: 12px;
     --font: 'Inter', system-ui, sans-serif;
     --mono: 'JetBrains Mono', monospace;
+    --nav-h: 52px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font);
     overflow-x: hidden;
   }
-  ::selection { background: var(--accent); color: var(--bg); }
+  ::selection { background: var(--acc); color: var(--bg); }
 
-  /* ─── Animated grid background ─── */
+  a { color: var(--acc); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    z-index: 100;
+    transition: background 0.3s, border-color 0.3s;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(10,14,23,0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-color: var(--border);
+  }
+  nav .nl {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  nav .nl .g { color: var(--acc); }
+  nav .nl .s {
+    display: inline-block;
+    width: 14px; height: 14px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  nav .nl .s svg { width: 100%; height: 100%; display: block; }
+  nav .nls {
+    display: flex; gap: 2px; list-style: none; margin: 0; padding: 0;
+  }
+  nav .nls li { list-style: none; margin: 0; padding: 0; }
+  nav .nls a {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: var(--dim);
+    transition: color 0.15s, background 0.15s;
+    text-decoration: none;
+  }
+  nav .nls a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.04);
+  }
+
   .hero {
     min-height: 100vh;
     display: flex;
@@ -42,7 +93,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 40px 20px;
+    padding: 60px 20px;
     position: relative;
     overflow: hidden;
   }
@@ -50,785 +101,675 @@
     content: '';
     position: absolute;
     inset: 0;
-    background:
-      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 60% 50% at 50% 45%, black 30%, transparent 70%);
-    -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 45%, black 30%, transparent 70%);
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(0,255,136,0.03) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(0,255,136,0.02) 0%, transparent 50%);
     pointer-events: none;
+    z-index: 0;
   }
   .hero::after {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(ellipse at 50% 40%, var(--accent-dim) 0%, transparent 50%);
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M40 0H0v40' fill='none' stroke='%231e293b' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E");
+    background-size: 40px 40px;
     pointer-events: none;
-    animation: pulseGlow 6s ease-in-out infinite;
-  }
-  @keyframes pulseGlow {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
+    z-index: 0;
+    opacity: 0.4;
   }
 
   .snake-logo {
-    width: 160px;
-    height: 160px;
-    margin-bottom: 24px;
-    filter: drop-shadow(0 0 40px var(--accent-glow));
-    animation: float 4s ease-in-out infinite;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 28px;
+    filter: drop-shadow(0 0 30px var(--acc-glow));
     position: relative;
     z-index: 1;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
   }
 
   .hero h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-size: clamp(2.2rem, 5vw, 4rem);
     font-weight: 900;
-    letter-spacing: 8px;
+    letter-spacing: 6px;
     color: #fff;
-    text-shadow: 0 0 60px var(--accent-glow);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     position: relative;
     z-index: 1;
   }
-  .hero h1 span { color: var(--accent); }
-  .hero h1 .char { display: inline-block; animation: letterPop 0.4s ease both; }
-  @keyframes letterPop {
-    0% { opacity: 0; transform: translateY(20px) scale(0.8); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+  .hero h1 .g {
+    color: var(--acc);
+    text-shadow: 0 0 20px rgba(0,255,136,0.3), 0 0 40px rgba(0,255,136,0.1);
   }
 
-  .hero .tagline {
-    font-size: clamp(1rem, 2.5vw, 1.35rem);
+  .hero .sub {
+    font-size: clamp(0.9rem, 2vw, 1.15rem);
     color: var(--dim);
-    max-width: 620px;
-    line-height: 1.7;
-    margin-bottom: 40px;
+    max-width: 540px;
+    line-height: 1.6;
+    margin-bottom: 32px;
     position: relative;
     z-index: 1;
-    min-height: 2.4em;
   }
-  .hero .tagline strong { color: var(--accent); font-weight: 600; }
-  .cursor {
-    display: inline-block;
-    width: 2px;
-    height: 1.1em;
-    background: var(--accent);
-    margin-left: 2px;
-    vertical-align: text-bottom;
-    animation: blink 0.8s step-end infinite;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
+  .hero .sub strong { color: #fff; font-weight: 600; }
 
   .hero-btns {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
     justify-content: center;
     position: relative;
     z-index: 1;
   }
-  .btn-hero {
-    padding: 14px 32px;
-    border-radius: 50px;
+  .btn-h {
+    padding: 12px 28px;
+    border-radius: 6px;
     font-family: var(--font);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     cursor: pointer;
     border: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s;
     text-decoration: none;
   }
-  .btn-hero.primary {
-    background: linear-gradient(135deg, var(--accent), #00cc6a);
+  .btn-h.primary {
+    background: var(--acc);
     color: var(--bg);
-    box-shadow: 0 0 30px var(--accent-glow);
-    position: relative;
-    overflow: hidden;
   }
-  .btn-hero.primary::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
-    transform: translateX(-100%);
-    transition: transform 0.6s ease;
+  .btn-h.primary:hover {
+    background: #00cc6a;
+    box-shadow: 0 0 20px rgba(0,255,136,0.25);
   }
-  .btn-hero.primary:hover::after { transform: translateX(100%); }
-  .btn-hero.primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 40px var(--accent-glow);
-  }
-  .btn-hero.secondary {
+  .btn-h.sec {
     background: transparent;
     color: var(--text);
     border: 1px solid var(--border);
   }
-  .btn-hero.secondary:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 0 30px var(--accent-dim);
+  .btn-h.sec:hover {
+    border-color: var(--dim);
+    background: rgba(255,255,255,0.02);
   }
 
-  .scroll-indicator {
+  .sc {
     position: absolute;
-    bottom: 30px;
+    bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    color: var(--dim);
-    font-size: 0.65rem;
-    letter-spacing: 3px;
-    animation: bounce 2s ease-in-out infinite;
-    text-decoration: none;
-    cursor: pointer;
     z-index: 1;
   }
-  .mouse {
-    width: 22px; height: 34px;
+  .sc a {
+    display: block;
+    width: 24px;
+    height: 36px;
     border: 2px solid var(--dim);
     border-radius: 12px;
     position: relative;
+    transition: border-color 0.2s;
   }
-  .mouse::after {
+  .sc a:hover { border-color: var(--acc); }
+  .sc a::after {
     content: '';
     position: absolute;
     top: 6px; left: 50%;
     transform: translateX(-50%);
-    width: 3px; height: 8px;
-    background: var(--accent);
-    border-radius: 2px;
-    animation: scrollWheel 1.5s ease-in-out infinite;
+    width: 2px; height: 7px;
+    background: var(--dim);
+    border-radius: 1px;
+    animation: scW 1.5s ease-in-out infinite;
   }
-  @keyframes scrollWheel {
+  .sc a:hover::after { background: var(--acc); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+
+  @keyframes scW {
     0% { transform: translateX(-50%) translateY(0); opacity: 1; }
-    100% { transform: translateX(-50%) translateY(12px); opacity: 0; }
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(6px); }
+    100% { transform: translateX(-50%) translateY(10px); opacity: 0; }
   }
 
-  /* ─── Section dividers ─── */
-  .section-divider {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0.15;
-    margin: 0 auto;
-    max-width: 300px;
-  }
-
-  /* ─── Features ─── */
-  .features {
-    padding: 80px 20px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .features h2 {
+  /* ─── sections ─── */
+  section { padding: 72px 20px; }
+  section > h2 {
     text-align: center;
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 48px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 44px;
   }
-  .features h2 span { color: var(--accent); }
-  .feature-grid {
+  section > h2 .g { color: var(--acc); }
+
+  .inner {
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  /* ─── feature grid ─── */
+  .f-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
   }
-  .feature-card {
+  .f-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 32px 28px;
-    transition: all 0.4s ease;
+    padding: 28px 24px;
+    transition: all 0.25s;
     position: relative;
     overflow: hidden;
   }
-  .feature-card::before {
+  .f-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    transform: scaleX(0);
-    transition: transform 0.4s ease;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--acc);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+    transform-origin: top;
   }
-  .feature-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(0,255,136,0.2);
-    box-shadow: 0 12px 50px rgba(0,0,0,0.3);
+  .f-card:hover::before { transform: scaleY(1); }
+  .f-card:hover {
+    border-color: rgba(255,255,255,0.08);
+    background: #141c2a;
+    transform: translateY(-2px);
   }
-  .feature-card:hover::before { transform: scaleX(1); }
-  .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 16px;
-    display: block;
+  .f-card svg {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 14px;
+    opacity: 0.7;
   }
-  .feature-card h3 {
-    font-size: 1.05rem;
+  .f-card h3 {
+    font-size: 0.95rem;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
-  .feature-card p {
-    font-size: 0.85rem;
+  .f-card p {
+    font-size: 0.82rem;
     color: var(--dim);
-    line-height: 1.6;
+    line-height: 1.5;
   }
 
-  /* ─── Steps Section ─── */
-  .steps-section {
-    padding: 60px 20px 80px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  .steps-section h2 {
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 48px;
-  }
-  .steps-section h2 span { color: var(--accent); }
-  .steps-grid {
+  /* ─── steps ─── */
+  .s-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 24px;
-    counter-reset: step;
+    gap: 20px;
+    counter-reset: s;
   }
-  .step-card {
+  .s-card {
     text-align: center;
     padding: 32px 20px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     position: relative;
-    counter-increment: step;
+    counter-increment: s;
   }
-  .step-card::before {
-    content: counter(step);
+  .s-card::before {
+    content: "0" counter(s);
     position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 28px;
-    height: 28px;
-    background: var(--accent);
-    color: var(--bg);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 0.85rem;
-    box-shadow: 0 0 20px var(--accent-glow);
-  }
-  .step-icon { font-size: 2rem; margin: 8px 0 12px; display: block; }
-  .step-card h3 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .step-card p { font-size: 0.8rem; color: var(--dim); line-height: 1.5; }
-
-  /* ─── Config Tool ─── */
-  .config-section {
-    padding: 60px 20px 80px;
-  }
-  .config-section h2 {
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-  .config-section h2 span { color: var(--accent); }
-  .config-section > p {
-    text-align: center;
+    top: -10px;
+    left: 20px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
     color: var(--dim);
-    font-size: 0.9rem;
-    margin-bottom: 32px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
   }
-  .config-container {
-    max-width: 1100px;
+  .s-card:hover { border-color: rgba(255,255,255,0.08); background: #141c2a; }
+  .s-card h3 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .s-card p { font-size: 0.8rem; color: var(--dim); line-height: 1.5; }
+
+  .divider {
+    width: 120px;
+    height: 1px;
+    background: var(--border);
+    margin: 0 auto;
+  }
+
+  /* ─── config tool ─── */
+  .cfg-box {
+    max-width: 1040px;
     margin: 0 auto;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: 0 4px 40px rgba(0,0,0,0.2);
+    padding: 20px;
   }
-  .status-bar {
+  .cfg-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--border);
   }
-  .status-badge {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 14px; border-radius: 20px;
-    font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+  .badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 4px;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.5px;
     font-family: var(--mono);
   }
-  .status-badge.online { background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid var(--accent); }
-  .status-badge.offline { background: rgba(255,68,102,0.1); color: var(--danger); border: 1px solid var(--danger); }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .status-dot.green { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-  .status-dot.red { background: var(--danger); }
+  .badge.on { background: rgba(0,255,136,0.08); color: var(--acc); border: 1px solid rgba(0,255,136,0.2); }
+  .badge.off { background: rgba(255,68,102,0.08); color: var(--danger); border: 1px solid rgba(255,68,102,0.2); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot.g { background: var(--acc); }
+  .dot.r { background: var(--danger); }
 
-  .toolbar {
+  .tb {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
   }
   .btn {
-    padding: 8px 16px; border-radius: 8px;
-    font-family: var(--font); font-size: 0.8rem; font-weight: 600;
-    cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase;
-    transition: all 0.2s; border: 1px solid var(--border);
+    padding: 7px 14px; border-radius: 6px;
+    font-family: var(--font); font-size: 0.75rem; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.3px; text-transform: uppercase;
+    transition: all 0.15s; border: 1px solid var(--border);
     background: var(--surface2); color: var(--text);
   }
-  .btn:hover { border-color: var(--accent); color: var(--accent); }
-  .btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .btn.primary:hover { background: #00cc66; box-shadow: 0 0 20px var(--accent-glow); }
-  .btn.danger { border-color: var(--danger); color: var(--danger); }
-  .btn.danger:hover { background: var(--danger); color: var(--bg); }
-  .btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  .btn:hover { border-color: var(--dim); }
+  .btn.pri { background: var(--acc); color: var(--bg); border-color: var(--acc); }
+  .btn.pri:hover { background: #00cc6a; }
+  .btn.dan { border-color: var(--danger); color: var(--danger); }
+  .btn.dan:hover { background: var(--danger); color: var(--bg); }
 
-  .pages-bar { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-  .page-tab {
-    padding: 6px 16px; border-radius: 6px; cursor: pointer;
-    font-size: 0.75rem; font-weight: 600;
+  .p-bar { display: flex; gap: 4px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .p-tab {
+    padding: 5px 14px; border-radius: 4px; cursor: pointer;
+    font-size: 0.7rem; font-weight: 600;
     border: 1px solid var(--border);
     background: transparent; color: var(--dim);
-    font-family: var(--font); transition: all 0.2s;
+    font-family: var(--font); transition: all 0.15s;
   }
-  .page-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .page-tab:hover:not(.active) { color: var(--text); border-color: var(--text); }
+  .p-tab.on { background: var(--acc); color: var(--bg); border-color: var(--acc); }
+  .p-tab:hover:not(.on) { color: var(--text); border-color: var(--dim); }
 
-  #grid-preview {
-    display: grid; gap: 8px; padding: 12px;
+  #gp {
+    display: grid; gap: 6px; padding: 10px;
     background: var(--surface2); border-radius: var(--radius);
-    min-height: 200px; align-content: start;
-    margin-bottom: 16px;
+    min-height: 180px; align-content: start;
+    margin-bottom: 12px;
   }
-  .grid-btn {
+  .gb {
     aspect-ratio: 1.5;
-    border: none; border-radius: 8px; cursor: pointer;
+    border: none; border-radius: 6px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font); font-size: 0.75rem; font-weight: 700;
-    color: #fff; transition: all 0.15s; position: relative;
-    min-width: 50px; min-height: 40px;
-    word-break: break-all; text-align: center; padding: 4px;
+    font-family: var(--font); font-size: 0.7rem; font-weight: 700;
+    color: #fff; transition: all 0.12s; position: relative;
+    min-width: 44px; min-height: 36px;
+    word-break: break-all; text-align: center; padding: 2px;
   }
-  .grid-btn:hover { transform: scale(1.06); box-shadow: 0 0 16px var(--accent-glow); z-index: 2; }
-  .grid-btn.selected { outline: 2px solid var(--accent); outline-offset: 3px; }
-  .grid-btn.empty { opacity: 0.3; }
-  .grid-btn .btn-idx {
-    position: absolute; top: 3px; left: 5px;
-    font-size: 0.5rem; color: rgba(255,255,255,0.3);
+  .gb:hover { transform: scale(1.05); z-index: 2; border: 1px solid rgba(255,255,255,0.15); }
+  .gb.sel { outline: 2px solid var(--acc); outline-offset: 2px; box-shadow: 0 0 12px var(--acc-glow); }
+  .gb.em { opacity: 0.25; }
+  .gb .ix {
+    position: absolute; top: 2px; left: 4px;
+    font-size: 0.45rem; color: rgba(255,255,255,0.25);
     font-family: var(--mono);
   }
 
-  .editor-panel {
-    padding: 20px; background: var(--surface2); border-radius: var(--radius);
-    border: 1px solid var(--border); display: none; flex-direction: column; gap: 14px;
+  .ep {
+    padding: 16px; background: var(--surface2); border-radius: var(--radius);
+    border: 1px solid var(--acc-dim); display: none; flex-direction: column; gap: 12px;
   }
-  .editor-panel h3 {
-    color: var(--accent); font-size: 0.8rem; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+  .ep h3 {
+    color: var(--acc); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
   }
-  .editor-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .editor-row label {
-    font-size: 0.65rem; color: var(--dim); text-transform: uppercase;
-    letter-spacing: 1px; font-weight: 600; min-width: 50px;
+  .er { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .er label {
+    font-size: 0.6rem; color: var(--dim); text-transform: uppercase;
+    letter-spacing: 0.5px; font-weight: 600; min-width: 44px;
   }
-  .editor-row input, .editor-row select {
+  .er input, .er select {
     background: var(--bg); color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 8px 12px; font-family: var(--font);
-    font-size: 0.85rem; flex: 1; min-width: 120px;
+    border-radius: 4px; padding: 7px 10px; font-family: var(--font);
+    font-size: 0.8rem; flex: 1; min-width: 100px;
   }
-  .editor-row input:focus, .editor-row select:focus {
-    outline: none; border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-dim);
+  .er input:focus, .er select:focus {
+    outline: none; border-color: var(--acc);
   }
-  .editor-row input[type="color"] {
-    padding: 2px; height: 38px; width: 60px; flex: 0; cursor: pointer;
+  .er input[type="color"] {
+    padding: 2px; height: 34px; width: 50px; flex: 0; cursor: pointer;
   }
-  .btn-row { display: flex; gap: 8px; }
+  .br { display: flex; gap: 6px; }
 
-  .action-builder {
-    padding: 14px; background: var(--surface); border-radius: 8px;
+  .ab {
+    padding: 12px; background: var(--surface); border-radius: 6px;
     border: 1px solid var(--border);
   }
-  .macro-step {
-    display: flex; gap: 8px; align-items: center; padding: 8px 10px;
-    background: var(--surface2); border-radius: 6px; margin-bottom: 6px; flex-wrap: wrap;
+  .ms {
+    display: flex; gap: 6px; align-items: center; padding: 6px 8px;
+    background: var(--surface2); border-radius: 4px; margin-bottom: 5px; flex-wrap: wrap;
   }
-  .macro-step input, .macro-step select {
+  .ms input, .ms select {
     background: var(--bg); color: var(--text); border: 1px solid var(--border);
-    border-radius: 4px; padding: 6px 10px; font-family: var(--font); font-size: 0.8rem;
+    border-radius: 4px; padding: 5px 8px; font-family: var(--font); font-size: 0.75rem;
   }
-  .step-num { color: var(--dim); font-size: 0.65rem; min-width: 22px; font-family: var(--mono); }
 
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    padding: 14px 24px; border-radius: var(--radius);
-    font-family: var(--font); font-size: 0.85rem; font-weight: 500;
-    z-index: 999; animation: slideIn 0.3s ease;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-  }
-  .toast.success { background: rgba(0,255,136,0.12); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
-  .toast.error { background: rgba(255,68,102,0.12); color: var(--danger); border: 1px solid rgba(255,68,102,0.3); }
-  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-  .layout-controls {
-    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px;
-    padding: 16px; background: var(--surface2); border-radius: var(--radius);
+  .lc {
+    display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px;
+    padding: 14px; background: var(--surface2); border-radius: var(--radius);
     align-items: flex-end;
   }
-  .ctrl-group { display: flex; flex-direction: column; gap: 6px; }
-  .ctrl-group label {
-    font-size: 0.65rem; color: var(--dim); text-transform: uppercase;
-    letter-spacing: 1px; font-weight: 600;
+  .cg { display: flex; flex-direction: column; gap: 4px; }
+  .cg label {
+    font-size: 0.6rem; color: var(--dim); text-transform: uppercase;
+    letter-spacing: 0.5px; font-weight: 600;
   }
-  .ctrl-group input {
+  .cg input {
     background: var(--bg); color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 8px 12px; font-family: var(--font);
-    font-size: 0.85rem; width: 80px;
+    border-radius: 4px; padding: 7px 10px; font-family: var(--font);
+    font-size: 0.8rem; width: 70px;
   }
-  .ctrl-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .cg input:focus { outline: none; border-color: var(--acc); }
 
-  /* ─── About ─── */
-  .about {
-    padding: 60px 20px 80px;
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    padding: 10px 18px; border-radius: 6px;
+    font-family: var(--font); font-size: 0.8rem;
+    z-index: 999; animation: si 0.2s ease;
+  }
+  .toast.ok { background: var(--surface); color: var(--acc); border: 1px solid rgba(0,255,136,0.25); }
+  .toast.ng { background: var(--surface); color: var(--danger); border: 1px solid rgba(255,68,102,0.25); }
+  @keyframes si { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* ─── about ─── */
+  .abt {
     text-align: center;
-    max-width: 700px;
+    max-width: 600px;
     margin: 0 auto;
   }
-  .about h2 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-  .about h2 span { color: var(--accent); }
-  .about .mission {
-    padding: 32px;
+  .abt .blk {
+    padding: 28px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    margin: 32px 0;
-    position: relative;
-    overflow: hidden;
+    margin: 28px 0;
   }
-  .about .mission::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  }
-  .about .mission p {
+  .abt .blk p {
     color: var(--dim);
-    line-height: 1.7;
-    font-size: 0.9rem;
+    line-height: 1.6;
+    font-size: 0.85rem;
   }
-  .about .mission strong { color: #fff; }
-  .about .byline {
-    color: var(--accent);
+  .abt .blk .by {
+    color: var(--acc);
     font-weight: 700;
     margin-top: 16px;
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
+  .abt .blk strong { color: #fff; }
+
+  /* ─── reveal ─── */
+  .rv {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .rv.in { opacity: 1; transform: translateY(0); }
+  .d1 { transition-delay: 0.05s; }
+  .d2 { transition-delay: 0.1s; }
+  .d3 { transition-delay: 0.15s; }
+  .d4 { transition-delay: 0.2s; }
+  .d5 { transition-delay: 0.25s; }
+  .d6 { transition-delay: 0.3s; }
 
   footer {
     text-align: center;
-    padding: 24px;
+    padding: 20px;
     border-top: 1px solid var(--border);
     color: var(--dim);
-    font-size: 0.75rem;
-    letter-spacing: 1px;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
   }
-  footer span { color: var(--accent); }
 
-  /* ─── Scroll animations ─── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .reveal-delay-1 { transition-delay: 0.1s; }
-  .reveal-delay-2 { transition-delay: 0.2s; }
-  .reveal-delay-3 { transition-delay: 0.3s; }
-  .reveal-delay-4 { transition-delay: 0.4s; }
-  .reveal-delay-5 { transition-delay: 0.5s; }
-  .reveal-delay-6 { transition-delay: 0.6s; }
-
-  @media (max-width: 700px) {
-    .snake-logo { width: 120px; height: 120px; }
-    .config-container { padding: 16px; }
-    .toolbar { gap: 6px; }
-    .btn { font-size: 0.7rem; padding: 6px 12px; }
+  @media (max-width: 640px) {
+    .snake-logo { width: 100px; height: 100px; }
+    section { padding: 40px 16px; }
+    .cfg-box { padding: 14px; }
+    .tb { gap: 4px; }
+    .btn { font-size: 0.65rem; padding: 5px 10px; }
+    nav { padding: 0 12px; }
+    nav .nls a { padding: 6px 8px; font-size: 0.65rem; }
   }
 </style>
 </head>
 <body>
 
+<nav id="nav">
+  <a class="nl" href="#">
+    <span class="s"><svg viewBox="0 0 512 512" fill="none"><path d="M256 96 C320 96 360 140 360 200 C360 260 320 280 280 280 C240 280 220 260 220 220 C220 180 240 160 280 160 C320 160 340 180 340 220 C340 280 300 320 260 340 C220 360 200 380 200 410" stroke="#00FF88" stroke-width="24" stroke-linecap="round" fill="none"/><circle cx="200" cy="410" r="8" fill="#00FF88"/></svg></span>
+    <span class="g">S</span>UDO<span class="g">D</span>ECK
+  </a>
+  <ul class="nls">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#config">Configure</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+</nav>
+
 <section class="hero">
   <svg class="snake-logo" viewBox="0 0 512 512" fill="none">
+    <defs>
+      <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00ff88"/>
+        <stop offset="100%" stop-color="#00cc66"/>
+      </linearGradient>
+    </defs>
     <rect width="512" height="512" rx="96" fill="var(--surface)"/>
+    <rect width="512" height="512" rx="96" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.15"/>
     <path d="M256 96 C320 96 360 140 360 200 C360 260 320 280 280 280 C240 280 220 260 220 220 C220 180 240 160 280 160 C320 160 340 180 340 220 C340 280 300 320 260 340 C220 360 200 380 200 410"
-          stroke="#00FF88" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <ellipse cx="200" cy="410" rx="14" ry="10" fill="#00FF88" transform="rotate(-15 200 410)"/>
-    <circle cx="194" cy="407" r="2.5" fill="#0A0E17"/>
-    <circle cx="188" cy="413" r="2.5" fill="#0A0E17"/>
-    <path class="tongue" d="M186 415 C182 420 178 425 176 428" stroke="#FF4466" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <path class="tongue" d="M176 428 L172 430 M176 428 L176 433" stroke="#FF4466" stroke-width="2" stroke-linecap="round" fill="none"/>
+          stroke="url(#sg)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <ellipse cx="200" cy="410" rx="14" ry="10" fill="url(#sg)" transform="rotate(-15 200 410)"/>
+    <circle cx="194" cy="407" r="2.5" fill="var(--bg)"/>
+    <circle cx="188" cy="413" r="2.5" fill="var(--bg)"/>
+    <path d="M186 415 C182 420 178 425 176 428" stroke="#FF4466" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M176 428 L172 430 M176 428 L176 433" stroke="#FF4466" stroke-width="2" stroke-linecap="round" fill="none"/>
   </svg>
-  <h1><span>S</span>UDO<span>D</span>ECK</h1>
-  <p class="tagline" id="tagline"></p>
-  <div class="hero-btns">
-    <a class="btn-hero primary" href="#config">Configure Yours</a>
-    <a class="btn-hero secondary" href="#about">Learn More</a>
-  </div>
-  <a class="scroll-indicator" href="#features">
-    <div class="mouse"></div>
-    <span>SCROLL</span>
-  </a>
-</section>
-
-<section id="features" class="features">
-  <h2>Why <span>Sudo</span>Deck?</h2>
-  <div class="feature-grid">
-    <div class="feature-card reveal reveal-delay-1">
-      <span class="feature-icon">🔌</span>
-      <h3>Zero Setup</h3>
-      <p>Pair via Bluetooth once. Works on any PC, Mac, or phone. No drivers, no daemons, no downloads.</p>
-    </div>
-    <div class="feature-card reveal reveal-delay-2">
-      <span class="feature-icon">🎨</span>
-      <h3>Fully Configurable</h3>
-      <p>Edit every button: label, color, action. Build macros, combos, text strings. All from your browser.</p>
-    </div>
-    <div class="feature-card reveal reveal-delay-3">
-      <span class="feature-icon">💾</span>
-      <h3>Self-Contained</h3>
-      <p>All config lives on the device's flash memory. Unplug it, take it anywhere. Your setup follows you.</p>
-    </div>
-    <div class="feature-card reveal reveal-delay-4">
-      <span class="feature-icon">🛠️</span>
-      <h3>Open Source</h3>
-      <p>MIT licensed. Modify it, remix it, build your own. The code is yours to shape and share.</p>
-    </div>
-    <div class="feature-card reveal reveal-delay-5">
-      <span class="feature-icon">💰</span>
-      <h3>Under $10</h3>
-      <p>Build it with a $10 ESP32 display. No hundred-dollar "gaming" keypad needed. Real hardware, real savings.</p>
-    </div>
-    <div class="feature-card reveal reveal-delay-6">
-      <span class="feature-icon">⚡</span>
-      <h3>BLE HID</h3>
-      <p>Direct Bluetooth HID — your computer sees a real keyboard. Instant, reliable, low power, no latency.</p>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<section class="steps-section">
-  <h2>Get Started in <span>3</span> Steps</h2>
-  <div class="steps-grid">
-    <div class="step-card reveal reveal-delay-1">
-      <span class="step-icon">🔌</span>
-      <h3>Plug In</h3>
-      <p>Connect your CYD via USB. Power and serial in one cable.</p>
-    </div>
-    <div class="step-card reveal reveal-delay-2">
-      <span class="step-icon">📡</span>
-      <h3>Pair</h3>
-      <p>Find "SudoDeck" in Bluetooth settings. Connect once, works forever.</p>
-    </div>
-    <div class="step-card reveal reveal-delay-3">
-      <span class="step-icon">🎮</span>
-      <h3>Push Buttons</h3>
-      <p>Your macros fire instantly over Bluetooth. No config needed on the PC.</p>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<section id="config" class="config-section">
-  <h2>Configure Your <span>Deck</span></h2>
-  <p>Connect your CYD via USB and use the editor below</p>
-  <div class="config-container">
-    <div class="status-bar">
-      <div id="statusBadge" class="status-badge offline">
-        <div class="status-dot red"></div>
-        <span>DISCONNECTED</span>
-      </div>
-      <div class="toolbar" style="margin-bottom:0;">
-        <button class="btn primary" id="btnConnect">Connect CYD</button>
-        <button class="btn" id="btnRead">Read Config</button>
-        <button class="btn primary" id="btnWrite">Write to CYD</button>
-        <button class="btn" id="btnExport">Export</button>
-        <button class="btn" id="btnImport" onclick="document.getElementById('fileInput').click()">Import</button>
-        <input type="file" id="fileInput" accept=".json" style="display:none">
-        <button class="btn danger" id="btnReset">Reset</button>
-      </div>
-    </div>
-    <div class="pages-bar" id="pagesBar"></div>
-    <div id="grid-preview" style="grid-template-columns:repeat(4,1fr)"></div>
-    <div class="editor-panel" id="editorPanel">
-      <h3>Edit Button</h3>
-      <div class="editor-row">
-        <label>Label</label>
-        <input type="text" id="editLabel" placeholder="Button label" maxlength="12">
-        <label>Color</label>
-        <input type="color" id="editColor" value="#16213e">
-      </div>
-      <div class="editor-row">
-        <label>Action</label>
-        <select id="editActionType">
-          <option value="key">Single Key</option>
-          <option value="combo">Key Combo</option>
-          <option value="text">Text String</option>
-          <option value="macro">Macro Sequence</option>
-          <option value="delay">Delay (ms)</option>
-        </select>
-      </div>
-      <div id="actionFields"></div>
-      <div class="btn-row">
-        <button class="btn primary" id="btnApplyEdit">Apply</button>
-        <button class="btn" id="btnCancelEdit">Cancel</button>
-      </div>
-    </div>
-    <div class="layout-controls" style="margin-top:16px;">
-      <div class="ctrl-group">
-        <label>Columns</label>
-        <input type="number" id="layoutCols" min="1" max="6" value="4">
-      </div>
-      <div class="ctrl-group">
-        <label>Rows</label>
-        <input type="number" id="layoutRows" min="1" max="5" value="3">
-      </div>
-      <div class="ctrl-group">
-        <label>Pages</label>
-        <input type="number" id="layoutPages" min="1" max="12" value="3">
-      </div>
-      <button class="btn primary" id="btnApplyLayout">Apply Layout</button>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<section id="about" class="about">
-  <h2><span>Sudo</span>Deck</h2>
-  <p style="color:var(--dim);">cheap. open. yours.</p>
-  <div class="mission">
-    <p style="font-size:0.95rem;">
-      <strong>SudoDeck</strong> turns a <strong>$10 CYD display</strong> into a
-      fully customizable, wireless macro deck. No subscriptions,
-      no proprietary software, no bullshit.
-    </p>
-    <p style="margin-top:16px;">
-      <strong>Our mission:</strong> affordable tech for everyone.<br>
-      If you can dream it, you can build it.
-    </p>
-    <p style="margin-top:16px;">
-      All config lives on the device.<br>
-      Pair once via Bluetooth, works on any PC.
-    </p>
-    <p class="byline">Built by Shahid Singh</p>
-  </div>
-  <p style="font-size:0.75rem;color:var(--dim);">
-    CYD (Cheap Yellow Display) · ESP32 + ILI9341 · BLE HID · Open Source · MIT
+  <h1><span class="g">S</span>UDO<span class="g">D</span>ECK</h1>
+  <p class="sub">
+    A $10 CYD display turned into a wireless macro deck.<br>
+    No subscriptions. No proprietary software. Just open source.
   </p>
+  <div class="hero-btns">
+    <a class="btn-h primary" href="#config">Configure</a>
+    <a class="btn-h sec" href="#about">About</a>
+  </div>
+  <div class="sc"><a href="#features"></a></div>
+</section>
+
+<section id="features">
+  <div class="inner">
+    <h2>Why <span class="g">Sudo</span>Deck</h2>
+    <div class="f-grid">
+      <div class="f-card rv d1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+        </svg>
+        <h3>Zero Setup</h3>
+        <p>Pair once via Bluetooth. Works on any PC, Mac, or phone. No daemons, no drivers, nothing to install.</p>
+      </div>
+      <div class="f-card rv d2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        <h3>Fully Configurable</h3>
+        <p>Edit every button's label, color, and action from your browser. Build macros, combos, and text snippets.</p>
+      </div>
+      <div class="f-card rv d3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+          <line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+        <h3>Self-Contained</h3>
+        <p>All config lives on the device's flash. Unplug it, move to another machine, your layout follows.</p>
+      </div>
+      <div class="f-card rv d4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+        <h3>Open Source</h3>
+        <p>MIT licensed. Fork it, hack it, build your own. The code is yours — modify it however you see fit.</p>
+      </div>
+      <div class="f-card rv d5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+        </svg>
+        <h3>Under $10</h3>
+        <p>Built with a Cheap Yellow Display — ~$10 on AliExpress. No need for hundred-dollar stream decks.</p>
+      </div>
+      <div class="f-card rv d6">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 9l4 4-4 4"/><path d="M9 21h4l4-4-4-4"/>
+          <path d="M23 9l-4 4 4 4"/><path d="M15 3h-4l-4 4 4 4"/>
+        </svg>
+        <h3>BLE HID</h3>
+        <p>Standard Bluetooth HID — your computer sees a real keyboard. Instant, reliable, no extra software needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <div class="inner">
+    <h2>Get Started</h2>
+    <div class="s-grid">
+      <div class="s-card rv d1">
+        <h3>Plug In</h3>
+        <p>Connect your CYD via USB. Power and data over a single cable.</p>
+      </div>
+      <div class="s-card rv d2">
+        <h3>Pair</h3>
+        <p>Find SudoDeck in your Bluetooth settings. Pair once, it stays paired.</p>
+      </div>
+      <div class="s-card rv d3">
+        <h3>Push Buttons</h3>
+        <p>Your macros fire instantly. No configuration needed on the host computer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="config">
+  <div class="inner">
+    <h2>Configure</h2>
+    <div class="cfg-box">
+      <div class="cfg-bar">
+        <div id="sb" class="badge off">
+          <div class="dot r"></div>
+          <span>DISCONNECTED</span>
+        </div>
+        <div class="tb" style="margin:0;">
+          <button class="btn pri" id="btnConnect">Connect</button>
+          <button class="btn" id="btnRead">Read</button>
+          <button class="btn pri" id="btnWrite">Write</button>
+          <button class="btn" id="btnExport">Export</button>
+          <button class="btn" id="btnImport" onclick="document.getElementById('fileInput').click()">Import</button>
+          <input type="file" id="fileInput" accept=".json" style="display:none">
+          <button class="btn dan" id="btnReset">Reset</button>
+        </div>
+      </div>
+      <div class="p-bar" id="pBar"></div>
+      <div id="gp" style="grid-template-columns:repeat(4,1fr)"></div>
+      <div class="ep" id="ep">
+        <h3>Edit Button</h3>
+        <div class="er">
+          <label>Label</label>
+          <input type="text" id="el" placeholder="Button label" maxlength="12">
+          <label>Color</label>
+          <input type="color" id="ec" value="#16213e">
+        </div>
+        <div class="er">
+          <label>Action</label>
+          <select id="eat">
+            <option value="key">Single Key</option>
+            <option value="combo">Key Combo</option>
+            <option value="text">Text String</option>
+            <option value="macro">Macro Sequence</option>
+            <option value="delay">Delay (ms)</option>
+          </select>
+        </div>
+        <div id="af"></div>
+        <div class="br">
+          <button class="btn pri" id="bae">Apply</button>
+          <button class="btn" id="bce">Cancel</button>
+        </div>
+      </div>
+      <div class="lc">
+        <div class="cg">
+          <label>Columns</label>
+          <input type="number" id="lc" min="1" max="6" value="4">
+        </div>
+        <div class="cg">
+          <label>Rows</label>
+          <input type="number" id="lr" min="1" max="5" value="3">
+        </div>
+        <div class="cg">
+          <label>Pages</label>
+          <input type="number" id="lp" min="1" max="12" value="3">
+        </div>
+        <button class="btn pri" id="bal">Apply Layout</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="about">
+  <div class="abt">
+    <h2><span class="g">Sudo</span>Deck</h2>
+    <p style="color:var(--dim);font-size:0.85rem;">cheap. open. yours.</p>
+    <div class="blk">
+      <p>
+        <strong>SudoDeck</strong> turns a $10 CYD display into a
+        wireless macro deck. No subscriptions, no proprietary software.
+      </p>
+      <p style="margin-top:12px;">
+        Build it yourself. Configure it your way. All your settings live
+        on the device — no cloud, no accounts, no tracking.
+      </p>
+      <p style="margin-top:12px;">
+        Our mission: affordable tech for everyone.
+      </p>
+      <p class="by">built by Shahid Singh</p>
+    </div>
+    <p style="font-size:0.7rem;color:var(--dim);">
+      CYD (ESP32 + ILI9341) &middot; BLE HID &middot; Open Source &middot; MIT
+    </p>
+  </div>
 </section>
 
 <footer>
-  SudoDeck &mdash; cheap. open. yours. &mdash; built by <span>Shahid Singh</span>
+  SudoDeck &mdash; cheap. open. yours. &mdash; built by Shahid Singh
 </footer>
 
 <script>
-// ─── Typewriter effect ───
-const taglines = [
-  'A <strong>$10 CYD display</strong> turned into a powerful wireless macro deck.',
-  'No subscriptions. No proprietary software. Just <strong>pure open source</strong>.'
-];
-let taglineIdx = 0;
-let charIdx = 0;
-const el = document.getElementById('tagline');
-function typeWriter() {
-  const full = taglines[taglineIdx];
-  if (charIdx <= full.length) {
-    el.innerHTML = full.substring(0, charIdx) + '<span class="cursor"></span>';
-    charIdx++;
-    const delay = full[charIdx - 1] === '<' ? 10 : full[charIdx - 1] === '>' ? 10 : full[charIdx - 1] === '&' ? 10 : Math.random() * 40 + 20;
-    setTimeout(typeWriter, delay);
-  } else {
-    setTimeout(() => {
-      el.innerHTML = full + '<span class="cursor"></span>';
-      setTimeout(() => {
-        taglineIdx = (taglineIdx + 1) % taglineLines.length;
-        charIdx = 0;
-        el.innerHTML = '';
-        setTimeout(typeWriter, 500);
-      }, 3000);
-    }, 100);
-  }
-}
-const taglineLines = taglines;
-setTimeout(typeWriter, 800);
-
-// ─── Snake tongue animation ───
-setInterval(() => {
-  document.querySelectorAll('.tongue').forEach(t => {
-    t.style.opacity = t.style.opacity === '0' ? '1' : '0';
-  });
-}, 3000);
-
-// ─── Scroll reveal ───
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+const iv = new IntersectionObserver(function(es) {
+  es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
 }, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
 
-// ─── Config tool ───
-let devicePort = null;
-let deviceReader = null;
-let deviceWriter = null;
-let configData = null;
-let selectedPage = 0;
-let selectedButton = -1;
+var dp = null, dr = null, dw = null, cd = null, sp = 0, sb = -1;
 
-function defaultConfig() {
+function dc() {
   return {
-    name: "SudoDeck",
-    grid: { cols: 4, rows: 3 },
+    name: "SudoDeck", grid: { cols: 4, rows: 3 },
     pages: [
       { name: "Main", buttons: [
         { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
@@ -875,304 +816,229 @@ function defaultConfig() {
     ]
   };
 }
-function initConfig() { configData = defaultConfig(); }
-function toast(msg, type) {
-  const t = document.createElement('div');
-  t.className = 'toast ' + (type || 'success');
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+function ic() { cd = dc(); }
+function tm(m, t) { var o = document.createElement('div'); o.className = 'toast ' + (t||'ok'); o.textContent = m; document.body.appendChild(o); setTimeout(function() { o.remove(); }, 3000); }
+function ss(on) {
+  var b = document.getElementById('sb');
+  b.className = 'badge ' + (on ? 'on' : 'off');
+  b.querySelector('.dot').className = 'dot ' + (on ? 'g' : 'r');
+  b.querySelector('span').textContent = on ? 'CONNECTED' : 'DISCONNECTED';
 }
-function setStatus(online) {
-  const badge = document.getElementById('statusBadge');
-  badge.className = 'status-badge ' + (online ? 'online' : 'offline');
-  badge.querySelector('.status-dot').className = 'status-dot ' + (online ? 'green' : 'red');
-  badge.querySelector('span').textContent = online ? 'CONNECTED' : 'DISCONNECTED';
-}
-async function serialReadLine(timeout = 5000) {
-  const decoder = new TextDecoder();
-  let buf = '';
-  const start = Date.now();
-  while (Date.now() - start < timeout) {
-    try {
-      const { value, done } = await deviceReader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const nl = buf.indexOf('\n');
-      if (nl >= 0) return buf.substring(0, nl).trim();
-    } catch (e) { await new Promise(r => setTimeout(r, 50)); }
+async function srl(t) {
+  t = t || 5000; var d = new TextDecoder(), b = '', s = Date.now();
+  while (Date.now() - s < t) {
+    try { var v = await dr.read(); if (v.done) break; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) return b.substring(0,n).trim(); }
+    catch(e) { await new Promise(function(r) { setTimeout(r, 50); }); }
   }
-  return buf.trim();
+  return b.trim();
 }
-async function serialCmd(cmd) {
-  if (!deviceWriter) throw new Error('Not connected');
-  const data = new TextEncoder().encode(JSON.stringify(cmd) + '\n');
-  await deviceWriter.write(data);
-  return JSON.parse(await serialReadLine());
-}
-document.getElementById('btnConnect').addEventListener('click', async () => {
+async function sc(c) { if (!dw) throw new Error('nc'); await dw.write(new TextEncoder().encode(JSON.stringify(c)+'\n')); return JSON.parse(await srl()); }
+document.getElementById('btnConnect').addEventListener('click', async function() {
   try {
-    if (!('serial' in navigator)) { toast('Web Serial requires Chrome/Edge', 'error'); return; }
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 115200 });
-    devicePort = port;
-    deviceReader = port.readable.getReader();
-    deviceWriter = port.writable.getWriter();
-    setStatus(true);
-    toast('Connected to SudoDeck');
-    try {
-      const resp = await serialCmd({ cmd: 'get_info' });
-      toast('Device: ' + (resp.name || 'unknown') + ' v' + (resp.version || '?'));
-    } catch(e) {}
-  } catch (e) {
-    if (e.message !== 'The device has been lost.') toast('Connection failed', 'error');
-    setStatus(false);
-  }
+    if (!('serial' in navigator)) { tm('Web Serial needs Chrome/Edge', 'ng'); return; }
+    var p = await navigator.serial.requestPort(); await p.open({baudRate:115200});
+    dp = p; dr = p.readable.getReader(); dw = p.writable.getWriter(); ss(true); tm('Connected');
+    try { var r = await sc({cmd:'get_info'}); tm(r.name+' v'+(r.version||'?')); } catch(e) {}
+  } catch(e) { if(e.message!=='The device has been lost.') tm('Connection failed', 'ng'); ss(false); }
 });
-window.addEventListener('beforeunload', async () => {
-  if (deviceReader) { try { await deviceReader.cancel(); } catch(e){} }
-  if (deviceWriter) { try { await deviceWriter.close(); } catch(e){} }
-  if (devicePort) { try { await devicePort.close(); } catch(e){} }
+window.addEventListener('beforeunload', async function() {
+  if(dr) { try { await dr.cancel(); } catch(e){} } if(dw) { try { await dw.close(); } catch(e){} } if(dp) { try { await dp.close(); } catch(e){} }
 });
-document.getElementById('btnRead').addEventListener('click', async () => {
-  if (!deviceWriter) { toast('Connect to CYD first', 'error'); return; }
-  try {
-    const resp = await serialCmd({ cmd: 'get_config' });
-    if (resp.config) { configData = resp.config; selectedPage = 0; selectedButton = -1; renderAll(); toast('Config loaded'); }
-  } catch (e) { toast('Read failed', 'error'); }
+document.getElementById('btnRead').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  try { var r = await sc({cmd:'get_config'}); if(r.config) { cd=r.config; sp=0; sb=-1; ra(); tm('Config loaded'); } } catch(e) { tm('Read failed', 'ng'); }
 });
-document.getElementById('btnWrite').addEventListener('click', async () => {
-  if (!deviceWriter) { toast('Connect to CYD first', 'error'); return; }
-  try { await serialCmd({ cmd: 'set_config', config: configData }); toast('Config written to CYD'); }
-  catch (e) { toast('Write failed', 'error'); }
+document.getElementById('btnWrite').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  try { await sc({cmd:'set_config',config:cd}); tm('Written to CYD'); } catch(e) { tm('Write failed', 'ng'); }
 });
-document.getElementById('btnExport').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(configData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'sudodeck-config.json'; a.click();
-  URL.revokeObjectURL(url); toast('Config exported');
+document.getElementById('btnExport').addEventListener('click', function() {
+  var b = new Blob([JSON.stringify(cd,null,2)], {type:'application/json'});
+  var u = URL.createObjectURL(b); var a = document.createElement('a'); a.href=u; a.download='sudodeck-config.json'; a.click(); URL.revokeObjectURL(u); tm('Exported');
 });
-document.getElementById('btnReset').addEventListener('click', async () => {
-  if (!confirm('Reset to factory defaults?')) return;
-  if (deviceWriter) {
-    try {
-      await serialCmd({ cmd: 'factory_reset' });
-      const resp = await serialCmd({ cmd: 'get_config' });
-      if (resp.config) configData = resp.config;
-    } catch (e) { toast('Reset failed', 'error'); return; }
-  } else { configData = defaultConfig(); }
-  selectedPage = 0; selectedButton = -1; renderAll(); toast('Factory reset');
+document.getElementById('btnReset').addEventListener('click', async function() {
+  if(!confirm('Factory reset?')) return;
+  if(dw) { try { await sc({cmd:'factory_reset'}); var r = await sc({cmd:'get_config'}); if(r.config) cd=r.config; } catch(e) { tm('Reset failed','ng'); return; } }
+  else { cd=dc(); }
+  sp=0; sb=-1; ra(); tm('Reset done');
 });
-document.getElementById('fileInput').addEventListener('change', (e) => {
-  const f = e.target.files[0]; if (!f) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (!data.pages || !data.grid) throw new Error('Invalid format');
-      configData = data; selectedPage = 0; selectedButton = -1; renderAll(); toast('Config imported');
-    } catch (err) { toast('Invalid file', 'error'); }
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  var f = e.target.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    try { var d = JSON.parse(ev.target.result); if(!d.pages||!d.grid) throw Error('bad'); cd=d; sp=0; sb=-1; ra(); tm('Imported'); } catch(err) { tm('Invalid file','ng'); }
   };
-  reader.readAsText(f); e.target.value = '';
+  r.readAsText(f); e.target.value = '';
 });
-function updateLayoutInputs() {
-  if (!configData) return;
-  document.getElementById('layoutCols').value = configData.grid.cols;
-  document.getElementById('layoutRows').value = configData.grid.rows;
-  document.getElementById('layoutPages').value = configData.pages.length;
-}
-document.getElementById('btnApplyLayout').addEventListener('click', () => {
-  const cols = Math.max(1, Math.min(6, parseInt(document.getElementById('layoutCols').value) || 4));
-  const rows = Math.max(1, Math.min(5, parseInt(document.getElementById('layoutRows').value) || 3));
-  const pageCount = Math.max(1, Math.min(12, parseInt(document.getElementById('layoutPages').value) || 1));
-  configData.grid.cols = cols; configData.grid.rows = rows;
-  const totalBtns = cols * rows;
-  while (configData.pages.length < pageCount) {
-    const btns = [];
-    for (let i = 0; i < totalBtns; i++) btns.push({ label: '', color: '#16213E', action: { type: 'key', value: '' } });
-    configData.pages.push({ name: 'Page ' + (configData.pages.length + 1), buttons: btns });
-  }
-  while (configData.pages.length > pageCount) configData.pages.pop();
-  for (const page of configData.pages) {
-    while (page.buttons.length < totalBtns) page.buttons.push({ label: '', color: '#16213E', action: { type: 'key', value: '' } });
-    while (page.buttons.length > totalBtns) page.buttons.pop();
-  }
-  selectedPage = 0; selectedButton = -1; renderAll(); toast('Layout updated');
+function ul() { if(!cd) return; document.getElementById('lc').value=cd.grid.cols; document.getElementById('lr').value=cd.grid.rows; document.getElementById('lp').value=cd.pages.length; }
+document.getElementById('bal').addEventListener('click', function() {
+  var c=Math.max(1,Math.min(6,parseInt(document.getElementById('lc').value)||4));
+  var r=Math.max(1,Math.min(5,parseInt(document.getElementById('lr').value)||3));
+  var pc=Math.max(1,Math.min(12,parseInt(document.getElementById('lp').value)||1));
+  cd.grid.cols=c; cd.grid.rows=r; var tb=c*r;
+  while(cd.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); cd.pages.push({name:'Page '+(cd.pages.length+1),buttons:bt}); }
+  while(cd.pages.length>pc) cd.pages.pop();
+  for(var i=0;i<cd.pages.length;i++) { while(cd.pages[i].buttons.length<tb) cd.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); while(cd.pages[i].buttons.length>tb) cd.pages[i].buttons.pop(); }
+  sp=0; sb=-1; ra(); tm('Layout updated');
 });
-function renderAll() { renderPagesBar(); renderGrid(); updateLayoutInputs(); }
-function renderPagesBar() {
-  const bar = document.getElementById('pagesBar'); bar.innerHTML = '';
-  if (!configData) return;
-  for (let i = 0; i < configData.pages.length; i++) {
-    const tab = document.createElement('span');
-    tab.className = 'page-tab' + (i === selectedPage ? ' active' : '');
-    tab.textContent = configData.pages[i].name || ('Pg' + (i + 1));
-    tab.addEventListener('click', () => { selectedPage = i; selectedButton = -1; renderAll(); });
-    tab.addEventListener('dblclick', () => {
-      const n = prompt('Page name:', configData.pages[i].name);
-      if (n !== null) { configData.pages[i].name = n; renderAll(); }
-    });
-    bar.appendChild(tab);
+function ra() { rpb(); rg(); ul(); }
+function rpb() {
+  var b = document.getElementById('pBar'); b.innerHTML = '';
+  if(!cd) return;
+  for(var i=0;i<cd.pages.length;i++) {
+    var t = document.createElement('span');
+    t.className = 'p-tab' + (i===sp?' on':'');
+    t.textContent = cd.pages[i].name || ('Pg'+(i+1));
+    t.addEventListener('click', function(idx) { return function() { sp=idx; sb=-1; ra(); }; }(i));
+    t.addEventListener('dblclick', function(idx) { return function() { var n=prompt('Page name:',cd.pages[idx].name); if(n!==null) { cd.pages[idx].name=n; ra(); } }; }(i));
+    b.appendChild(t);
   }
 }
-function renderGrid() {
-  const grid = document.getElementById('grid-preview');
-  if (!configData) return;
-  const { cols, rows } = configData.grid;
-  grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
-  const page = configData.pages[selectedPage];
-  if (!page) return;
-  grid.innerHTML = '';
-  for (let i = 0; i < cols * rows; i++) {
-    const btn = document.createElement('div');
-    btn.className = 'grid-btn';
-    if (i >= page.buttons.length || !page.buttons[i] || !page.buttons[i].label) btn.classList.add('empty');
-    if (i === selectedButton) btn.classList.add('selected');
-    const b = page.buttons[i] || { label: '', color: '#16213E' };
-    btn.style.backgroundColor = b.color || '#16213E';
-    btn.innerHTML = '<span class="btn-idx">' + (i+1) + '</span>' + (b.label || '...');
-    btn.addEventListener('click', () => { selectedButton = i; renderGrid(); showEditor(i); });
-    grid.appendChild(btn);
+function rg() {
+  var g = document.getElementById('gp');
+  if(!cd) return;
+  var cols=cd.grid.cols, rows=cd.grid.rows;
+  g.style.gridTemplateColumns = 'repeat('+cols+',1fr)';
+  var p = cd.pages[sp]; if(!p) return;
+  g.innerHTML = '';
+  for(var i=0;i<cols*rows;i++) {
+    var b = document.createElement('div');
+    b.className = 'gb';
+    if(i>=p.buttons.length||!p.buttons[i]||!p.buttons[i].label) b.classList.add('em');
+    if(i===sb) b.classList.add('sel');
+    var d = p.buttons[i]||{label:'',color:'#16213E'};
+    b.style.backgroundColor = d.color||'#16213E';
+    b.innerHTML = '<span class="ix">'+(i+1)+'</span>'+(d.label||'...');
+    b.addEventListener('click', function(idx) { return function() { sb=idx; rg(); se(idx); }; }(i));
+    g.appendChild(b);
   }
 }
-function showEditor(idx) {
-  const panel = document.getElementById('editorPanel');
-  const page = configData.pages[selectedPage];
-  if (!page || idx >= page.buttons.length) { panel.style.display = 'none'; return; }
-  panel.style.display = 'flex';
-  const btn = page.buttons[idx];
-  document.getElementById('editLabel').value = btn.label || '';
-  document.getElementById('editColor').value = btn.color || '#16213E';
-  document.getElementById('editActionType').value = btn.action ? btn.action.type : 'key';
-  updateActionFields();
+function se(idx) {
+  var p = document.getElementById('ep');
+  var pg = cd.pages[sp];
+  if(!pg||idx>=pg.buttons.length) { p.style.display='none'; return; }
+  p.style.display='flex';
+  var b = pg.buttons[idx];
+  document.getElementById('el').value = b.label||'';
+  document.getElementById('ec').value = b.color||'#16213E';
+  document.getElementById('eat').value = b.action?b.action.type:'key';
+  uaf();
 }
-function updateActionFields() {
-  const type = document.getElementById('editActionType').value;
-  const container = document.getElementById('actionFields');
-  const page = configData.pages[selectedPage];
-  const btn = page ? page.buttons[selectedButton] : null;
-  const action = btn ? btn.action : { type: 'key', value: '' };
-  let html = '';
-  if (type === 'key') {
-    html = '<div class="editor-row"><label>Key</label><input type="text" id="editKeyValue" value="' + esc(action.value||'') + '" placeholder="ENTER, F1, a, MEDIA_PLAY_PAUSE"></div>';
-  } else if (type === 'combo') {
-    html = '<div class="editor-row"><label>Mod</label><select id="editComboMod">' +
-      ['CTRL','ALT','SHIFT','CTRL_SHIFT','CTRL_ALT','ALT_SHIFT','CTRL_ALT_SHIFT'].map(function(m) {
-        return '<option value="' + m + '"' + (action.mod===m?' selected':'') + '>' + m.replace('_','+') + '</option>';
-      }).join('') +
-      '</select><label>Key</label><input type="text" id="editComboKey" value="' + esc(action.key||'') + '" placeholder="c, s, v"></div>';
-  } else if (type === 'text') {
-    html = '<div class="editor-row"><label>Text</label><input type="text" id="editTextValue" value="' + esc(action.value||'') + '" placeholder="Text to type"></div>';
-  } else if (type === 'delay') {
-    html = '<div class="editor-row"><label>Delay</label><input type="number" id="editDelayValue" value="' + (action.value||100) + '" min="1" max="10000"> <span style="font-size:0.7rem;color:var(--dim)">ms</span></div>';
-  } else if (type === 'macro') {
-    html = '<div class="action-builder"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="color:var(--accent);font-size:0.75rem;">MACRO STEPS</span><button class="btn small" id="btnAddStep">+ Add Step</button></div><div id="macroSteps"></div></div>';
+function uaf() {
+  var t = document.getElementById('eat').value;
+  var c = document.getElementById('af');
+  var pg = cd.pages[sp];
+  var b = pg?pg.buttons[sb]:null;
+  var a = b?b.action:{type:'key',value:''};
+  var h = '';
+  if(t==='key') {
+    h = '<div class="er"><label>Key</label><input type="text" id="ekv" value="'+es(a.value||'')+'" placeholder="ENTER, F1, a"></div>';
+  } else if(t==='combo') {
+    h = '<div class="er"><label>Mod</label><select id="ecm">'+
+      ['CTRL','ALT','SHIFT','CTRL_SHIFT','CTRL_ALT','ALT_SHIFT','CTRL_ALT_SHIFT'].map(function(m){return '<option value="'+m+'"'+(a.mod===m?' selected':'')+'>'+m.replace('_','+')+'</option>';}).join('')+
+      '</select><label>Key</label><input type="text" id="eck" value="'+es(a.key||'')+'" placeholder="c, s, v"></div>';
+  } else if(t==='text') {
+    h = '<div class="er"><label>Text</label><input type="text" id="etv" value="'+es(a.value||'')+'" placeholder="Text to type"></div>';
+  } else if(t==='delay') {
+    h = '<div class="er"><label>Delay</label><input type="number" id="edv" value="'+(a.value||100)+'" min="1" max="10000"> <span style="font-size:0.7rem;color:var(--dim)">ms</span></div>';
+  } else if(t==='macro') {
+    h = '<div class="ab"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="color:var(--acc);font-size:0.7rem;">STEPS</span><button class="btn" id="bas">+ Add</button></div><div id="mss"></div></div>';
     setTimeout(function() {
-      renderMacroSteps(action.steps || []);
-      document.getElementById('btnAddStep').addEventListener('click', function() {
-        const steps = getActionFromFields().steps || [];
-        steps.push({ type: 'key', value: '' });
-        const page = configData.pages[selectedPage];
-        page.buttons[selectedButton].action = { type: 'macro', steps: steps };
-        updateActionFields();
+      rms(a.steps||[]);
+      document.getElementById('bas').addEventListener('click', function() {
+        var s = gaf().steps||[]; s.push({type:'key',value:''});
+        cd.pages[sp].buttons[sb].action = {type:'macro',steps:s};
+        uaf();
       });
     }, 50);
   }
-  container.innerHTML = html;
+  c.innerHTML = h;
 }
-function renderMacroSteps(steps) {
-  const container = document.getElementById('macroSteps');
-  if (!container) return;
-  container.innerHTML = '';
-  steps = steps || [];
-  steps.forEach(function(step, i) {
-    const div = document.createElement('div');
-    div.className = 'macro-step';
-    div.innerHTML = '<span class="step-num">#' + (i+1) + '</span>' +
-      '<select class="macro-type" data-idx="' + i + '">' +
-        ['key','combo','text','delay'].map(function(t) {
-          return '<option value="' + t + '"' + (step.type===t?' selected':'') + '>' + t.charAt(0).toUpperCase()+t.slice(1) + '</option>';
-        }).join('') +
-      '</select>' +
-      '<input type="text" class="macro-value" value="' + esc(step.value||step.key||'') + '" data-idx="' + i + '" placeholder="value" style="flex:1">' +
-      '<button class="btn small danger macro-del" data-idx="' + i + '">X</button>';
-    container.appendChild(div);
+function rms(steps) {
+  var c = document.getElementById('mss'); if(!c) return;
+  c.innerHTML = '';
+  steps = steps||[];
+  steps.forEach(function(s,i) {
+    var d = document.createElement('div'); d.className = 'ms';
+    d.innerHTML = '<span style="color:var(--dim);font-size:0.6rem;min-width:18px;font-family:var(--mono)">#'+(i+1)+'</span>'+
+      '<select class="mt" data-idx="'+i+'">'+['key','combo','text','delay'].map(function(t){return '<option value="'+t+'"'+(s.type===t?' selected':'')+'>'+t.charAt(0).toUpperCase()+t.slice(1)+'</option>';}).join('')+
+      '</select><input type="text" class="mv" value="'+es(s.value||s.key||'')+'" data-idx="'+i+'" placeholder="value" style="flex:1">'+
+      '<button class="btn dan md" data-idx="'+i+'" style="padding:3px 8px;font-size:0.65rem;">X</button>';
+    c.appendChild(d);
   });
-  container.querySelectorAll('.macro-type').forEach(function(sel) {
-    sel.addEventListener('change', function(e) {
-      const idx = parseInt(e.target.dataset.idx);
-      const page = configData.pages[selectedPage];
-      if (page.buttons[selectedButton].action.steps) {
-        page.buttons[selectedButton].action.steps[idx].type = e.target.value;
-      }
-      renderMacroSteps(page.buttons[selectedButton].action.steps);
+  c.querySelectorAll('.mt').forEach(function(s) {
+    s.addEventListener('change', function(e) {
+      var idx = parseInt(e.target.dataset.idx);
+      if(cd.pages[sp].buttons[sb].action.steps) { cd.pages[sp].buttons[sb].action.steps[idx].type = e.target.value; }
+      rms(cd.pages[sp].buttons[sb].action.steps);
     });
   });
-  container.querySelectorAll('.macro-value').forEach(function(inp) {
-    inp.addEventListener('input', function(e) {
-      const idx = parseInt(e.target.dataset.idx);
-      const page = configData.pages[selectedPage];
-      if (page.buttons[selectedButton].action.steps) {
-        const step = page.buttons[selectedButton].action.steps[idx];
-        if (step.type === 'key' || step.type === 'text' || step.type === 'delay') step.value = e.target.value;
-        else if (step.type === 'combo') step.key = e.target.value;
+  c.querySelectorAll('.mv').forEach(function(i) {
+    i.addEventListener('input', function(e) {
+      var idx = parseInt(e.target.dataset.idx);
+      if(cd.pages[sp].buttons[sb].action.steps) {
+        var s2 = cd.pages[sp].buttons[sb].action.steps[idx];
+        if(s2.type==='key'||s2.type==='text'||s2.type==='delay') s2.value = e.target.value;
+        else if(s2.type==='combo') s2.key = e.target.value;
       }
     });
   });
-  container.querySelectorAll('.macro-del').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      const idx = parseInt(e.target.dataset.idx);
-      const page = configData.pages[selectedPage];
-      if (page.buttons[selectedButton].action.steps) {
-        page.buttons[selectedButton].action.steps.splice(idx, 1);
-        renderMacroSteps(page.buttons[selectedButton].action.steps);
-      }
+  c.querySelectorAll('.md').forEach(function(b) {
+    b.addEventListener('click', function(e) {
+      var idx = parseInt(e.target.dataset.idx);
+      if(cd.pages[sp].buttons[sb].action.steps) { cd.pages[sp].buttons[sb].action.steps.splice(idx,1); rms(cd.pages[sp].buttons[sb].action.steps); }
     });
   });
 }
-function getActionFromFields() {
-  const type = document.getElementById('editActionType').value;
-  if (type === 'key') return { type: 'key', value: document.getElementById('editKeyValue')?.value || '' };
-  if (type === 'combo') return { type: 'combo', mod: document.getElementById('editComboMod')?.value || 'CTRL', key: document.getElementById('editComboKey')?.value || '' };
-  if (type === 'text') return { type: 'text', value: document.getElementById('editTextValue')?.value || '' };
-  if (type === 'delay') return { type: 'delay', value: parseInt(document.getElementById('editDelayValue')?.value) || 100 };
-  if (type === 'macro') {
-    const page = configData.pages[selectedPage];
-    return { type: 'macro', steps: page.buttons[selectedButton].action?.steps || [] };
+function gaf() {
+  var t = document.getElementById('eat').value;
+  if(t==='key') return {type:'key',value:document.getElementById('ekv')?.value||''};
+  if(t==='combo') return {type:'combo',mod:document.getElementById('ecm')?.value||'CTRL',key:document.getElementById('eck')?.value||''};
+  if(t==='text') return {type:'text',value:document.getElementById('etv')?.value||''};
+  if(t==='delay') return {type:'delay',value:parseInt(document.getElementById('edv')?.value)||100};
+  if(t==='macro') { return {type:'macro',steps:cd.pages[sp].buttons[sb].action?.steps||[]}; }
+  return {type:'key',value:''};
+}
+document.getElementById('eat').addEventListener('change', function() {
+  var pg = cd.pages[sp];
+  if(pg&&sb>=0) {
+    var nt = document.getElementById('eat').value;
+    var na = {type:nt};
+    if(nt==='key'||nt==='text') na.value='';
+    if(nt==='combo') { na.mod='CTRL'; na.key=''; }
+    if(nt==='delay') na.value=100;
+    if(nt==='macro') na.steps=[];
+    pg.buttons[sb].action = na;
   }
-  return { type: 'key', value: '' };
-}
-document.getElementById('editActionType').addEventListener('change', function() {
-  const page = configData.pages[selectedPage];
-  if (page && selectedButton >= 0) {
-    const newType = document.getElementById('editActionType').value;
-    const newAction = { type: newType };
-    if (newType === 'key' || newType === 'text') newAction.value = '';
-    if (newType === 'combo') { newAction.mod = 'CTRL'; newAction.key = ''; }
-    if (newType === 'delay') newAction.value = 100;
-    if (newType === 'macro') newAction.steps = [];
-    page.buttons[selectedButton].action = newAction;
-  }
-  updateActionFields();
+  uaf();
 });
-document.getElementById('btnApplyEdit').addEventListener('click', function() {
-  const page = configData.pages[selectedPage];
-  if (!page || selectedButton < 0) return;
-  page.buttons[selectedButton].label = document.getElementById('editLabel').value;
-  page.buttons[selectedButton].color = document.getElementById('editColor').value;
-  page.buttons[selectedButton].action = getActionFromFields();
-  document.getElementById('editorPanel').style.display = 'none';
-  renderAll(); toast('Button updated');
+document.getElementById('bae').addEventListener('click', function() {
+  var pg = cd.pages[sp]; if(!pg||sb<0) return;
+  pg.buttons[sb].label = document.getElementById('el').value;
+  pg.buttons[sb].color = document.getElementById('ec').value;
+  pg.buttons[sb].action = gaf();
+  document.getElementById('ep').style.display = 'none';
+  ra(); tm('Button updated');
 });
-document.getElementById('btnCancelEdit').addEventListener('click', function() {
-  document.getElementById('editorPanel').style.display = 'none';
-  selectedButton = -1; renderGrid();
+document.getElementById('bce').addEventListener('click', function() {
+  document.getElementById('ep').style.display = 'none';
+  sb = -1; rg();
 });
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&#34;'); }
+function es(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&#34;'); }
 
-initConfig();
-renderAll();
+var nav = document.getElementById('nav');
+var navTicking = false;
+window.addEventListener('scroll', function() {
+  if (!navTicking) {
+    requestAnimationFrame(function() {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+      navTicking = false;
+    });
+    navTicking = true;
+  }
+});
+
+ic(); ra();
 </script>
 </body>
 </html>
