@@ -279,25 +279,13 @@
   }
 
   /* ─── sections ─── */
-  section { padding: 72px 20px; }
+  section { padding: 80px 20px; }
   section > h2 {
+    text-align: center;
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 1px;
-    margin-bottom: 44px;
-    position: relative;
-    display: inline-block;
-    white-space: nowrap;
-  }
-  section > h2::after {
-    content: '';
-    display: block;
-    width: 40%;
-    height: 2px;
-    background: var(--acc);
-    margin: 10px auto 0;
-    border-radius: 1px;
-    opacity: 0.4;
+    margin-bottom: 48px;
   }
   section > h2 .g { color: var(--acc); }
 
@@ -374,7 +362,7 @@
   .s-card::before {
     content: "0" counter(s);
     position: absolute;
-    top: -10px;
+    top: -8px;
     left: 20px;
     font-family: var(--mono);
     font-size: 0.65rem;
@@ -562,8 +550,13 @@
   /* ─── about ─── */
   .abt {
     text-align: center;
-    max-width: 600px;
+    max-width: 720px;
     margin: 0 auto;
+  }
+  .abt-tag {
+    color: var(--dim);
+    font-size: 0.85rem;
+    margin-bottom: 28px;
   }
   .abt .blk {
     padding: 28px;
@@ -577,13 +570,51 @@
     line-height: 1.6;
     font-size: 0.85rem;
   }
-  .abt .blk .by {
+  .abt .blk strong { color: #fff; font-size: 0.9rem; }
+
+  .abt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .abt-card {
+    text-align: left;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all 0.2s;
+  }
+  .abt-card:hover {
+    border-color: rgba(255,255,255,0.08);
+    background: #141c2a;
+  }
+  .abt-card h3 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--acc);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .abt-card p {
+    font-size: 0.8rem;
+    color: var(--dim);
+    line-height: 1.5;
+  }
+
+  .by {
     color: var(--acc);
     font-weight: 700;
-    margin-top: 16px;
+    margin: 24px 0 12px;
     font-size: 0.9rem;
   }
-  .abt .blk strong { color: #fff; }
+  .abt-tags {
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 0.3px;
+  }
 
   /* ─── reveal ─── */
   .rv {
@@ -616,6 +647,7 @@
     .btn { font-size: 0.65rem; padding: 5px 10px; }
     nav { padding: 0 12px; }
     nav .nls a { padding: 6px 8px; font-size: 0.65rem; }
+    .abt-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -809,23 +841,66 @@
 <section id="about">
   <div class="abt">
     <h2><span class="g">Sudo</span>Deck</h2>
-    <p style="color:var(--dim);font-size:0.85rem;">cheap. open. yours.</p>
+    <p class="abt-tag">cheap. open. yours.</p>
     <div class="blk">
       <p>
         <strong>SudoDeck</strong> turns a $10 CYD display into a
-        wireless macro deck. No subscriptions, no proprietary software.
+        wireless macro deck. Pair it over Bluetooth, configure it from
+        your browser, use it anywhere. No subscriptions, no proprietary
+        software, no vendor lock-in.
       </p>
-      <p style="margin-top:12px;">
-        Build it yourself. Configure it your way. All your settings live
-        on the device — no cloud, no accounts, no tracking.
-      </p>
-      <p style="margin-top:12px;">
-        Our mission: affordable tech for everyone.
-      </p>
-      <p class="by">built by Shahid Singh</p>
     </div>
-    <p style="font-size:0.7rem;color:var(--dim);">
-      CYD (ESP32 + ILI9341) &middot; BLE HID &middot; Open Source &middot; MIT
+
+    <div class="abt-grid">
+      <div class="abt-card">
+        <h3>The Mission</h3>
+        <p>
+          Macro decks shouldn't cost a hundred dollars. We believe
+          affordable tech is a right, not a privilege. SudoDeck is our
+          answer — open hardware and open software that anyone can build,
+          modify, and own.
+        </p>
+      </div>
+      <div class="abt-card">
+        <h3>Your Privacy</h3>
+        <p>
+          All configuration stays on the device. No cloud sync, no
+          accounts, no telemetry. When you unplug SudoDeck, your layout
+          follows — because it never left.
+        </p>
+      </div>
+      <div class="abt-card">
+        <h3>Open Source</h3>
+        <p>
+          MIT licensed. The firmware, the website, the config tool —
+          everything is public. Fork it, hack it, build something new.
+          The only limit is what you decide to build.
+        </p>
+      </div>
+      <div class="abt-card">
+        <h3>Your Way</h3>
+        <p>
+          Single keys, key combos, text strings, macro sequences — every
+          button does what you want. Change labels, change colors, build
+          multiple pages. No restrictions, no paid upgrades.
+        </p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <p><strong>How it works</strong></p>
+      <p style="margin-top:8px;">
+        SudoDeck runs on an ESP32 microcontroller with a 2.8" TFT display.
+        It connects to your computer as a standard Bluetooth keyboard
+        (BLE HID) — no drivers, no daemons, no downloads. Your button
+        layout is stored on the device's SPIFFS flash and edited through
+        any browser that supports Web Serial.
+      </p>
+    </div>
+
+    <p class="by">built by Shahid Singh</p>
+    <p class="abt-tags">
+      ESP32 + ILI9341 &middot; BLE HID &middot; Open Source &middot; MIT
     </p>
   </div>
 </section>
