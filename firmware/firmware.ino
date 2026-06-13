@@ -205,6 +205,8 @@ void apply_cfg() {
   if (num_pages < 1) num_pages = 1;
   total_btns = cols * rows;
   if (page >= num_pages) page = 0;
+  int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
+  if (t >= 5 && t <= 600) saver_timeout = t;
 }
 
 void s_ok(JsonDocument& r) { r["ok"]=true; serializeJson(r,Serial); Serial.println(); }
@@ -235,18 +237,21 @@ void proc_serial(const String& l) {
     r["total"]=SPIFFS.totalBytes();
     s_ok(r);
   }
-  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; draw_all(); JsonDocument r; s_ok(r); }
+  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; saver_timeout = DEFAULT_TIMEOUT; if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
   else if (!strcmp(cmd,"set_saver")) {
     int t = req["timeout"]|DEFAULT_TIMEOUT;
-    if (t >= 5 && t <= 600) saver_timeout = t;
+    if (t >= 5 && t <= 600) {
+      saver_timeout = t;
+      config["saver"]["timeout"] = t;
+      save_cfg();
+    }
     JsonDocument r; r["timeout"] = saver_timeout; s_ok(r);
   }
   else if (!strcmp(cmd,"get_saver")) {
     JsonDocument r; r["timeout"] = saver_timeout;
-    if (saver_img) { r["has_img"] = true; r["w"] = SAVER_W; r["h"] = SAVER_H; }
-    else { r["has_img"] = false; }
+    r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");;
     s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
@@ -628,6 +633,13 @@ void loop() {
 
   if (saver_active) {
     draw_saver();
+    if (ts.tirqTouched() && ts.touched()) {
+      TS_Point p = ts.getPoint();
+      int tx = map(p.x, 200, 3700, 0, SCR_W);
+      int ty = map(p.y, 240, 3800, 0, SCR_H);
+      handle_touch(tx, ty);
+      while (ts.touched()) delay(5);
+    }
     delay(33);
     return;
   }
