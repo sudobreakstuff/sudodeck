@@ -38,6 +38,7 @@ int page = 0;
 int num_pages = 0;
 int cols = 4, rows = 3;
 int total_btns = 0;
+int nav_dot_x = 0;
 
 JsonDocument config;
 String serial_buf;
@@ -342,20 +343,20 @@ void draw_bottom() {
   tft.fillRect(0, SCR_H - BOT_H, SCR_W, BOT_H, C_HDR);
   int cy = SCR_H - BOT_H + 4;
 
-  int nav_l = 2, nav_w = 20;
+  int nav_l = 2, nav_w = 22;
 
   if (num_pages > 1) {
     tft.fillRoundRect(nav_l, cy - 2, nav_w, 18, 4, C_BTN_BG);
     tft.setTextColor(C_TXT, C_BTN_BG);
-    tft.setCursor(nav_l + 6, cy);
+    tft.setCursor(nav_l + 7, cy);
     tft.print("<");
   }
 
   if (num_pages > 1) {
-    int bx = SCR_W - nav_w - 2;
+    int bx = SCR_W - nav_w - nav_l;
     tft.fillRoundRect(bx, cy - 2, nav_w, 18, 4, C_BTN_BG);
     tft.setTextColor(C_TXT, C_BTN_BG);
-    tft.setCursor(bx + 6, cy);
+    tft.setCursor(bx + 7, cy);
     tft.print(">");
   }
 
@@ -379,10 +380,10 @@ void draw_bottom() {
   tft.print(pname);
 
   // dots after page name
-  int dot_x = name_x + pw + 8;
+  nav_dot_x = name_x + pw + 8;
   for (int i = 0; i < ndots; i++) {
-    if (dot_x + i * 10 < rx) {
-      tft.fillCircle(dot_x + i * 10, cy + 8, 3, i == page ? C_ACC : C_DIM);
+    if (nav_dot_x + i * 10 < rx) {
+      tft.fillCircle(nav_dot_x + i * 10, cy + 8, 3, i == page ? C_ACC : C_DIM);
     }
   }
 }
@@ -398,16 +399,17 @@ void handle_touch(int tx, int ty) {
   if (ty < 0) ty = 0; if (ty >= SCR_H) ty = SCR_H - 1;
 
   if (ty >= SCR_H - BOT_H) {
-    if (num_pages > 1 && tx >= 0 && tx <= 26) {
+    int nav_l = 2, nav_w = 22;
+    if (num_pages > 1 && tx >= nav_l && tx <= nav_l + nav_w) {
       if (page > 0) { page--; draw_grid(); draw_bottom(); }
       return;
     }
-    if (num_pages > 1 && tx >= SCR_W - 92 && tx <= SCR_W - 58) {
+    if (num_pages > 1 && tx >= SCR_W - nav_l - nav_w && tx <= SCR_W - nav_l) {
       if (page < num_pages - 1) { page++; draw_grid(); draw_bottom(); }
       return;
     }
     for (int i = 0; i < num_pages && i < 12; i++) {
-      int dx = 130 + i * 10;
+      int dx = nav_dot_x + i * 10;
       if (tx >= dx - 9 && tx <= dx + 9) { page = i; draw_grid(); draw_bottom(); return; }
     }
     return;
