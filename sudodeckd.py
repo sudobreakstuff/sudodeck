@@ -103,10 +103,11 @@ class TouchListener:
 
     def find_port(self):
         for p in serial.tools.list_ports.comports():
-            if "ch340" in p.description.lower() or "usb" in p.description.lower():
+            d = p.description.lower()
+            if "ch340" in d or "usb serial" in d:
                 return p.device
         for p in serial.tools.list_ports.comports():
-            if "serial" in p.description.lower() or "tty" in p.device:
+            if "usb" in p.description.lower() and "ttyusb" in p.device.lower():
                 return p.device
         return None
 
