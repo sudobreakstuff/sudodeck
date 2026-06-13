@@ -68,8 +68,9 @@ h1{text-align:center;font-size:22px;font-weight:600}h1 span{color:var(--muted);f
   <span style="font-size:10px;color:var(--muted)">Copy, paste in terminal, press enter. Refresh after.</span>
 </div>
 <div class="bar">
-  <button class="btn-conn" id="btnConn" onclick="connectCYD()">Connect CYD (calibrate)</button>
+  <button class="btn-conn" id="btnConn" onclick="connectCYD()">Connect USB</button>
   <button class="btn-cal" id="btnCal" onclick="startCalib()" disabled>Calibrate</button>
+  <button class="btn-def" onclick="toggleWiFi()" id="btnWiFi">Connect WiFi</button>
   <button class="btn-def" onclick="resetAll()">Defaults</button>
 </div>
 <div class="tbar"><div id="tbar"></div></div>
@@ -97,7 +98,7 @@ const DAEMON='http://localhost:8092';
 const KEYDB={Media:[['VolUp',115],['VolDown',114],['Mute',113],['Play',164],['Prev',165],['Next',163],['Stop',166]],Modifiers:[['Ctrl',29],['Alt',56],['Shift',42],['Super',125]],Nav:[['Up',103],['Down',108],['Left',105],['Right',106],['Enter',28],['Space',57],['Tab',15],['Esc',1],['Bksp',14],['Del',111],['Home',102],['End',107]],Letters:[['A',30],['B',48],['C',46],['D',32],['E',18],['F',33],['G',34],['H',35],['I',23],['J',36],['K',37],['L',38],['M',50],['N',49],['O',24],['P',25],['Q',16],['R',19],['S',31],['T',20],['U',22],['V',47],['W',17],['X',45],['Y',21],['Z',44]],Numbers:[['0',11],['1',2],['2',3],['3',4],['4',5],['5',6],['6',7],['7',8],['8',9],['9',10]]};
 const COMBOS=[['Alt+Left',[56,105]],['Alt+Right',[56,106]],['Ctrl+R',[29,19]],['Ctrl+T',[29,20]],['Ctrl+W',[29,25]],['Ctrl+C',[29,46]],['Ctrl+V',[29,47]],['Ctrl+Z',[29,44]],['Super',[125]]];
 const DZONES=[{name:'PREV',x1:300,y1:100,x2:1700,y2:1100,keys:[165]},{name:'PLAY',x1:1600,y1:100,x2:2900,y2:1100,keys:[164]},{name:'NEXT',x1:2800,y1:100,x2:4000,y2:1100,keys:[163]},{name:'VOL+',x1:300,y1:1000,x2:1700,y2:2000,keys:[115]},{name:'MUTE',x1:1600,y1:1000,x2:2900,y2:2000,keys:[113]},{name:'VOL-',x1:2800,y1:1000,x2:4000,y2:2000,keys:[114]},{name:'BACK',x1:300,y1:1900,x2:1700,y2:3200,keys:[56,105]},{name:'RELOAD',x1:1600,y1:1900,x2:2900,y2:3200,keys:[29,19]},{name:'FORWD',x1:2800,y1:1900,x2:4000,y2:3200,keys:[56,106]}];
-let config=null,editIdx=-1,daemonOk=false,port=null,reader=null,keep=false;
+let config=null,editIdx=-1,daemonOk=false,port=null,reader=null,keep=false,ws=null;
 let calStep=0,calPts=[],calBlock=0,lastSent=0,lastZone='',tbarTimer=null;
 
 function loadD(){try{let r=localStorage.getItem('sudodeck_v4');if(r){config=JSON.parse(r);return}}catch(e){}config={zones:DZONES.map(z=>({...z}))};saveD()}
@@ -165,6 +166,17 @@ function parse(line){
 }
 function addLog(nm,x,y,keys){let el=document.getElementById('log'),pre=document.getElementById('logPre');el.style.display='block';pre.textContent=`[${new Date().toLocaleTimeString()}] ${nm} x:${x} y:${y} ${keys}\n`+pre.textContent;let ls=pre.textContent.split('\n').filter(l=>l);if(ls.length>30)pre.textContent=ls.slice(0,30).join('\n')}
 async function sendKeys(cs){if(!cs||!cs.length)return;if(!daemonOk){checkDaemon();return}try{await fetch(DAEMON+'/key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keys:cs})})}catch(e){daemonOk=false;checkDaemon()}}
+
+async function toggleWiFi(){
+  if(ws){ws.close();ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';document.getElementById('stCYD').style.display='none';return}
+  try{
+    ws=new WebSocket('ws://192.168.4.1:81');
+    ws.onopen=()=>{document.getElementById('btnWiFi').textContent='WiFi Disconnect';document.getElementById('stCYD').style.display='block';document.getElementById('stCYD').textContent='CYD: WiFi connected';document.getElementById('stCYD').className='ok';document.getElementById('btnCal').disabled=false;}
+    ws.onmessage=(e)=>{let l=e.data.trim();if(l)parse(l)}
+    ws.onclose=()=>{ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';document.getElementById('stCYD').style.display='none'}
+    ws.onerror=()=>{ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';toast('WiFi not found – join SudoDeck network first')}
+  }catch(e){toast('WiFi error: '+e.message)}
+}
 
 function startCalib(){calStep=1;calPts=[];calBlock=Date.now()+800;toast('Tap top-left corner');document.getElementById('stCYD').textContent='Tap TOP-LEFT';document.getElementById('stCYD').className='w'}
 function calTouch(x,y,z){if(Date.now()<calBlock)return;calPts.push({x,y});calBlock=Date.now()+800;
