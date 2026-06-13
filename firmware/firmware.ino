@@ -41,8 +41,8 @@ int total_btns = 0;
 int nav_dot_x = 0;
 
 // Screensaver
-#define SAVER_W 48
-#define SAVER_H 48
+#define SAVER_W 96
+#define SAVER_H 64
 #define DEFAULT_TIMEOUT 30
 
 bool saver_active = false;
@@ -251,7 +251,7 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_saver")) {
     JsonDocument r; r["timeout"] = saver_timeout;
-    r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");;
+    r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");
     s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
@@ -489,11 +489,11 @@ void draw_saver() {
     int cx = (int)saver_x + SAVER_W/2, cy = (int)saver_y + SAVER_H/2;
     for (int i = 0; i < 7; i++) {
       float t = (float)i / 6.0 * 2.0 * PI;
-      int x = cx + (int)(14.0 * sin(t));
-      int y = cy - 8 + i * 5;
-      tft.fillCircle(x, y, 4, C_ACC);
+      int x = cx + (int)(24.0 * sin(t));
+      int y = cy - 12 + i * 8;
+      tft.fillCircle(x, y, 5, C_ACC);
     }
-    tft.fillCircle(cx, cy, 7, C_TXT);
+    tft.fillCircle(cx, cy, 10, C_TXT);
     tft.fillCircle(cx + 4, cy - 2, 2, C_BG);
     tft.fillCircle(cx + 4, cy + 2, 2, C_BG);
   }
