@@ -169,13 +169,32 @@ async function sendKeys(cs){if(!cs||!cs.length)return;if(!daemonOk){checkDaemon(
 
 async function toggleWiFi(){
   if(ws){ws.close();ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';document.getElementById('stCYD').style.display='none';return}
-  try{
-    ws=new WebSocket('ws://192.168.4.1:81');
-    ws.onopen=()=>{document.getElementById('btnWiFi').textContent='WiFi Disconnect';document.getElementById('stCYD').style.display='block';document.getElementById('stCYD').textContent='CYD: WiFi connected';document.getElementById('stCYD').className='ok';document.getElementById('btnCal').disabled=false;}
-    ws.onmessage=(e)=>{let l=e.data.trim();if(l)parse(l)}
-    ws.onclose=()=>{ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';document.getElementById('stCYD').style.display='none'}
-    ws.onerror=()=>{ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';toast('WiFi not found – join SudoDeck network first')}
-  }catch(e){toast('WiFi error: '+e.message)}
+  // Try station mode first (sudodeck.local), then AP mode (192.168.4.1)
+  for(let addr of ['ws://sudodeck.local:81','ws://192.168.4.1:81']){
+    try{
+      ws=new WebSocket(addr);
+      await new Promise((resolve,reject)=>{
+        ws.onopen=()=>resolve();
+        ws.onerror=()=>reject();
+        setTimeout(()=>reject(),2000);
+      });
+      document.getElementById('btnWiFi').textContent='WiFi Disconnect';
+      document.getElementById('stCYD').style.display='block';
+      document.getElementById('stCYD').textContent='CYD: WiFi @ '+addr.replace('ws://','');
+      document.getElementById('stCYD').className='ok';
+      document.getElementById('btnCal').disabled=false;
+      ws.onmessage=(e)=>{let l=e.data.trim();if(l)parse(l)}
+      ws.onclose=()=>{ws=null;document.getElementById('btnWiFi').textContent='Connect WiFi';document.getElementById('stCYD').style.display='none'}
+      ws.onerror=()=>{}
+      // If we connected to AP mode, show setup prompt
+      if(addr.includes('192.168')){
+        let ssid=prompt('CYD is in setup mode. Enter your WiFi name (SSID):');
+        if(ssid){let pass=prompt('WiFi password:');if(pass!==null){ws.send('WIFI:'+ssid+':'+pass);toast('WiFi saved! CYD will reboot and join your network.')}}
+      }
+      return;
+    }catch(e){ws=null;}
+  }
+  toast('CYD not found. Connect USB first to set up WiFi.')
 }
 
 function startCalib(){calStep=1;calPts=[];calBlock=Date.now()+800;toast('Tap top-left corner');document.getElementById('stCYD').textContent='Tap TOP-LEFT';document.getElementById('stCYD').className='w'}
