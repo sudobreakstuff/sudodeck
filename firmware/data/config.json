@@ -1,0 +1,62 @@
+{
+  "name": "SudoDeck",
+  "grid": {"cols": 4, "rows": 3},
+  "pages": [
+    {
+      "name": "Main",
+      "buttons": [
+        {"label":"Copy",  "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"c"}},
+        {"label":"Paste", "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"v"}},
+        {"label":"Cut",   "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"x"}},
+        {"label":"Undo",  "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"z"}},
+        {"label":"Save",  "color":"#1a3a1a","action":{"type":"combo","mod":"CTRL","key":"s"}},
+        {"label":"Find",  "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"f"}},
+        {"label":"Select All","color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"a"}},
+        {"label":"Tab",   "color":"#16213e","action":{"type":"key","value":"TAB"}},
+        {"label":"Enter", "color":"#1a2a1a","action":{"type":"key","value":"ENTER"}},
+        {"label":"Esc",   "color":"#3a1a1a","action":{"type":"key","value":"ESC"}},
+        {"label":"Vol+",  "color":"#1a1a3a","action":{"type":"key","value":"MEDIA_VOLUME_UP"}},
+        {"label":"Vol-",  "color":"#1a1a3a","action":{"type":"key","value":"MEDIA_VOLUME_DOWN"}}
+      ]
+    },
+    {
+      "name": "Media",
+      "buttons": [
+        {"label":"Play",       "color":"#1a2a1a","action":{"type":"key","value":"MEDIA_PLAY_PAUSE"}},
+        {"label":"Next",       "color":"#16213e","action":{"type":"key","value":"MEDIA_NEXT_TRACK"}},
+        {"label":"Prev",       "color":"#16213e","action":{"type":"key","value":"MEDIA_PREV_TRACK"}},
+        {"label":"Mute",       "color":"#3a1a1a","action":{"type":"key","value":"MEDIA_MUTE"}},
+        {"label":"Bright+",    "color":"#1a1a3a","action":{"type":"key","value":"BRIGHTNESS_UP"}},
+        {"label":"Bright-",    "color":"#1a1a3a","action":{"type":"key","value":"BRIGHTNESS_DOWN"}},
+        {"label":"Home",       "color":"#16213e","action":{"type":"key","value":"HOME"}},
+        {"label":"End",        "color":"#16213e","action":{"type":"key","value":"END"}},
+        {"label":"PgUp",       "color":"#16213e","action":{"type":"key","value":"PAGE_UP"}},
+        {"label":"PgDn",       "color":"#16213e","action":{"type":"key","value":"PAGE_DOWN"}},
+        {"label":"Screenshot", "color":"#3a2a1a","action":{"type":"combo","mod":"CTRL_SHIFT","key":"s"}},
+        {"label":"Lock",       "color":"#3a1a1a","action":{"type":"combo","mod":"CTRL_ALT","key":"l"}}
+      ]
+    },
+    {
+      "name": "YT Studio",
+      "buttons": [
+        {"label":"Cut",      "color":"#16213e","action":{"type":"macro","steps":[
+          {"type":"combo","mod":"CTRL","key":"k"},
+          {"type":"delay","value":100}
+        ]}},
+        {"label":"Undo",     "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"z"}},
+        {"label":"Redo",     "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"y"}},
+        {"label":"Snip",     "color":"#3a2a1a","action":{"type":"macro","steps":[
+          {"type":"combo","mod":"CTRL","key":"t"}
+        ]}},
+        {"label":"FullScr",  "color":"#16213e","action":{"type":"key","value":"F11"}},
+        {"label":"Timeline", "color":"#1a2a1a","action":{"type":"key","value":"F3"}},
+        {"label":"Render",   "color":"#3a1a1a","action":{"type":"key","value":"F8"}},
+        {"label":"New Proj", "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"n"}},
+        {"label":"Export",   "color":"#1a2a1a","action":{"type":"combo","mod":"CTRL","key":"m"}},
+        {"label":"Import",   "color":"#16213e","action":{"type":"combo","mod":"CTRL","key":"i"}},
+        {"label":"Del Rpl",  "color":"#3a1a1a","action":{"type":"combo","mod":"CTRL_SHIFT","key":"d"}},
+        {"label":"Add TX",   "color":"#1a1a3a","action":{"type":"combo","mod":"CTRL","key":"t"}}
+      ]
+    }
+  ]
+}
