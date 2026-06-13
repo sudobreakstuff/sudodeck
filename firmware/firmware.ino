@@ -768,6 +768,7 @@ void handle_touch(int tx, int ty) {
 
 
 void setup() {
+  Serial.setRxBufferSize(8192);
   Serial.begin(115200);
   delay(500);
 
