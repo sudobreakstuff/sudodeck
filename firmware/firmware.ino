@@ -71,6 +71,7 @@ String wifi_ssid;
 String wifi_pass;
 bool wifi_connecting = false;
 unsigned long wifi_retry_ms = 0;
+unsigned long wifi_connect_start_ms = 0;
 
 // Widget data
 String widget_cache = "";
@@ -372,6 +373,7 @@ void proc_serial(const String& l) {
     config.clear();
     if (!config.set(req["config"].as<JsonObject>())) { s_err("oom"); return; }
     save_cfg(); apply_cfg(); page=0;
+    init_wifi();
     JsonDocument r; s_ok(r);
     draw_all();
   }
@@ -986,11 +988,12 @@ void loop() {
   if (wifi_ssid.length() > 0 && !WiFi.isConnected() && !wifi_connecting) {
     if (wifi_retry_ms == 0 || now - wifi_retry_ms > 30000) {
       wifi_connecting = true;
+      wifi_connect_start_ms = now;
       WiFi.mode(WIFI_STA);
       WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
     }
   }
-  if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || now > 20000)) {
+  if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || now - wifi_connect_start_ms > 20000)) {
     wifi_connecting = false;
     wifi_retry_ms = now;
   }

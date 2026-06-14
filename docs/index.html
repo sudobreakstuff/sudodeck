@@ -1176,6 +1176,7 @@ function dc() {
   return {
     name: "SudoDeck", grid: { cols: 4, rows: 3 },
     wifi: { ssid: "", password: "" },
+    saver: { timeout: 30, mode: 0 },
     pages: [
       { name: "Main", buttons: [
         { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
@@ -1257,7 +1258,7 @@ document.getElementById('btnRead').addEventListener('click', async function() {
 document.getElementById('btnWrite').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
   if(__busy) return; __busy = true; var btn = this; btn.disabled = true;
-  syncWifi();
+  syncWifi(); syncSaver();
   try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { console.log('Write ERR:',r); var s = r.got||''; tm('CYD: '+r.error+' (len:'+r.len+') "'+s.substring(0,60)+'"', 'ng'); return; } tm('Written to CYD'); } catch(e) { console.error('Write failed:', e); tm('Write failed: '+(e.message||e), 'ng'); } finally { __busy = false; btn.disabled = false; }
 });
 document.getElementById('btnExport').addEventListener('click', function() {
@@ -1278,6 +1279,12 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
   };
   r.readAsText(f); e.target.value = '';
 });
+function modeToInt(m) {
+  return {matrix:0,particles:1,stars:2,image:3,f1:4,football:5}[m]||0;
+}
+function modeToStr(n) {
+  return ['matrix','particles','stars','image','f1','football'][n]||'matrix';
+}
 function ul() {
   if(!cd) return;
   document.getElementById('lc').value=cd.grid.cols;
@@ -1286,12 +1293,21 @@ function ul() {
   if(!cd.wifi) cd.wifi={ssid:'',password:''};
   document.getElementById('wifiSsid').value=cd.wifi.ssid||'';
   document.getElementById('wifiPass').value=cd.wifi.password||'';
+  if(!cd.saver) cd.saver={timeout:30,mode:0};
+  document.getElementById('saverTimeout').value=cd.saver.timeout||30;
+  document.getElementById('saverMode').value=modeToStr(cd.saver.mode||0);
 }
 function syncWifi() {
   if(!cd) return;
   if(!cd.wifi) cd.wifi={};
   cd.wifi.ssid=document.getElementById('wifiSsid').value;
   cd.wifi.password=document.getElementById('wifiPass').value;
+}
+function syncSaver() {
+  if(!cd) return;
+  if(!cd.saver) cd.saver={};
+  cd.saver.timeout=parseInt(document.getElementById('saverTimeout').value)||30;
+  cd.saver.mode=modeToInt(document.getElementById('saverMode').value);
 }
 document.getElementById('bal').addEventListener('click', function() {
   var c=Math.max(1,Math.min(6,parseInt(document.getElementById('lc').value)||4));
@@ -1301,7 +1317,7 @@ document.getElementById('bal').addEventListener('click', function() {
   while(cd.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); cd.pages.push({name:'Page '+(cd.pages.length+1),buttons:bt}); }
   while(cd.pages.length>pc) cd.pages.pop();
   for(var i=0;i<cd.pages.length;i++) { while(cd.pages[i].buttons.length<tb) cd.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); while(cd.pages[i].buttons.length>tb) cd.pages[i].buttons.pop(); }
-  syncWifi();
+  syncWifi(); syncSaver();
   sp=0; sb=-1; ra(); tm('Layout updated');
 });
 function ra() { rpb(); rg(); ul(); }
@@ -1505,13 +1521,14 @@ async function saverSync() {
     document.getElementById('saverHint').textContent = r.timeout + 's ' + (r.mode||'matrix');
     if(r.mode) document.getElementById('saverMode').value = r.mode;
     document.getElementById('saverImgArea').style.display = r.mode === 'image' ? 'flex' : 'none';
+    if(cd && cd.saver) { cd.saver.timeout=r.timeout||30; cd.saver.mode=modeToInt(r.mode||'matrix'); }
   } catch(e) {}
 }
 document.getElementById('btnSaverSet').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
   var t = parseInt(document.getElementById('saverTimeout').value) || 30;
   if(t < 5) t = 5; if(t > 600) t = 600;
-  try { await sc({cmd:'set_saver',timeout:t}); tm('Timeout set to ' + t + 's'); saverSync(); } catch(e) { tm('Failed', 'ng'); }
+  try { await sc({cmd:'set_saver',timeout:t}); cd.saver.timeout=t; tm('Timeout set to ' + t + 's'); saverSync(); } catch(e) { tm('Failed', 'ng'); }
 });
 document.getElementById('saverFileInput').addEventListener('change', function(e) {
   var f = e.target.files[0]; if(!f) return;
@@ -1535,7 +1552,7 @@ document.getElementById('saverFileInput').addEventListener('change', function(e)
 document.getElementById('btnSaverModeSet').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
   var m = document.getElementById('saverMode').value;
-  try { var r = await sc({cmd:'set_saver_mode',mode:m}); if(r&&r.error) { tm('Mode error: '+r.error,'ng'); return; } tm('Saver mode: '+m); saverSync(); } catch(e) { tm('Mode command failed','ng'); }
+  try { var r = await sc({cmd:'set_saver_mode',mode:m}); if(r&&r.error) { tm('Mode error: '+r.error,'ng'); return; } cd.saver.mode=modeToInt(m); tm('Saver mode: '+m); saverSync(); } catch(e) { tm('Mode command failed','ng'); }
 });
 document.getElementById('saverMode').addEventListener('change', function() {
   document.getElementById('saverImgArea').style.display = this.value === 'image' ? 'flex' : 'none';
