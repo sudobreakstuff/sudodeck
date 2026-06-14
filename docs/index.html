@@ -992,7 +992,7 @@ const iv = new IntersectionObserver(function(es) {
 }, { threshold: 0.1 });
 document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
 
-var dp = null, dr = null, dw = null, cd = null, sp = 0, sb = -1;
+var dp = null, dr = null, dw = null, cd = null, sp = 0, sb = -1, __srl_buf = '', __busy = false;
 
 function dc() {
   return {
@@ -1052,14 +1052,14 @@ function ss(on) {
   b.querySelector('span').textContent = on ? 'CONNECTED' : 'DISCONNECTED';
 }
 async function srl(t) {
-  t = t || 5000; var d = new TextDecoder(), b = '', s = Date.now();
+  t = t || 5000; var d = new TextDecoder(), b = __srl_buf, s = Date.now(); __srl_buf = '';
   while (Date.now() - s < t) {
-    try { var v = await dr.read(); if (v.done) break; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) return b.substring(0,n).trim(); }
+    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) { __srl_buf = b.substring(n+1); return b.substring(0,n).trim(); } }
     catch(e) { await new Promise(function(r) { setTimeout(r, 50); }); }
   }
   return b.trim();
 }
-async function sc(c, t) { if (!dw) throw new Error('nc'); await dw.write(new TextEncoder().encode(JSON.stringify(c)+'\n')); return JSON.parse(await srl(t)); }
+async function sc(c, t) { if (!dw) throw new Error('nc'); await dw.write(new TextEncoder().encode(JSON.stringify(c)+'\n')); await new Promise(function(r) { setTimeout(r, 100); }); return JSON.parse(await srl(t)); }
 document.getElementById('btnConnect').addEventListener('click', async function() {
   try {
     if (!('serial' in navigator)) { tm('Web Serial needs Chrome/Edge', 'ng'); return; }
@@ -1073,11 +1073,12 @@ window.addEventListener('beforeunload', async function() {
 });
 document.getElementById('btnRead').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
-  try { var r = await sc({cmd:'get_config'}); if(r.config) { cd=r.config; sp=0; sb=-1; ra(); tm('Config loaded'); } } catch(e) { tm('Read failed', 'ng'); }
+  try { var r = await sc({cmd:'get_config'}); if(r.config) { cd=r.config; sp=0; sb=-1; ra(); tm('Config loaded'); } } catch(e) { console.error('Read failed:', e); tm('Read failed', 'ng'); }
 });
 document.getElementById('btnWrite').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
-  try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { console.log('Write ERR:',r); var s = r.got||''; tm('CYD: '+r.error+' (len:'+r.len+') "'+s.substring(0,60)+'"', 'ng'); return; } tm('Written to CYD'); } catch(e) { tm('Write failed', 'ng'); }
+  if(__busy) return; __busy = true; var btn = this; btn.disabled = true;
+  try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { console.log('Write ERR:',r); var s = r.got||''; tm('CYD: '+r.error+' (len:'+r.len+') "'+s.substring(0,60)+'"', 'ng'); return; } tm('Written to CYD'); } catch(e) { console.error('Write failed:', e); tm('Write failed: '+(e.message||e), 'ng'); } finally { __busy = false; btn.disabled = false; }
 });
 document.getElementById('btnExport').addEventListener('click', function() {
   var b = new Blob([JSON.stringify(cd,null,2)], {type:'application/json'});

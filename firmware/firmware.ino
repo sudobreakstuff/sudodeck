@@ -247,9 +247,11 @@ void proc_serial(const String& l) {
   if (!strcmp(cmd,"get_config")) { JsonDocument r; r["config"]=config; s_ok(r); }
   else if (!strcmp(cmd,"set_config")) {
     if (!req["config"].is<JsonObject>()) { s_err("missing config"); return; }
-    config.clear(); config.set(req["config"].as<JsonObject>());
-    save_cfg(); apply_cfg(); page=0; draw_all();
+    config.clear();
+    if (!config.set(req["config"].as<JsonObject>())) { s_err("oom"); return; }
+    save_cfg(); apply_cfg(); page=0;
     JsonDocument r; s_ok(r);
+    draw_all();
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
@@ -809,10 +811,10 @@ void setup() {
   last_touch_ms = millis();
   draw_all();
 
-  ble.setLogLevel(HIDLogLevel::Normal);
+  ble.setLogLevel(HIDLogLevel::Off);
   ble.setSecurityMode(BLEKeyboardSecurity::JustWorks);
   ble.onPairingComplete([](bool s) {
-    Serial.printf("BLE: pairing %s\n", s ? "OK" : "FAIL");
+    // Pairing events are NOT printed to serial to avoid corrupting JSON responses
   });
   ble.begin();
   ble_ready = true;
