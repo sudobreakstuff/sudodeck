@@ -963,8 +963,26 @@
         <div class="guide-num">6</div>
         <div class="guide-body">
           <h3>Use It</h3>
-          <p>That's it. Push a button on the CYD — your macro fires on the paired device. Navigate pages, trigger combos, type snippets. The screensaver kicks in after a minute of inactivity (customize it in the config tool).</p>
+          <p>That's it. Push a button on the CYD — your macro fires on the paired device. Navigate pages, trigger combos, type snippets. After a period of inactivity (configurable in the config tool), the screensaver kicks in with your chosen mode.</p>
           <div class="guide-note">Powered by <strong>BLE HID</strong> — your computer thinks it's a real keyboard. Reliable, fast, zero configuration.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">7</div>
+        <div class="guide-body">
+          <h3>Screensaver &amp; Live Widgets</h3>
+          <p>Seven screensaver modes are built in: <strong>Matrix Rain</strong>, <strong>Particles</strong>, <strong>Stars</strong>, <strong>Bouncing Image</strong> (upload your own PNG), <strong>F1 Standings</strong> (live driver + constructor standings), <strong>Football Scores</strong>, and <strong>Custom Widgets</strong> — user-defined API endpoints displayed as live data cards.</p>
+          <p>To use live data modes (F1, Football, Custom), first set up <strong>WiFi</strong> in the config tool layout controls. For custom widgets, add one or more widget sources below the Screensaver section:</p>
+          <ul style="margin:6px 0 0 18px;font-size:0.8rem;color:var(--dim);line-height:1.6">
+            <li><strong>Label</strong> — name shown above the value on the CYD display</li>
+            <li><strong>URL</strong> — any JSON API endpoint (must return valid JSON, no auth headers needed)</li>
+            <li><strong>Path</strong> — dot-notation JSON path, e.g. <code>btc.usd</code> or <code>current_weather.temperature</code>. Array access with <code>[index]</code> is supported</li>
+            <li><strong>Format</strong> — display template with <code>{value}</code> placeholder, e.g. <code>${value}</code> or <code>{value}°C</code></li>
+            <li><strong>Interval</strong> — seconds between data refreshes (minimum 30s recommended)</li>
+          </ul>
+          <p style="margin-top:8px">Use the <strong>Test</strong> button on each widget to verify your URL and path before writing to the device. Widgets cycle every 10s on the CYD display with page-dot navigation.</p>
+          <div class="guide-note">No API keys required for the built-in F1 data (Jolpica API) or Open-Meteo weather. For custom APIs, choose free tiers with no auth.</div>
         </div>
       </div>
 
