@@ -700,6 +700,12 @@
   .fmw-st { font-size: 0.8rem; color: var(--dim); font-family: var(--mono); }
   .fmw-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .fmw-flash { display: flex; gap: 8px; align-items: center; }
+  .fmw-flash select {
+    background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 6px 10px; font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .fw-or { color: var(--dim); font-size: 0.78rem; }
   .fmw-log {
     background: #000; color: var(--acc); font-family: var(--mono);
     font-size: 0.78rem; padding: 12px; border-radius: 6px;
@@ -943,6 +949,12 @@
 
 <div class="divider"></div>
 
+<!--
+  Adding a new firmware version:
+  1. Compile: arduino-cli compile --fqbn esp32:esp32:jczn_2432s028r --output-dir /tmp/fw firmware/firmware.ino
+  2. Copy: cp /tmp/fw/firmware.ino.merged.bin docs/assets/firmware/sudodeck-X.Y.Z.bin
+  3. Add entry to docs/assets/firmware/manifest.json
+-->
 <section id="firmware">
   <div class="sec">
     <h2><span class="g">Firmware</span></h2>
@@ -958,9 +970,13 @@
       <div class="fmw-actions">
         <button class="btn" id="btnFwBackup" onclick="fwBackup()" disabled>Backup Firmware</button>
         <div class="fmw-flash">
+          <select id="fwVersion" onchange="fwVersionChanged()">
+            <option value="">— Select version —</option>
+          </select>
+          <span class="fw-or">or</span>
           <label class="btn" id="btnFwFlashLabel">
             <input type="file" id="btnFwFile" accept=".bin" onchange="fwFileSelected()" hidden>
-            Select Firmware .bin
+            Custom .bin
           </label>
           <button class="btn dan" id="btnFwFlash" onclick="fwFlash()" disabled>Flash</button>
         </div>
@@ -1451,7 +1467,7 @@ document.getElementById('btnSaverClear').addEventListener('click', async functio
 ic(); ra();
 
 /* ── Firmware (esptool-js via dynamic import) ── */
-var fwLoader = null, fwFileData = null, fwTransport = null;
+var fwLoader = null, fwFileData = null, fwTransport = null, fwFlashAddr = 0, fwManifest = null;
 
 function fwLog(msg) {
   var el = document.getElementById('fwLog');
@@ -1467,6 +1483,46 @@ function fwSetStatus(s) {
   var el = document.getElementById('fwStatus');
   el.textContent = s;
   el.style.color = s === 'Connected' ? 'var(--acc)' : 'var(--dim)';
+}
+
+async function fwLoadManifest() {
+  try {
+    var r = await fetch('assets/firmware/manifest.json');
+    fwManifest = await r.json();
+    var sel = document.getElementById('fwVersion');
+    fwManifest.versions.forEach(function(v) {
+      var opt = document.createElement('option');
+      opt.value = v.file;
+      opt.textContent = v.label;
+      opt.dataset.address = v.address;
+      sel.appendChild(opt);
+    });
+    fwLog('Firmware versions loaded.');
+  } catch(e) {
+    fwLog('Could not load firmware list.');
+  }
+}
+fwLoadManifest();
+
+async function fwVersionChanged() {
+  var sel = document.getElementById('fwVersion');
+  if (!sel.value) {
+    document.getElementById('btnFwFlash').disabled = true;
+    fwFileData = null;
+    return;
+  }
+  var label = sel.options[sel.selectedIndex].textContent;
+  fwLog('Downloading ' + label + '...');
+  try {
+    var r = await fetch('assets/firmware/' + sel.value);
+    fwFileData = await r.arrayBuffer();
+    fwFlashAddr = parseInt(sel.options[sel.selectedIndex].dataset.address);
+    fwLog('Ready: ' + label + ' (' + (fwFileData.byteLength / 1024 / 1024).toFixed(1) + ' MB)');
+    document.getElementById('btnFwFlash').disabled = false;
+    document.getElementById('btnFwFlashLabel').textContent = 'Custom .bin';
+  } catch(e) {
+    fwLog('Download failed: ' + e.message);
+  }
 }
 
 async function fwConnect() {
@@ -1537,24 +1593,26 @@ function fwFileSelected() {
   var r = new FileReader();
   r.onload = function(ev) {
     fwFileData = ev.target.result;
+    fwFlashAddr = 0;
     fwLog('Selected: ' + f.name + ' (' + (fwFileData.byteLength/1024).toFixed(0) + ' KB)');
     document.getElementById('btnFwFlash').disabled = false;
     document.getElementById('btnFwFlashLabel').textContent = f.name;
+    document.getElementById('fwVersion').value = '';
   };
   r.readAsArrayBuffer(f);
 }
 
 async function fwFlash() {
   if (!fwLoader) { fwLog('Connect first'); return; }
-  if (!fwFileData) { fwLog('Select a firmware .bin file first'); return; }
+  if (!fwFileData) { fwLog('Select or choose a firmware version first'); return; }
   var btn = document.getElementById('btnFwFlash');
   btn.disabled = true; btn.textContent = 'Flashing…';
   document.getElementById('btnFwBackup').disabled = true;
-  fwLog('Flashing firmware… DO NOT DISCONNECT!');
+  fwLog('Flashing firmware at 0x' + fwFlashAddr.toString(16) + '… DO NOT DISCONNECT!');
   fwBar(0);
   try {
     var opts = {
-      fileArray: [{ data: new Uint8Array(fwFileData), address: 0x0 }],
+      fileArray: [{ data: new Uint8Array(fwFileData), address: fwFlashAddr }],
       flashSize: '4MB',
       flashMode: 'dio',
       flashFreq: '40m',

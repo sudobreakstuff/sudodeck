@@ -1,0 +1,11 @@
+{
+  "versions": [
+    {
+      "version": "1.0.0",
+      "label": "SudoDeck v1.0.0",
+      "file": "sudodeck-1.0.0.bin",
+      "address": "0",
+      "notes": "Initial release — BLE macro deck with config UI, 4 screensaver modes, web serial config tool"
+    }
+  ]
+}
