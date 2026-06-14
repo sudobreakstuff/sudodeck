@@ -1525,9 +1525,16 @@ async function fwVersionChanged() {
   }
 }
 
+var fwPort = null;
+
 async function fwConnect() {
   if (fwLoader) { fwLog('Already connected.'); return; }
   if (!('serial' in navigator)) { fwLog('Web Serial not available (Chrome/Edge required)'); return; }
+
+  // Close stale port if any (from a previous failed attempt)
+  if (fwPort) { try { fwPort.close(); } catch(e) {} fwPort = null; }
+  fwTransport = null; fwLoader = null;
+
   try {
     fwLog('Loading esptool-js...');
     var esptool = await import('https://unpkg.com/esptool-js@0.6.0/bundle.js');
@@ -1536,9 +1543,8 @@ async function fwConnect() {
     fwLog('Library loaded. Requesting serial port...');
     fwLog('Put CYD in flash mode (hold BOOT, tap RESET, release BOOT), then select the port.');
 
-    var port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 115200 });
-    fwLog('Port opened. Syncing with ESP32...');
+    fwPort = await navigator.serial.requestPort();
+    fwLog('Opening port...');
 
     var term = {
       clean: function() {},
@@ -1546,7 +1552,7 @@ async function fwConnect() {
       write: function(d) {},
     };
 
-    fwTransport = new Transport(port, true);
+    fwTransport = new Transport(fwPort, false);
     fwLoader = new ESPLoader({ transport: fwTransport, baudrate: 115200, terminal: term });
     var chipName = await fwLoader.main();
     fwLog('Connected to: ' + chipName);
@@ -1559,7 +1565,8 @@ async function fwConnect() {
   } catch(e) {
     fwLog('Connection failed: ' + e.message);
     fwSetStatus('Error');
-    fwLoader = null;
+    fwLoader = null; fwTransport = null;
+    if (fwPort) { try { fwPort.close(); } catch(e2) {} fwPort = null; }
   }
 }
 
