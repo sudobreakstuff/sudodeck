@@ -533,6 +533,15 @@ void draw_header() {
     tft.print("SudoDeck | BLE: ...");
   else
     tft.print("SudoDeck | booting");
+  // WiFi status
+  if (wifi_ssid.length() > 0) {
+    if (WiFi.isConnected())
+      tft.print(" | WIFI: ON");
+    else if (wifi_connecting)
+      tft.print(" | WIFI:...");
+    else
+      tft.print(" | WIFI: OFF");
+  }
 }
 
 void draw_grid() {
@@ -996,10 +1005,12 @@ void loop() {
   if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || now - wifi_connect_start_ms > 20000)) {
     wifi_connecting = false;
     wifi_retry_ms = now;
+    draw_header();
   }
   if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
     wifi_connecting = false;
     wifi_retry_ms = 0;
+    draw_header();
   }
 
   // Pre-fetch widget data when WiFi is connected and idle
