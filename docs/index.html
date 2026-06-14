@@ -1234,10 +1234,10 @@ function ss(on) {
 async function srl(t) {
   t = t || 5000; var d = new TextDecoder(), b = __srl_buf, s = Date.now(); __srl_buf = '';
   while (Date.now() - s < t) {
-    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) { var l = b.substring(0,n); var j = l.lastIndexOf('{'); if(j>=0) { __srl_buf = b.substring(n+1); console.log('srl OK:',l.substring(j)); return l.substring(j).trim(); } console.log('srl no {:',l); } }
-    catch(e) { console.log('srl err:',e.message||e); await new Promise(function(r) { setTimeout(r, 50); }); }
+    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) { var l = b.substring(0,n); var j = l.lastIndexOf('{'); if(j>=0) { __srl_buf = b.substring(n+1); return l.substring(j).trim(); } } }
+    catch(e) { if(e.message&&e.message.indexOf('device has been lost')>=0) { ss(false); dr=null; dw=null; throw new Error('lost'); } await new Promise(function(r) { setTimeout(r, 50); }); }
   }
-  console.log('srl timeout:',b); var j = b.indexOf('{'); return j>=0 ? b.substring(j).trim() : '';
+  var j = b.indexOf('{'); return j>=0 ? b.substring(j).trim() : '';
 }
 async function sc(c, t) { if (!dw) throw new Error('nc'); if(!dr) throw new Error('nr'); console.log('sc send:',JSON.stringify(c)); await dw.write(new TextEncoder().encode(JSON.stringify(c)+'\n')); await new Promise(function(r) { setTimeout(r, 200); }); var s = await srl(t); console.log('sc recv:',s); if (!s) throw new Error('no response'); return JSON.parse(s); }
 document.getElementById('btnConnect').addEventListener('click', async function() {
@@ -1557,6 +1557,7 @@ document.getElementById('btnSaverModeSet').addEventListener('click', async funct
   try { var r = await sc({cmd:'set_saver_mode',mode:m}); if(r&&r.error) { tm('Mode error: '+r.error,'ng'); return; } cd.saver.mode=modeToInt(m); tm('Saver mode: '+m); saverSync(); } catch(e) { tm('Mode command failed','ng'); }
 });
 document.getElementById('saverMode').addEventListener('change', function() {
+  if(!dw) return;
   document.getElementById('saverImgArea').style.display = this.value === 'image' ? 'flex' : 'none';
 });
 document.getElementById('saverImgArea').style.display = 'none';
