@@ -1234,7 +1234,7 @@ function ss(on) {
 async function srl(t) {
   t = t || 5000; var d = new TextDecoder(), b = __srl_buf, s = Date.now(); __srl_buf = '';
   while (Date.now() - s < t) {
-    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.lastIndexOf('\n'); if(n>=0) { var l = b.substring(0,n+1); var j = l.lastIndexOf('{'); if(j>=0) { __srl_buf = b.substring(n+1); return l.substring(j,n).trim(); } } }
+    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) { var l = b.substring(0,n); var j = l.lastIndexOf('{'); if(j>=0) { __srl_buf = b.substring(n+1); return l.substring(j).trim(); } } }
     catch(e) { await new Promise(function(r) { setTimeout(r, 50); }); }
   }
   var j = b.indexOf('{'); return j>=0 ? b.substring(j).trim() : '';
@@ -1299,9 +1299,11 @@ function ul() {
 }
 function syncWifi() {
   if(!cd) return;
+  var s = document.getElementById('wifiSsid').value.trim();
+  if (!s) return; // Keep existing wifi when field is empty
   if(!cd.wifi) cd.wifi={};
-  cd.wifi.ssid=document.getElementById('wifiSsid').value;
-  cd.wifi.password=document.getElementById('wifiPass').value;
+  cd.wifi.ssid = s;
+  cd.wifi.password = document.getElementById('wifiPass').value;
 }
 function syncSaver() {
   if(!cd) return;
