@@ -4,6 +4,8 @@
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 #include <HijelHID_BLEKeyboard.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
 
 #define XP_IRQ 36
 #define XP_MOSI 32
@@ -48,6 +50,8 @@ int nav_dot_x = 0;
 #define SAVER_PARTICLES 1
 #define SAVER_STARS 2
 #define SAVER_IMAGE 3
+#define SAVER_F1 4
+#define SAVER_FOOTBALL 5
 
 int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
@@ -61,6 +65,18 @@ struct { int8_t x, y, len, spd; char ch[16]; } saver_drops[20];
 struct { float x, y, vx, vy; uint8_t life; } saver_parts[25];
 struct { uint8_t x, y, br; } saver_stars[40];
 unsigned long saver_last_frame = 0;
+
+// WiFi
+String wifi_ssid;
+String wifi_pass;
+bool wifi_connecting = false;
+unsigned long wifi_retry_ms = 0;
+
+// Widget data
+String widget_cache = "";
+unsigned long widget_fetch_ms = 0;
+bool widget_fetching = false;
+const unsigned long widget_refresh = 60000;
 
 JsonDocument config;
 String serial_buf;
@@ -152,6 +168,7 @@ void do_action(JsonObject a) {
 void gen_default() {
   config.clear();
   config["name"]="SudoDeck"; config["grid"]["cols"]=4; config["grid"]["rows"]=3;
+  config["wifi"]["ssid"]=""; config["wifi"]["password"]="";
   JsonArray pg = config["pages"].to<JsonArray>();
 
   JsonObject p1 = pg.add<JsonObject>(); p1["name"]="Main";
@@ -222,7 +239,109 @@ void apply_cfg() {
   int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
   if (t >= 5 && t <= 600) saver_timeout = t;
   int sm = config["saver"]["mode"]|SAVER_MATRIX;
-  if (sm >= SAVER_MATRIX && sm <= SAVER_IMAGE) saver_mode = sm;
+  if (sm >= SAVER_MATRIX && sm <= SAVER_FOOTBALL) saver_mode = sm;
+  wifi_ssid = config["wifi"]["ssid"]|"";
+  wifi_pass = config["wifi"]["password"]|"";
+}
+
+void init_wifi() {
+  if (wifi_ssid.length() == 0) return;
+  if (WiFi.isConnected()) return;
+  if (wifi_connecting) return;
+  wifi_connecting = true;
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
+}
+
+void fetch_widget_data() {
+  if (!WiFi.isConnected()) return;
+  if (widget_fetching) return;
+  widget_fetching = true;
+  HTTPClient http;
+  String url;
+  if (saver_mode == SAVER_F1) {
+    url = "https://api.jolpi.ca/ergast/f1/current/driverStandings.json";
+  } else if (saver_mode == SAVER_FOOTBALL) {
+    url = "https://api.sportscore.io/v1/football/matches"; // placeholder
+  } else {
+    widget_fetching = false;
+    return;
+  }
+  http.setTimeout(10000);
+  http.begin(url);
+  int code = http.GET();
+  if (code > 0) {
+    widget_cache = http.getString();
+  }
+  http.end();
+  widget_fetching = false;
+  widget_fetch_ms = millis();
+}
+
+void draw_widget_f1() {
+  tft.fillScreen(C_BG);
+  tft.setTextColor(C_ACC, C_BG);
+  tft.setTextSize(2);
+  tft.setCursor(10, 4);
+  tft.print("F1 STANDINGS");
+  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  if (widget_cache.length() == 0) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextSize(1);
+    tft.setCursor(10, 40);
+    if (wifi_ssid.length() == 0) tft.print("no wifi configured");
+    else if (widget_fetching) tft.print("loading...");
+    else tft.print("no data");
+    return;
+  }
+  tft.setTextSize(1);
+  JsonDocument doc;
+  DeserializationError err = deserializeJson(doc, widget_cache);
+  if (err) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setCursor(10, 40);
+    tft.print("parse error");
+    return;
+  }
+  JsonArray standings = doc["MRData"]["StandingsTable"]["StandingsLists"][0]["DriverStandings"];
+  int y = 32;
+  int n = 0;
+  for (JsonObject s : standings) {
+    if (n >= 10) break;
+    const char* pos = s["position"]|"";
+    const char* code = s["Driver"]["code"]|"";
+    const char* pts = s["points"]|"";
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%-2s  %-3s  %s", pos, code, pts);
+    tft.setTextColor(C_TXT, C_BG);
+    tft.setCursor(10, y);
+    tft.print(buf);
+    y += 18;
+    n++;
+  }
+  doc.clear();
+}
+
+void draw_widget_football() {
+  tft.fillScreen(C_BG);
+  tft.setTextColor(C_ACC, C_BG);
+  tft.setTextSize(2);
+  tft.setCursor(10, 4);
+  tft.print("FOOTBALL");
+  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  if (widget_cache.length() == 0) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextSize(1);
+    tft.setCursor(10, 40);
+    if (wifi_ssid.length() == 0) tft.print("no wifi configured");
+    else if (widget_fetching) tft.print("loading...");
+    else tft.print("no data");
+    return;
+  }
+  tft.setTextSize(1);
+  tft.setTextColor(C_TXT, C_BG);
+  tft.setCursor(10, 40);
+  tft.print(widget_cache.substring(0, 2000));
 }
 
 void s_ok(JsonDocument& r) { r["ok"]=true; serializeJson(r,Serial); Serial.println(); }
@@ -258,7 +377,7 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
-    r["name"]="SudoDeck"; r["version"]="1.0";
+    r["name"]="SudoDeck"; r["version"]="2.0";
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
@@ -273,6 +392,8 @@ void proc_serial(const String& l) {
     else if (!strcmp(m,"particles")) saver_mode = SAVER_PARTICLES;
     else if (!strcmp(m,"stars")) saver_mode = SAVER_STARS;
     else if (!strcmp(m,"image")) saver_mode = SAVER_IMAGE;
+    else if (!strcmp(m,"f1")) saver_mode = SAVER_F1;
+    else if (!strcmp(m,"football")) saver_mode = SAVER_FOOTBALL;
     else { s_err("bad mode"); return; }
     config["saver"]["mode"] = saver_mode;
     save_cfg();
@@ -292,9 +413,29 @@ void proc_serial(const String& l) {
     if (saver_mode == SAVER_PARTICLES) r["mode"] = "particles";
     else if (saver_mode == SAVER_STARS) r["mode"] = "stars";
     else if (saver_mode == SAVER_IMAGE) r["mode"] = "image";
+    else if (saver_mode == SAVER_F1) r["mode"] = "f1";
+    else if (saver_mode == SAVER_FOOTBALL) r["mode"] = "football";
     else r["mode"] = "matrix";
     r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");
     s_ok(r);
+  }
+  else if (!strcmp(cmd,"set_wifi")) {
+    wifi_ssid = req["ssid"]|"";
+    wifi_pass = req["password"]|"";
+    config["wifi"]["ssid"] = wifi_ssid;
+    config["wifi"]["password"] = wifi_pass;
+    save_cfg();
+    JsonDocument r; s_ok(r);
+  }
+  else if (!strcmp(cmd,"get_wifi")) {
+    JsonDocument r;
+    r["ssid"] = wifi_ssid;
+    r["connected"] = WiFi.isConnected();
+    s_ok(r);
+  }
+  else if (!strcmp(cmd,"wifi_connect")) {
+    init_wifi();
+    JsonDocument r; s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
     const char* data = req["data"]|"";
@@ -572,7 +713,9 @@ void gen_saver_preset(const char* name) {
 
 void enter_saver() {
   saver_active = true;
-  if (saver_mode == SAVER_PARTICLES) {
+  if (saver_mode == SAVER_F1 || saver_mode == SAVER_FOOTBALL) {
+    if (WiFi.isConnected() && widget_cache.length() == 0) fetch_widget_data();
+  } else if (saver_mode == SAVER_PARTICLES) {
     for (int i = 0; i < 25; i++) {
       saver_parts[i].x = random(SCR_W);
       saver_parts[i].y = random(SCR_H);
@@ -646,8 +789,17 @@ void draw_saver() {
       if (saver_stars[i].br > 240) saver_stars[i].br = 240;
       tft.drawPixel(saver_stars[i].x, saver_stars[i].y, rgb565(0, saver_stars[i].br, 0));
     }
+  } else if (saver_mode == SAVER_F1) {
+    if (now - saver_last_frame < 30000) return;
+    saver_last_frame = now;
+    if (WiFi.isConnected() && !widget_fetching && now - widget_fetch_ms > widget_refresh) fetch_widget_data();
+    draw_widget_f1();
+  } else if (saver_mode == SAVER_FOOTBALL) {
+    if (now - saver_last_frame < 60000) return;
+    saver_last_frame = now;
+    if (WiFi.isConnected() && !widget_fetching && now - widget_fetch_ms > widget_refresh) fetch_widget_data();
+    draw_widget_football();
   } else if (saver_mode == SAVER_MATRIX) {
-    unsigned long now = millis();
     if (now - saver_last_frame < 60) return;
     saver_last_frame = now;
 
@@ -810,6 +962,7 @@ void setup() {
 
   load_cfg();
   apply_cfg();
+  init_wifi();
   load_saver_img();
   last_touch_ms = millis();
   draw_all();
@@ -828,6 +981,28 @@ void loop() {
   s_serial();
 
   unsigned long now = millis();
+
+  // WiFi connection management
+  if (wifi_ssid.length() > 0 && !WiFi.isConnected() && !wifi_connecting) {
+    if (wifi_retry_ms == 0 || now - wifi_retry_ms > 30000) {
+      wifi_connecting = true;
+      WiFi.mode(WIFI_STA);
+      WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
+    }
+  }
+  if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || now > 20000)) {
+    wifi_connecting = false;
+    wifi_retry_ms = now;
+  }
+  if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
+    wifi_connecting = false;
+    wifi_retry_ms = 0;
+  }
+
+  // Pre-fetch widget data when WiFi is connected and idle
+  if (WiFi.isConnected() && widget_cache.length() == 0 && !widget_fetching && now - widget_fetch_ms > 5000) {
+    fetch_widget_data();
+  }
 
   if (!saver_active) {
     static unsigned long last_hdr = 0;

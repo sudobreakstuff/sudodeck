@@ -936,9 +936,10 @@
 
 <!--
   Adding a new firmware version:
-  1. Compile: arduino-cli compile --fqbn esp32:esp32:jczn_2432s028r --output-dir /tmp/fw firmware/firmware.ino
-  2. Copy: cp /tmp/fw/firmware.ino.merged.bin docs/assets/firmware/sudodeck-X.Y.Z.bin
-  3. Add entry to docs/assets/firmware/manifest.json
+   1. Compile: arduino-cli compile --fqbn "esp32:esp32:jczn_2432s028r:PartitionScheme=no_ota" --output-dir /tmp/fw firmware/firmware.ino
+   2. Copy: cp /tmp/fw/firmware.ino.merged.bin docs/assets/firmware/sudodeck-X.Y.Z.bin
+   3. Add entry to docs/assets/firmware/manifest.json
+   Note: v2.0.0+ uses no_ota partition (2MB APP/2MB SPIFFS). The merged bin at address 0 includes the partition table.
 -->
 <section id="firmware">
   <div class="sec">
@@ -1037,6 +1038,15 @@
           <input type="number" id="lp" min="1" max="12" value="3">
         </div>
         <button class="btn pri" id="bal">Apply Layout</button>
+        <div class="cg" style="margin-left:auto">
+          <label>WiFi SSID</label>
+          <input type="text" id="wifiSsid" placeholder="SSID" style="width:120px">
+        </div>
+        <div class="cg">
+          <label>Password</label>
+          <input type="password" id="wifiPass" placeholder="password" style="width:120px">
+        </div>
+        <button class="btn" id="btnWifiSet" style="display:none">Set WiFi</button>
       </div>
       <div class="saver-fold">
         <div class="saver-hdr" id="saverToggle">
@@ -1057,6 +1067,8 @@
               <option value="particles">Particles</option>
               <option value="stars">Stars</option>
               <option value="image">Bouncing Image</option>
+              <option value="f1">F1 Standings</option>
+              <option value="football">Football Scores</option>
             </select>
             <button class="btn pri" id="btnSaverModeSet" style="margin-left:auto">Set</button>
           </div>
@@ -1163,6 +1175,7 @@ var dp = null, dr = null, dw = null, cd = null, sp = 0, sb = -1, __srl_buf = '',
 function dc() {
   return {
     name: "SudoDeck", grid: { cols: 4, rows: 3 },
+    wifi: { ssid: "", password: "" },
     pages: [
       { name: "Main", buttons: [
         { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
@@ -1244,6 +1257,7 @@ document.getElementById('btnRead').addEventListener('click', async function() {
 document.getElementById('btnWrite').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
   if(__busy) return; __busy = true; var btn = this; btn.disabled = true;
+  syncWifi();
   try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { console.log('Write ERR:',r); var s = r.got||''; tm('CYD: '+r.error+' (len:'+r.len+') "'+s.substring(0,60)+'"', 'ng'); return; } tm('Written to CYD'); } catch(e) { console.error('Write failed:', e); tm('Write failed: '+(e.message||e), 'ng'); } finally { __busy = false; btn.disabled = false; }
 });
 document.getElementById('btnExport').addEventListener('click', function() {
@@ -1264,7 +1278,21 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
   };
   r.readAsText(f); e.target.value = '';
 });
-function ul() { if(!cd) return; document.getElementById('lc').value=cd.grid.cols; document.getElementById('lr').value=cd.grid.rows; document.getElementById('lp').value=cd.pages.length; }
+function ul() {
+  if(!cd) return;
+  document.getElementById('lc').value=cd.grid.cols;
+  document.getElementById('lr').value=cd.grid.rows;
+  document.getElementById('lp').value=cd.pages.length;
+  if(!cd.wifi) cd.wifi={ssid:'',password:''};
+  document.getElementById('wifiSsid').value=cd.wifi.ssid||'';
+  document.getElementById('wifiPass').value=cd.wifi.password||'';
+}
+function syncWifi() {
+  if(!cd) return;
+  if(!cd.wifi) cd.wifi={};
+  cd.wifi.ssid=document.getElementById('wifiSsid').value;
+  cd.wifi.password=document.getElementById('wifiPass').value;
+}
 document.getElementById('bal').addEventListener('click', function() {
   var c=Math.max(1,Math.min(6,parseInt(document.getElementById('lc').value)||4));
   var r=Math.max(1,Math.min(5,parseInt(document.getElementById('lr').value)||3));
@@ -1273,6 +1301,7 @@ document.getElementById('bal').addEventListener('click', function() {
   while(cd.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); cd.pages.push({name:'Page '+(cd.pages.length+1),buttons:bt}); }
   while(cd.pages.length>pc) cd.pages.pop();
   for(var i=0;i<cd.pages.length;i++) { while(cd.pages[i].buttons.length<tb) cd.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); while(cd.pages[i].buttons.length>tb) cd.pages[i].buttons.pop(); }
+  syncWifi();
   sp=0; sb=-1; ra(); tm('Layout updated');
 });
 function ra() { rpb(); rg(); ul(); }

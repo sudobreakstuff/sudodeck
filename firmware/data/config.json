@@ -1,6 +1,8 @@
 {
   "name": "SudoDeck",
   "grid": {"cols": 4, "rows": 3},
+  "wifi": {"ssid": "", "password": ""},
+  "saver": {"timeout": 30, "mode": 0},
   "pages": [
     {
       "name": "Main",
