@@ -134,10 +134,13 @@ void do_action(JsonObject a) {
   if (!ble_ready) return;
   const char* t = a["type"]|"";
   if (!strcmp(t,"key")) {
-    uint16_t c; bool m; if (key_lookup(a["value"]|"",&c,&m)) ble.tap(c);
+    uint16_t c; bool m; if (key_lookup(a["value"]|"",&c,&m)) { if (m) ble.tap(c); else ble.tap((uint8_t)c); }
   } else if (!strcmp(t,"combo")) {
     uint8_t mod = mod_mask(a["mod"]|"");
-    uint16_t c; bool m; if (key_lookup(a["key"]|"",&c,&m)) { ble.press((uint8_t)c,mod); delay(25); ble.releaseAll(); }
+    uint16_t c; bool m; if (key_lookup(a["key"]|"",&c,&m)) {
+      if (m) { ble.press(c); delay(25); ble.releaseAll(); }
+      else { ble.press((uint8_t)c,mod); delay(25); ble.releaseAll(); }
+    }
   } else if (!strcmp(t,"text")) {
     ble.print(a["value"]|"");
   } else if (!strcmp(t,"macro")) {
