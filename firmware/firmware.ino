@@ -250,6 +250,7 @@ void init_wifi() {
   if (WiFi.isConnected()) return;
   if (wifi_connecting) return;
   wifi_connecting = true;
+  wifi_connect_start_ms = millis();
   WiFi.mode(WIFI_STA);
   WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
 }
@@ -373,7 +374,7 @@ void proc_serial(const String& l) {
     config.clear();
     if (!config.set(req["config"].as<JsonObject>())) { s_err("oom"); return; }
     save_cfg(); apply_cfg(); page=0;
-    JsonDocument r; s_ok(r);
+    JsonDocument r; s_ok(r); Serial.flush();
     init_wifi();
     draw_all();
   }
@@ -938,6 +939,7 @@ void handle_touch(int tx, int ty) {
 void setup() {
   Serial.setRxBufferSize(8192);
   Serial.begin(115200);
+  esp_log_level_set("*", ESP_LOG_NONE);
   delay(500);
 
   tft.begin();
