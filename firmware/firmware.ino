@@ -373,8 +373,8 @@ void proc_serial(const String& l) {
     config.clear();
     if (!config.set(req["config"].as<JsonObject>())) { s_err("oom"); return; }
     save_cfg(); apply_cfg(); page=0;
-    init_wifi();
     JsonDocument r; s_ok(r);
+    init_wifi();
     draw_all();
   }
   else if (!strcmp(cmd,"get_info")) {
