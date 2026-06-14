@@ -1481,7 +1481,7 @@ function uaf() {
     h = '<div class="er"><label>Key</label><input type="text" id="ekv" value="'+es(a.value||'')+'" placeholder="ENTER, F1, a"></div>';
   } else if(t==='combo') {
     h = '<div class="er"><label>Mod</label><select id="ecm">'+
-      ['CTRL','ALT','SHIFT','CTRL_SHIFT','CTRL_ALT','ALT_SHIFT','CTRL_ALT_SHIFT'].map(function(m){return '<option value="'+m+'"'+(a.mod===m?' selected':'')+'>'+m.replace('_','+')+'</option>';}).join('')+
+      ['CTRL','ALT','SHIFT','GUI','CTRL_SHIFT','CTRL_ALT','CTRL_GUI','ALT_SHIFT','ALT_GUI','SHIFT_GUI','CTRL_ALT_SHIFT','CTRL_ALT_GUI','CTRL_SHIFT_GUI','ALT_SHIFT_GUI','CTRL_ALT_SHIFT_GUI'].map(function(m){return '<option value="'+m+'"'+(a.mod===m?' selected':'')+'>'+m.replace(/_/g,'+')+'</option>';}).join('')+
       '</select><label>Key</label><input type="text" id="eck" value="'+es(a.key||'')+'" placeholder="c, s, v"></div>';
   } else if(t==='text') {
     h = '<div class="er"><label>Text</label><input type="text" id="etv" value="'+es(a.value||'')+'" placeholder="Text to type"></div>';
