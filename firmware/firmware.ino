@@ -77,7 +77,8 @@ int wifi_last_status = -1;
 // Widget data
 String widget_cache = "";
 String f1_race_cache = "";
-bool f1_page = false;
+String f1_constructor_cache = "";
+int f1_page = 0;
 unsigned long widget_fetch_ms = 0;
 bool widget_fetching = false;
 const unsigned long widget_refresh = 60000;
@@ -279,6 +280,10 @@ void fetch_widget_data() {
     c = http.GET();
     if (c > 0) f1_race_cache = http.getString();
     http.end();
+    http.begin("https://api.jolpi.ca/ergast/f1/current/constructorStandings.json");
+    c = http.GET();
+    if (c > 0) f1_constructor_cache = http.getString();
+    http.end();
   } else if (saver_mode == SAVER_FOOTBALL) {
     http.begin("https://api.sportscore.io/v1/football/matches"); // placeholder
     int c = http.GET();
@@ -287,6 +292,22 @@ void fetch_widget_data() {
   }
   widget_fetching = false;
   widget_fetch_ms = millis();
+}
+
+uint16_t team_color(const char* name) {
+  if (!name || !name[0]) return C_ACC;
+  if (!strcmp(name, "Mercedes")) return 0x07B6;
+  if (!strcmp(name, "Ferrari")) return 0xF800;
+  if (!strcmp(name, "McLaren")) return 0xFD20;
+  if (!strcmp(name, "Red Bull")) return 0x001F;
+  if (!strcmp(name, "Alpine F1 Team")) return 0xFE9F;
+  if (!strcmp(name, "RB F1 Team")) return 0x24D2;
+  if (!strcmp(name, "Haas F1 Team")) return 0xFFFF;
+  if (!strcmp(name, "Williams")) return 0x03BF;
+  if (!strcmp(name, "Audi")) return 0xF001;
+  if (!strcmp(name, "Cadillac F1 Team")) return 0x7B6D;
+  if (!strcmp(name, "Aston Martin")) return 0x0362;
+  return C_ACC;
 }
 
 void draw_widget_f1_standings() {
@@ -318,20 +339,36 @@ void draw_widget_f1_standings() {
   int y = 32;
   int n = 0;
   for (JsonObject s : standings) {
-    if (n >= 12) break;
+    if (n >= 11) break;
     const char* pos = s["position"]|"";
     const char* code = s["Driver"]["code"]|"";
     const char* pts = s["points"]|"";
     const char* team = s["Constructors"][0]["name"]|"";
     const char* wins = s["wins"]|"";
-    char buf[40];
-    if (strcmp(wins, "0") == 0 || wins[0] == 0)
-      snprintf(buf, sizeof(buf), "%2s %-3s %4s  %s", pos, code, pts, team);
-    else
-      snprintf(buf, sizeof(buf), "%2s %-3s %4s  %-11s %sW", pos, code, pts, team, wins);
+    uint16_t tc = team_color(team);
+    tft.fillRect(4, y + 4, 4, 4, tc);
+    uint16_t pc;
+    if (n == 0) pc = 0xFD20;
+    else if (n == 1) pc = 0xC618;
+    else if (n == 2) pc = 0xCB40;
+    else pc = C_TXT;
+    tft.setTextColor(pc, C_BG);
+    tft.setCursor(14, y);
+    tft.print(pos);
     tft.setTextColor(C_TXT, C_BG);
-    tft.setCursor(10, y);
-    tft.print(buf);
+    tft.print(" ");
+    tft.print(code);
+    tft.print("  ");
+    tft.print(pts);
+    tft.print("  ");
+    tft.setTextColor(tc, C_BG);
+    tft.print(team);
+    if (strcmp(wins, "0") != 0 && wins[0] != 0) {
+      tft.setTextColor(C_DIM, C_BG);
+      tft.print(" ");
+      tft.print(wins);
+      tft.print("W");
+    }
     y += 18;
     n++;
   }
@@ -377,26 +414,30 @@ void draw_widget_f1_nextrace() {
   tft.print(name);
   y += 18;
 
+  tft.setTextColor(C_DIM, C_BG);
   tft.setCursor(10, y);
   tft.print(circuit);
   y += 18;
+
+  if (strlen(locality) > 0 && strlen(country) > 0) {
+    tft.setTextColor(C_ACC, C_BG);
+    tft.fillRect(4, y + 3, 4, 4, C_ACC);
+    snprintf(buf, sizeof(buf), " %s, %s", locality, country);
+    tft.setCursor(12, y);
+    tft.print(buf);
+    y += 18;
+  }
 
   if (strlen(raceDate) >= 10) {
     int yr = 0, mo = 0, dy = 0;
     sscanf(raceDate, "%d-%d-%d", &yr, &mo, &dy);
     if (mo >= 1 && mo <= 12) {
       snprintf(buf, sizeof(buf), "%s %d, %d", months[mo-1], dy, yr);
+      tft.setTextColor(C_TXT, C_BG);
       tft.setCursor(10, y);
       tft.print(buf);
       y += 18;
     }
-  }
-
-  if (strlen(locality) > 0 && strlen(country) > 0) {
-    snprintf(buf, sizeof(buf), "%s, %s", locality, country);
-    tft.setCursor(10, y);
-    tft.print(buf);
-    y += 18;
   }
 
   const char* qDate = race["Qualifying"]["date"]|"";
@@ -406,7 +447,8 @@ void draw_widget_f1_nextrace() {
     sscanf(qDate, "%d-%d-%d", &yr, &mo, &dy);
     sscanf(qTime, "%d:%d", &hr, &mn);
     if (mo >= 1 && mo <= 12) {
-      snprintf(buf, sizeof(buf), "Quali: %s %d %02d:%02d", months[mo-1], dy, hr, mn);
+      snprintf(buf, sizeof(buf), "Quali %s %d %02d:%02d", months[mo-1], dy, hr, mn);
+      tft.setTextColor(C_DIM, C_BG);
       tft.setCursor(10, y);
       tft.print(buf);
       y += 18;
@@ -419,8 +461,10 @@ void draw_widget_f1_nextrace() {
     sscanf(raceDate, "%d-%d-%d", &yr, &mo, &dy);
     sscanf(rTime, "%d:%d", &hr, &mn);
     if (mo >= 1 && mo <= 12) {
-      snprintf(buf, sizeof(buf), "Race:  %s %d %02d:%02d", months[mo-1], dy, hr, mn);
-      tft.setCursor(10, y);
+      tft.setTextColor(C_ACC, C_BG);
+      tft.fillRect(4, y + 3, 4, 4, C_ACC);
+      snprintf(buf, sizeof(buf), " Race %s %d %02d:%02d", months[mo-1], dy, hr, mn);
+      tft.setCursor(12, y);
       tft.print(buf);
     }
   }
@@ -428,10 +472,76 @@ void draw_widget_f1_nextrace() {
   doc.clear();
 }
 
+void draw_widget_f1_constructors() {
+  tft.fillScreen(C_BG);
+  tft.setTextColor(C_ACC, C_BG);
+  tft.setTextSize(2);
+  tft.setCursor(10, 4);
+  tft.print("CONSTRUCTORS");
+  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  if (f1_constructor_cache.length() == 0) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextSize(1);
+    tft.setCursor(10, 40);
+    if (widget_fetching) tft.print("loading...");
+    else tft.print("no data");
+    return;
+  }
+  tft.setTextSize(1);
+  JsonDocument doc;
+  DeserializationError err = deserializeJson(doc, f1_constructor_cache);
+  if (err) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setCursor(10, 40);
+    tft.print("parse error");
+    return;
+  }
+  JsonArray standings = doc["MRData"]["StandingsTable"]["StandingsLists"][0]["ConstructorStandings"];
+  int y = 32;
+  int n = 0;
+  for (JsonObject s : standings) {
+    if (n >= 11) break;
+    const char* pos = s["position"]|"";
+    const char* team = s["Constructor"]["name"]|"";
+    const char* pts = s["points"]|"";
+    const char* wins = s["wins"]|"";
+    uint16_t tc = team_color(team);
+    tft.fillRect(4, y + 4, 4, 4, tc);
+    uint16_t pc;
+    if (n == 0) pc = 0xFD20;
+    else if (n == 1) pc = 0xC618;
+    else if (n == 2) pc = 0xCB40;
+    else pc = C_TXT;
+    tft.setTextColor(pc, C_BG);
+    tft.setCursor(14, y);
+    tft.print(pos);
+    tft.setTextColor(C_TXT, C_BG);
+    tft.print("  ");
+    tft.setTextColor(tc, C_BG);
+    tft.print(team);
+    tft.setTextColor(C_TXT, C_BG);
+    tft.print("  ");
+    tft.print(pts);
+    if (strcmp(wins, "0") != 0 && wins[0] != 0) {
+      tft.setTextColor(C_DIM, C_BG);
+      tft.print(" ");
+      tft.print(wins);
+      tft.print("W");
+    }
+    y += 18;
+    n++;
+  }
+  doc.clear();
+}
+
 void draw_widget_f1() {
-  if (f1_page) draw_widget_f1_standings();
-  else draw_widget_f1_nextrace();
-  f1_page = !f1_page;
+  if (f1_page == 0) draw_widget_f1_nextrace();
+  else if (f1_page == 1) draw_widget_f1_standings();
+  else draw_widget_f1_constructors();
+  for (int i = 0; i < 3; i++) {
+    tft.fillCircle(SCR_W - 24 + i * 8, 12, 3, f1_page == i ? C_ACC : C_DIM);
+  }
+  f1_page = (f1_page + 1) % 3;
 }
 
 void draw_widget_football() {
@@ -837,6 +947,7 @@ void gen_saver_preset(const char* name) {
 
 void enter_saver() {
   saver_active = true;
+  f1_page = 0;
   if (saver_mode == SAVER_F1 || saver_mode == SAVER_FOOTBALL) {
     if (WiFi.isConnected()) fetch_widget_data();
   } else if (saver_mode == SAVER_PARTICLES) {
@@ -914,7 +1025,7 @@ void draw_saver() {
       tft.drawPixel(saver_stars[i].x, saver_stars[i].y, rgb565(0, saver_stars[i].br, 0));
     }
   } else if (saver_mode == SAVER_F1) {
-    if (now - saver_last_frame < 30000) return;
+    if (now - saver_last_frame < 10000) return;
     saver_last_frame = now;
     if (WiFi.isConnected() && !widget_fetching && now - widget_fetch_ms > widget_refresh) fetch_widget_data();
     draw_widget_f1();
