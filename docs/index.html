@@ -1234,12 +1234,12 @@ function ss(on) {
 async function srl(t) {
   t = t || 5000; var d = new TextDecoder(), b = __srl_buf, s = Date.now(); __srl_buf = '';
   while (Date.now() - s < t) {
-    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) { var l = b.substring(0,n); var j = l.lastIndexOf('{'); if(j>=0) { __srl_buf = b.substring(n+1); return l.substring(j).trim(); } } }
+    try { var v = await dr.read(); if (v.done) break; if(!v.value||!v.value.length) continue; b += d.decode(v.value, {stream:true}); var n = b.indexOf('\n'); if(n>=0) { var l = b.substring(0,n); var j = l.lastIndexOf('{'); if(j>=0) { __srl_buf = b.substring(n+1); console.log('srl OK:',l.substring(j)); return l.substring(j).trim(); } console.log('srl no {:',l); } }
     catch(e) { await new Promise(function(r) { setTimeout(r, 50); }); }
   }
-  var j = b.indexOf('{'); return j>=0 ? b.substring(j).trim() : '';
+  console.log('srl timeout:',b); var j = b.indexOf('{'); return j>=0 ? b.substring(j).trim() : '';
 }
-async function sc(c, t) { if (!dw) throw new Error('nc'); await dw.write(new TextEncoder().encode(JSON.stringify(c)+'\n')); await new Promise(function(r) { setTimeout(r, 200); }); var s = await srl(t); if (!s) throw new Error('no response'); return JSON.parse(s); }
+async function sc(c, t) { if (!dw) throw new Error('nc'); console.log('sc send:',JSON.stringify(c)); await dw.write(new TextEncoder().encode(JSON.stringify(c)+'\n')); await new Promise(function(r) { setTimeout(r, 200); }); var s = await srl(t); console.log('sc recv:',s); if (!s) throw new Error('no response'); return JSON.parse(s); }
 document.getElementById('btnConnect').addEventListener('click', async function() {
   try {
     if (!('serial' in navigator)) { tm('Web Serial needs Chrome/Edge', 'ng'); return; }
@@ -1300,7 +1300,7 @@ function ul() {
 function syncWifi() {
   if(!cd) return;
   var s = document.getElementById('wifiSsid').value.trim();
-  if (!s) return; // Keep existing wifi when field is empty
+  if (!s) { delete cd.wifi; return; }
   if(!cd.wifi) cd.wifi={};
   cd.wifi.ssid = s;
   cd.wifi.password = document.getElementById('wifiPass').value;

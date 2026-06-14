@@ -238,12 +238,19 @@ void apply_cfg() {
   if (num_pages < 1) num_pages = 1;
   total_btns = cols * rows;
   if (page >= num_pages) page = 0;
-  int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
-  if (t >= 5 && t <= 600) saver_timeout = t;
-  int sm = config["saver"]["mode"]|SAVER_MATRIX;
-  if (sm >= SAVER_MATRIX && sm <= SAVER_FOOTBALL) saver_mode = sm;
-  wifi_ssid = config["wifi"]["ssid"]|"";
-  wifi_pass = config["wifi"]["password"]|"";
+  if (config["saver"].is<JsonObject>()) {
+    int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
+    if (t >= 5 && t <= 600) saver_timeout = t;
+    int sm = config["saver"]["mode"]|SAVER_MATRIX;
+    if (sm >= SAVER_MATRIX && sm <= SAVER_FOOTBALL) saver_mode = sm;
+  }
+  if (config["wifi"].is<JsonObject>()) {
+    String new_ssid = config["wifi"]["ssid"]|"";
+    if (new_ssid.length() > 0) {
+      wifi_ssid = new_ssid;
+      wifi_pass = config["wifi"]["password"]|"";
+    }
+  }
 }
 
 void init_wifi() {
