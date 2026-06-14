@@ -72,6 +72,7 @@ String wifi_pass;
 bool wifi_connecting = false;
 unsigned long wifi_retry_ms = 0;
 unsigned long wifi_connect_start_ms = 0;
+int wifi_last_status = -1;
 
 // Widget data
 String widget_cache = "";
@@ -247,12 +248,11 @@ void apply_cfg() {
 
 void init_wifi() {
   if (wifi_ssid.length() == 0) return;
-  if (WiFi.isConnected()) return;
-  if (wifi_connecting) return;
-  wifi_connecting = true;
-  wifi_connect_start_ms = millis();
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
+  // Already connected to this network
+  if (WiFi.isConnected() && WiFi.SSID() == wifi_ssid) return;
+  // Force reconnect with new credentials
+  if (WiFi.isConnected()) WiFi.disconnect(false);
+  wifi_retry_ms = 0;
 }
 
 void fetch_widget_data() {
@@ -540,8 +540,10 @@ void draw_header() {
       tft.print(" | WIFI: ON");
     else if (wifi_connecting)
       tft.print(" | WIFI:...");
-    else
+    else {
       tft.print(" | WIFI: OFF");
+      if (wifi_last_status >= 0) { tft.setTextColor(TFT_RED, C_HDR); tft.print("("); tft.print(wifi_last_status); tft.print(")"); tft.setTextColor(C_ACC, C_HDR); }
+    }
   }
 }
 
@@ -975,6 +977,7 @@ void setup() {
 
   load_cfg();
   apply_cfg();
+  WiFi.mode(WIFI_STA);
   init_wifi();
   load_saver_img();
   last_touch_ms = millis();
@@ -1000,13 +1003,13 @@ void loop() {
     if (wifi_retry_ms == 0 || now - wifi_retry_ms > 30000) {
       wifi_connecting = true;
       wifi_connect_start_ms = now;
-      WiFi.mode(WIFI_STA);
       WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
     }
   }
   if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || now - wifi_connect_start_ms > 20000)) {
     wifi_connecting = false;
     wifi_retry_ms = now;
+    wifi_last_status = WiFi.status();
     draw_header();
   }
   if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
