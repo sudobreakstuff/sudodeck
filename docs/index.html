@@ -687,6 +687,33 @@
     nav .nls a { padding: 6px 8px; font-size: 0.65rem; }
     .abt-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── Firmware Section ── */
+  .fmw {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-top: 24px;
+  }
+  .fmw-hdr { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .fmw-note { color: var(--dim); font-size: 0.85rem; flex: 1; min-width: 200px; }
+  .fmw-st { font-size: 0.8rem; color: var(--dim); font-family: var(--mono); }
+  .fmw-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .fmw-flash { display: flex; gap: 8px; align-items: center; }
+  .fmw-log {
+    background: #000; color: var(--acc); font-family: var(--mono);
+    font-size: 0.78rem; padding: 12px; border-radius: 6px;
+    height: 140px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5;
+  }
+  .fmw-bar-wrap {
+    height: 4px; background: var(--border); border-radius: 2px;
+    margin-top: 10px; overflow: hidden;
+  }
+  .fmw-bar {
+    height: 100%; width: 0%; background: var(--acc);
+    transition: width 0.2s;
+  }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -699,6 +726,7 @@
   <ul class="nls">
     <li><a href="#features">Features</a></li>
     <li><a href="#config">Configure</a></li>
+    <li><a href="#firmware">Firmware</a></li>
     <li><a href="#about">About</a></li>
   </ul>
 </nav>
@@ -915,7 +943,39 @@
 
 <div class="divider"></div>
 
-<section id="about">
+<section id="firmware">
+  <div class="sec">
+    <h2><span class="g">Firmware</span></h2>
+    <p class="sd">Back up or update your SudoDeck firmware directly from the browser.</p>
+
+    <div class="fmw">
+      <div class="fmw-hdr">
+        <p class="fmw-note">Put your CYD in <strong>flash mode</strong>: hold the BOOT button, tap RESET, release BOOT — then click Connect.</p>
+        <button class="btn pri" id="btnFwConnect" onclick="fwConnect()">Connect for Flashing</button>
+        <span class="fmw-st" id="fwStatus">Disconnected</span>
+      </div>
+
+      <div class="fmw-actions">
+        <button class="btn" id="btnFwBackup" onclick="fwBackup()" disabled>Backup Firmware</button>
+        <div class="fmw-flash">
+          <label class="btn" id="btnFwFlashLabel">
+            <input type="file" id="btnFwFile" accept=".bin" onchange="fwFileSelected()" hidden>
+            Select Firmware .bin
+          </label>
+          <button class="btn dan" id="btnFwFlash" onclick="fwFlash()" disabled>Flash</button>
+        </div>
+      </div>
+
+      <pre class="fmw-log" id="fwLog">Ready.</pre>
+
+      <div class="fmw-bar-wrap">
+        <div class="fmw-bar" id="fwBar"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
   <div class="abt">
     <h2><span class="g">Sudo</span>Deck</h2>
     <p class="abt-tag">cheap. open. yours.</p>
@@ -1389,6 +1449,133 @@ document.getElementById('btnSaverClear').addEventListener('click', async functio
 })();
 
 ic(); ra();
+
+/* ── Firmware (esptool-js via dynamic import) ── */
+var fwLoader = null, fwFileData = null, fwTransport = null;
+
+function fwLog(msg) {
+  var el = document.getElementById('fwLog');
+  el.textContent += msg + '\n';
+  el.scrollTop = el.scrollHeight;
+}
+
+function fwBar(pct) {
+  document.getElementById('fwBar').style.width = Math.min(pct, 100) + '%';
+}
+
+function fwSetStatus(s) {
+  var el = document.getElementById('fwStatus');
+  el.textContent = s;
+  el.style.color = s === 'Connected' ? 'var(--acc)' : 'var(--dim)';
+}
+
+async function fwConnect() {
+  if (fwLoader) { fwLog('Already connected.'); return; }
+  if (!('serial' in navigator)) { fwLog('Web Serial not available (Chrome/Edge required)'); return; }
+  try {
+    fwLog('Loading esptool-js...');
+    var esptool = await import('https://unpkg.com/esptool-js@0.6.0/bundle.js');
+    var ESPLoader = esptool.ESPLoader;
+    var Transport = esptool.Transport;
+    fwLog('Library loaded. Requesting serial port...');
+    fwLog('Put CYD in flash mode (hold BOOT, tap RESET, release BOOT), then select the port.');
+
+    var port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 115200 });
+    fwLog('Port opened. Syncing with ESP32...');
+
+    var term = {
+      clean: function() {},
+      writeLine: function(d) { fwLog('> ' + d); },
+      write: function(d) {},
+    };
+
+    fwTransport = new Transport(port, true);
+    fwLoader = new ESPLoader({ transport: fwTransport, baudrate: 115200, terminal: term });
+    var chipName = await fwLoader.main();
+    fwLog('Connected to: ' + chipName);
+    fwSetStatus('Connected');
+    document.getElementById('btnFwConnect').disabled = true;
+    document.getElementById('btnFwConnect').textContent = 'Connected';
+    document.getElementById('btnFwBackup').disabled = false;
+    fwLog('Ready. You can backup or flash firmware.');
+    fwBar(100);
+  } catch(e) {
+    fwLog('Connection failed: ' + e.message);
+    fwSetStatus('Error');
+    fwLoader = null;
+  }
+}
+
+async function fwBackup() {
+  if (!fwLoader) { fwLog('Connect first'); return; }
+  var btn = document.getElementById('btnFwBackup');
+  btn.disabled = true; btn.textContent = 'Reading…';
+  fwLog('Reading full flash (4MB). This will take a minute…');
+  fwBar(0);
+  try {
+    var data = await fwLoader.readFlash(0, 0x400000, function(pkt, prog, total) {
+      fwBar((prog / total) * 100);
+    });
+    var blob = new Blob([data], { type: 'application/octet-stream' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'sudodeck-backup-' + Date.now() + '.bin';
+    a.click();
+    URL.revokeObjectURL(url);
+    fwLog('Backup saved! Size: ' + (data.byteLength / 1024 / 1024).toFixed(1) + ' MB');
+    fwBar(100);
+  } catch(e) {
+    fwLog('Backup failed: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Backup Firmware';
+}
+
+function fwFileSelected() {
+  var f = document.getElementById('btnFwFile').files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    fwFileData = ev.target.result;
+    fwLog('Selected: ' + f.name + ' (' + (fwFileData.byteLength/1024).toFixed(0) + ' KB)');
+    document.getElementById('btnFwFlash').disabled = false;
+    document.getElementById('btnFwFlashLabel').textContent = f.name;
+  };
+  r.readAsArrayBuffer(f);
+}
+
+async function fwFlash() {
+  if (!fwLoader) { fwLog('Connect first'); return; }
+  if (!fwFileData) { fwLog('Select a firmware .bin file first'); return; }
+  var btn = document.getElementById('btnFwFlash');
+  btn.disabled = true; btn.textContent = 'Flashing…';
+  document.getElementById('btnFwBackup').disabled = true;
+  fwLog('Flashing firmware… DO NOT DISCONNECT!');
+  fwBar(0);
+  try {
+    var opts = {
+      fileArray: [{ data: new Uint8Array(fwFileData), address: 0x0 }],
+      flashSize: '4MB',
+      flashMode: 'dio',
+      flashFreq: '40m',
+      eraseAll: false,
+      compress: true,
+      verify: true,
+      reportProgress: function(idx, written, total) {
+        fwBar((written / total) * 100);
+      },
+    };
+    var result = await fwLoader.writeFlash(opts);
+    fwLog('Flash complete! Resetting...');
+    try { await fwLoader.after('hard_reset'); } catch(e) {}
+    fwLog('Done! Reconnect USB. The CYD will boot the new firmware.');
+    fwBar(100);
+  } catch(e) {
+    fwLog('Flash failed: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Flash';
+  document.getElementById('btnFwBackup').disabled = true;
+}
 </script>
 </body>
 </html>
