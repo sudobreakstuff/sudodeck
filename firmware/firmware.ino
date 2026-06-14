@@ -52,6 +52,9 @@ int nav_dot_x = 0;
 #define SAVER_IMAGE 3
 #define SAVER_F1 4
 #define SAVER_FOOTBALL 5
+#define SAVER_CUSTOM 6
+
+#define MAX_WIDGETS 8
 
 int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
@@ -82,6 +85,19 @@ int f1_page = 0;
 unsigned long widget_fetch_ms = 0;
 bool widget_fetching = false;
 const unsigned long widget_refresh = 60000;
+
+struct CustomWidget {
+  String url;
+  String path;
+  String label;
+  String format;
+  int interval;
+  String cache;
+  unsigned long last_fetch;
+};
+CustomWidget cwidgets[MAX_WIDGETS];
+int cwidget_count = 0;
+int cwidget_idx = 0;
 
 JsonDocument config;
 String serial_buf;
@@ -174,6 +190,8 @@ void gen_default() {
   config.clear();
   config["name"]="SudoDeck"; config["grid"]["cols"]=4; config["grid"]["rows"]=3;
   config["wifi"]["ssid"]=""; config["wifi"]["password"]="";
+  config["saver"]["timeout"]=DEFAULT_TIMEOUT; config["saver"]["mode"]=SAVER_MATRIX;
+  config["widgets"]=JsonArray();
   JsonArray pg = config["pages"].to<JsonArray>();
 
   JsonObject p1 = pg.add<JsonObject>(); p1["name"]="Main";
@@ -245,13 +263,29 @@ void apply_cfg() {
     int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
     if (t >= 5 && t <= 600) saver_timeout = t;
     int sm = config["saver"]["mode"]|SAVER_MATRIX;
-    if (sm >= SAVER_MATRIX && sm <= SAVER_FOOTBALL) saver_mode = sm;
+    if (sm >= SAVER_MATRIX && sm <= SAVER_CUSTOM) saver_mode = sm;
   }
   if (config["wifi"].is<JsonObject>()) {
     String new_ssid = config["wifi"]["ssid"]|"";
     if (new_ssid.length() > 0) {
       wifi_ssid = new_ssid;
       wifi_pass = config["wifi"]["password"]|"";
+    }
+  }
+  if (config["widgets"].is<JsonArray>()) {
+    cwidget_count = 0;
+    JsonArray wl = config["widgets"];
+    for (JsonVariant v : wl) {
+      if (!v.is<JsonObject>() || cwidget_count >= MAX_WIDGETS) break;
+      JsonObject w = v;
+      CustomWidget& cw = cwidgets[cwidget_count++];
+      cw.url = w["url"]|"";
+      cw.path = w["path"]|"";
+      cw.label = w["label"]|"";
+      cw.format = w["format"]|"";
+      cw.interval = w["interval"]|60;
+      cw.cache = "";
+      cw.last_fetch = 0;
     }
   }
 }
@@ -544,6 +578,110 @@ void draw_widget_f1() {
   f1_page = (f1_page + 1) % 3;
 }
 
+String extract_path(JsonDocument& doc, const char* path) {
+  if (!path || !path[0]) return "";
+  JsonVariant v = doc.as<JsonVariant>();
+  char tmp[128];
+  strncpy(tmp, path, sizeof(tmp)); tmp[sizeof(tmp)-1] = 0;
+  char* seg = strtok(tmp, ".");
+  while (seg) {
+    if (v.isNull()) return "";
+    char* br = strchr(seg, '[');
+    if (br) {
+      *br = '\0'; int idx = atoi(br + 1);
+      if (seg[0]) v = v[seg];
+      v = v[idx];
+    } else {
+      v = v[seg];
+    }
+    seg = strtok(nullptr, ".");
+  }
+  if (v.is<const char*>()) return v.as<const char*>();
+  if (v.is<float>()) return String(v.as<float>());
+  if (v.is<double>()) return String(v.as<double>());
+  if (v.is<signed int>()) return String(v.as<signed int>());
+  if (v.is<unsigned int>()) return String(v.as<unsigned int>());
+  if (v.is<bool>()) return v.as<bool>() ? "true" : "false";
+  return "";
+}
+
+void fetch_custom_widget(int idx) {
+  if (idx < 0 || idx >= cwidget_count) return;
+  CustomWidget& w = cwidgets[idx];
+  if (w.url.length() == 0) return;
+  HTTPClient http;
+  http.setTimeout(10000);
+  http.begin(w.url);
+  int c = http.GET();
+  if (c > 0) w.cache = http.getString();
+  http.end();
+  w.last_fetch = millis();
+}
+
+void draw_widget_custom() {
+  tft.fillScreen(C_BG);
+  tft.setTextColor(C_ACC, C_BG);
+  tft.setTextSize(2);
+  tft.setCursor(10, 4);
+  tft.print("CUSTOM");
+  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  if (cwidget_count == 0) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextSize(1);
+    tft.setCursor(10, 40);
+    tft.print("no widgets configured");
+    return;
+  }
+  CustomWidget& w = cwidgets[cwidget_idx];
+  int nd = cwidget_count < 8 ? cwidget_count : 8;
+  for (int i = 0; i < nd; i++) {
+    tft.fillCircle(SCR_W - 24 + i * 8, 12, 3, i == cwidget_idx ? C_ACC : C_DIM);
+  }
+  if (w.label.length() > 0) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextSize(1);
+    tft.setCursor(10, 32);
+    tft.print(w.label);
+  }
+  tft.setTextColor(C_TXT, C_BG);
+  tft.setTextSize(2);
+  tft.setCursor(10, 52);
+  if (w.cache.length() == 0 && w.url.length() > 0) {
+    tft.setTextSize(1);
+    tft.setTextColor(C_DIM, C_BG);
+    tft.print("loading...");
+    return;
+  }
+  if (w.cache.length() == 0) {
+    tft.setTextSize(1);
+    tft.setTextColor(C_DIM, C_BG);
+    tft.print("no data");
+    return;
+  }
+  JsonDocument pd;
+  DeserializationError de = deserializeJson(pd, w.cache);
+  if (de) {
+    tft.setTextSize(1);
+    tft.setTextColor(C_DIM, C_BG);
+    tft.print("parse error");
+    return;
+  }
+  String val = extract_path(pd, w.path.c_str());
+  pd.clear();
+  if (val.length() == 0) {
+    tft.setTextSize(1);
+    tft.print("no data");
+    return;
+  }
+  if (w.format.length() > 0) {
+    String d = w.format;
+    d.replace("{value}", val);
+    tft.print(d);
+  } else {
+    tft.print(val);
+  }
+}
+
 void draw_widget_football() {
   tft.fillScreen(C_BG);
   tft.setTextColor(C_ACC, C_BG);
@@ -617,6 +755,7 @@ void proc_serial(const String& l) {
     else if (!strcmp(m,"image")) saver_mode = SAVER_IMAGE;
     else if (!strcmp(m,"f1")) saver_mode = SAVER_F1;
     else if (!strcmp(m,"football")) saver_mode = SAVER_FOOTBALL;
+    else if (!strcmp(m,"custom")) saver_mode = SAVER_CUSTOM;
     else { s_err("bad mode"); return; }
     config["saver"]["mode"] = saver_mode;
     save_cfg();
@@ -638,6 +777,7 @@ void proc_serial(const String& l) {
     else if (saver_mode == SAVER_IMAGE) r["mode"] = "image";
     else if (saver_mode == SAVER_F1) r["mode"] = "f1";
     else if (saver_mode == SAVER_FOOTBALL) r["mode"] = "football";
+    else if (saver_mode == SAVER_CUSTOM) r["mode"] = "custom";
     else r["mode"] = "matrix";
     r["has_img"] = saver_img != nullptr && SPIFFS.exists("/saver.img");
     s_ok(r);
@@ -950,16 +1090,11 @@ void enter_saver() {
   f1_page = 0;
   if (saver_mode == SAVER_F1 || saver_mode == SAVER_FOOTBALL) {
     if (WiFi.isConnected()) fetch_widget_data();
-  } else if (saver_mode == SAVER_PARTICLES) {
-    for (int i = 0; i < 25; i++) {
-      saver_parts[i].x = random(SCR_W);
-      saver_parts[i].y = random(SCR_H);
-      float a = (float)random(0, 628) / 100.0;
-      saver_parts[i].vx = cos(a) * 0.5;
-      saver_parts[i].vy = sin(a) * 0.3;
-      saver_parts[i].life = 50 + random(100);
+  } else if (saver_mode == SAVER_CUSTOM) {
+    cwidget_idx = 0;
+    if (WiFi.isConnected()) {
+      for (int i = 0; i < cwidget_count; i++) fetch_custom_widget(i);
     }
-    saver_last_frame = millis();
   } else if (saver_mode == SAVER_STARS) {
     for (int i = 0; i < 40; i++) {
       saver_stars[i].x = random(SCR_W);
@@ -1034,6 +1169,12 @@ void draw_saver() {
     saver_last_frame = now;
     if (WiFi.isConnected() && !widget_fetching && now - widget_fetch_ms > widget_refresh) fetch_widget_data();
     draw_widget_football();
+  } else if (saver_mode == SAVER_CUSTOM) {
+    if (now - saver_last_frame < 10000) return;
+    saver_last_frame = now;
+    cwidget_idx = (cwidget_idx + 1) % cwidget_count;
+    if (WiFi.isConnected()) fetch_custom_widget(cwidget_idx);
+    draw_widget_custom();
   } else if (saver_mode == SAVER_MATRIX) {
     if (now - saver_last_frame < 60) return;
     saver_last_frame = now;
@@ -1242,6 +1383,17 @@ void loop() {
   // Pre-fetch widget data when WiFi is connected and idle
   if (WiFi.isConnected() && widget_cache.length() == 0 && !widget_fetching && now - widget_fetch_ms > 5000) {
     fetch_widget_data();
+  }
+  if (WiFi.isConnected() && cwidget_count > 0) {
+    static unsigned long cw_last = 0;
+    for (int i = 0; i < cwidget_count; i++) {
+      CustomWidget& cw = cwidgets[i];
+      if (cw.url.length() > 0 && cw.cache.length() == 0 && now - cw.last_fetch > 5000) {
+        fetch_custom_widget(i);
+        cw_last = now;
+        break;
+      }
+    }
   }
 
   if (!saver_active) {
