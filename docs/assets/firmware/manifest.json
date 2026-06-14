@@ -5,7 +5,7 @@
       "label": "SudoDeck v2.0.0",
       "file": "sudodeck-2.0.0.bin",
       "address": "0",
-      "notes": "WiFi + widget screensavers (F1 standings + football scores), no_ota partition (68% flash)"
+      "notes": "WiFi + widget screensavers (F1 standings + football scores), WiFi status in header, no_ota partition (68% flash)"
     },
     {
       "version": "1.0.0",
