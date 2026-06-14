@@ -76,6 +76,8 @@ int wifi_last_status = -1;
 
 // Widget data
 String widget_cache = "";
+String f1_race_cache = "";
+bool f1_page = false;
 unsigned long widget_fetch_ms = 0;
 bool widget_fetching = false;
 const unsigned long widget_refresh = 60000;
@@ -267,27 +269,27 @@ void fetch_widget_data() {
   if (widget_fetching) return;
   widget_fetching = true;
   HTTPClient http;
-  String url;
-  if (saver_mode == SAVER_F1) {
-    url = "https://api.jolpi.ca/ergast/f1/current/driverStandings.json";
-  } else if (saver_mode == SAVER_FOOTBALL) {
-    url = "https://api.sportscore.io/v1/football/matches"; // placeholder
-  } else {
-    widget_fetching = false;
-    return;
-  }
   http.setTimeout(10000);
-  http.begin(url);
-  int code = http.GET();
-  if (code > 0) {
-    widget_cache = http.getString();
+  if (saver_mode == SAVER_F1) {
+    http.begin("https://api.jolpi.ca/ergast/f1/current/driverStandings.json");
+    int c = http.GET();
+    if (c > 0) widget_cache = http.getString();
+    http.end();
+    http.begin("https://api.jolpi.ca/ergast/f1/current/next.json");
+    c = http.GET();
+    if (c > 0) f1_race_cache = http.getString();
+    http.end();
+  } else if (saver_mode == SAVER_FOOTBALL) {
+    http.begin("https://api.sportscore.io/v1/football/matches"); // placeholder
+    int c = http.GET();
+    if (c > 0) widget_cache = http.getString();
+    http.end();
   }
-  http.end();
   widget_fetching = false;
   widget_fetch_ms = millis();
 }
 
-void draw_widget_f1() {
+void draw_widget_f1_standings() {
   tft.fillScreen(C_BG);
   tft.setTextColor(C_ACC, C_BG);
   tft.setTextSize(2);
@@ -316,12 +318,17 @@ void draw_widget_f1() {
   int y = 32;
   int n = 0;
   for (JsonObject s : standings) {
-    if (n >= 10) break;
+    if (n >= 12) break;
     const char* pos = s["position"]|"";
     const char* code = s["Driver"]["code"]|"";
     const char* pts = s["points"]|"";
-    char buf[32];
-    snprintf(buf, sizeof(buf), "%-2s  %-3s  %s", pos, code, pts);
+    const char* team = s["Constructors"][0]["name"]|"";
+    const char* wins = s["wins"]|"";
+    char buf[40];
+    if (strcmp(wins, "0") == 0 || wins[0] == 0)
+      snprintf(buf, sizeof(buf), "%2s %-3s %4s  %s", pos, code, pts, team);
+    else
+      snprintf(buf, sizeof(buf), "%2s %-3s %4s  %-11s %sW", pos, code, pts, team, wins);
     tft.setTextColor(C_TXT, C_BG);
     tft.setCursor(10, y);
     tft.print(buf);
@@ -329,6 +336,102 @@ void draw_widget_f1() {
     n++;
   }
   doc.clear();
+}
+
+void draw_widget_f1_nextrace() {
+  tft.fillScreen(C_BG);
+  tft.setTextColor(C_ACC, C_BG);
+  tft.setTextSize(2);
+  tft.setCursor(10, 4);
+  tft.print("NEXT RACE");
+  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  if (f1_race_cache.length() == 0) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextSize(1);
+    tft.setCursor(10, 40);
+    if (widget_fetching) tft.print("loading...");
+    else tft.print("no data");
+    return;
+  }
+  tft.setTextSize(1);
+  JsonDocument doc;
+  DeserializationError err = deserializeJson(doc, f1_race_cache);
+  if (err) {
+    tft.setTextColor(C_DIM, C_BG);
+    tft.setCursor(10, 40);
+    tft.print("parse error");
+    return;
+  }
+  JsonObject race = doc["MRData"]["RaceTable"]["Races"][0];
+  const char* name = race["raceName"]|"";
+  const char* circuit = race["Circuit"]["circuitName"]|"";
+  const char* locality = race["Circuit"]["Location"]["locality"]|"";
+  const char* country = race["Circuit"]["Location"]["country"]|"";
+  const char* raceDate = race["date"]|"";
+  static const char* months[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+  char buf[48];
+  int y = 32;
+
+  tft.setTextColor(C_TXT, C_BG);
+  tft.setCursor(10, y);
+  tft.print(name);
+  y += 18;
+
+  tft.setCursor(10, y);
+  tft.print(circuit);
+  y += 18;
+
+  if (strlen(raceDate) >= 10) {
+    int yr = 0, mo = 0, dy = 0;
+    sscanf(raceDate, "%d-%d-%d", &yr, &mo, &dy);
+    if (mo >= 1 && mo <= 12) {
+      snprintf(buf, sizeof(buf), "%s %d, %d", months[mo-1], dy, yr);
+      tft.setCursor(10, y);
+      tft.print(buf);
+      y += 18;
+    }
+  }
+
+  if (strlen(locality) > 0 && strlen(country) > 0) {
+    snprintf(buf, sizeof(buf), "%s, %s", locality, country);
+    tft.setCursor(10, y);
+    tft.print(buf);
+    y += 18;
+  }
+
+  const char* qDate = race["Qualifying"]["date"]|"";
+  const char* qTime = race["Qualifying"]["time"]|"";
+  if (strlen(qDate) >= 10 && strlen(qTime) >= 5) {
+    int yr, mo, dy, hr, mn;
+    sscanf(qDate, "%d-%d-%d", &yr, &mo, &dy);
+    sscanf(qTime, "%d:%d", &hr, &mn);
+    if (mo >= 1 && mo <= 12) {
+      snprintf(buf, sizeof(buf), "Quali: %s %d %02d:%02d", months[mo-1], dy, hr, mn);
+      tft.setCursor(10, y);
+      tft.print(buf);
+      y += 18;
+    }
+  }
+
+  const char* rTime = race["time"]|"";
+  if (strlen(raceDate) >= 10 && strlen(rTime) >= 5) {
+    int yr, mo, dy, hr, mn;
+    sscanf(raceDate, "%d-%d-%d", &yr, &mo, &dy);
+    sscanf(rTime, "%d:%d", &hr, &mn);
+    if (mo >= 1 && mo <= 12) {
+      snprintf(buf, sizeof(buf), "Race:  %s %d %02d:%02d", months[mo-1], dy, hr, mn);
+      tft.setCursor(10, y);
+      tft.print(buf);
+    }
+  }
+
+  doc.clear();
+}
+
+void draw_widget_f1() {
+  if (f1_page) draw_widget_f1_standings();
+  else draw_widget_f1_nextrace();
+  f1_page = !f1_page;
 }
 
 void draw_widget_football() {
@@ -735,7 +838,7 @@ void gen_saver_preset(const char* name) {
 void enter_saver() {
   saver_active = true;
   if (saver_mode == SAVER_F1 || saver_mode == SAVER_FOOTBALL) {
-    if (WiFi.isConnected() && widget_cache.length() == 0) fetch_widget_data();
+    if (WiFi.isConnected()) fetch_widget_data();
   } else if (saver_mode == SAVER_PARTICLES) {
     for (int i = 0; i < 25; i++) {
       saver_parts[i].x = random(SCR_W);
