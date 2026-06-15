@@ -1,6 +1,13 @@
 {
   "versions": [
     {
+      "version": "2.1.2",
+      "label": "SudoDeck v2.1.2",
+      "file": "sudodeck-2.1.2.bin",
+      "address": "0",
+      "notes": "Removed button icon support (to revisit later). Switched to no_ota partition scheme (69% flash)."
+    },
+    {
       "version": "2.1.1",
       "label": "SudoDeck v2.1.1",
       "file": "sudodeck-2.1.1.bin",

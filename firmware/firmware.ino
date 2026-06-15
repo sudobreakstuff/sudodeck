@@ -57,15 +57,11 @@ int nav_dot_x = 0;
 
 #define MAX_WIDGETS 8
 
-#define ICON_W 32
-#define ICON_H 32
-
 int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
 int saver_timeout = DEFAULT_TIMEOUT;
 unsigned long last_touch_ms = 0;
 uint16_t* saver_img = nullptr;
-uint16_t icon_buf[ICON_W * ICON_H];
 // Image bounce state
 float saver_x, saver_y, saver_vx, saver_vy;
 // Matrix rain state
@@ -892,36 +888,6 @@ void proc_serial(const String& l) {
     if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img");
     JsonDocument r; s_ok(r);
   }
-  else if (!strcmp(cmd,"upload_button_icon")) {
-    const char* name = req["name"]|"";
-    const char* data = req["data"]|"";
-    if (!name[0]) { s_err("no name"); return; }
-    for (int i = 0; name[i]; i++) {
-      char c = name[i];
-      if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')) { s_err("bad name"); return; }
-    }
-    int dlen = strlen(data);
-    if (dlen != ICON_W * ICON_H * 4) { s_err("bad size"); return; }
-    uint16_t* buf = (uint16_t*)malloc(ICON_W * ICON_H * 2);
-    if (!buf) { s_err("oom"); return; }
-    for (int i = 0; i < ICON_W * ICON_H; i++) {
-      char tmp[5] = {data[i*4], data[i*4+1], data[i*4+2], data[i*4+3], 0};
-      buf[i] = (uint16_t)strtol(tmp, nullptr, 16);
-    }
-    char path[32]; snprintf(path, sizeof(path), "/i%s.ico", name);
-    fs::File f = SPIFFS.open(path, "w");
-    if (!f) { free(buf); s_err("write fail"); return; }
-    f.write((uint8_t*)buf, ICON_W * ICON_H * 2);
-    f.close(); free(buf);
-    JsonDocument r; s_ok(r);
-  }
-  else if (!strcmp(cmd,"delete_button_icon")) {
-    const char* name = req["name"]|"";
-    if (!name[0]) { s_err("no name"); return; }
-    char path[32]; snprintf(path, sizeof(path), "/i%s.ico", name);
-    if (SPIFFS.exists(path)) SPIFFS.remove(path);
-    JsonDocument r; s_ok(r);
-  }
   else { s_err("unknown command"); }
 }
 
@@ -1038,45 +1004,17 @@ void draw_grid() {
 
     uint16_t bg = C_BTN_BG;
     const char* label = "";
-    const char* icon = "";
     if (i < (int)btns.size()) {
       bg = hex_col(btns[i]["color"] | "#16213E");
       label = btns[i]["label"] | "";
-      icon = btns[i]["icon"] | "";
     }
-
     tft.fillRoundRect(x, y, bw, bh, 6, bg);
-
-    int label_y = y + (bh - 16) / 2;
-
-    if (icon[0]) {
-      char ip[32];
-      snprintf(ip, sizeof(ip), "/i%s.ico", icon);
-      fs::File f = SPIFFS.open(ip, "r");
-      if (f && f.size() == ICON_W * ICON_H * 2) {
-        f.read((uint8_t*)icon_buf, sizeof(icon_buf));
-        int ix = x + (bw - ICON_W) / 2;
-        int iy = y + 4;
-        int max_iy = label[0] ? (y + bh - 16 - 4) : (y + bh - ICON_H - 4);
-        if (ix < x + 2) ix = x + 2;
-        if (iy + ICON_H <= max_iy && ix + ICON_W <= x + bw - 2) {
-          for (int pi = 0; pi < ICON_W * ICON_H; pi++) {
-            uint16_t p = icon_buf[pi];
-            icon_buf[pi] = (p << 8) | (p >> 8);
-          }
-          tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
-          if (label[0]) label_y = iy + ICON_H + 2;
-        }
-      }
-      f.close();
-    }
-
     if (label[0]) {
       tft.setTextColor(C_TXT, bg);
       int lw = tft.textWidth(label);
       int cx = x + (bw - lw) / 2;
       if (cx < x + 2) cx = x + 2;
-      tft.setCursor(cx, label_y);
+      tft.setCursor(cx, y + (bh - 16) / 2);
       tft.print(label);
     }
   }
@@ -1420,9 +1358,7 @@ void handle_touch(int tx, int ty) {
       tft.fillRoundRect(x, y, bw, bh, 6, hl);
       delay(60);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-      // Redraw label and icon after flash
-      const char* icon = "";
-      if (i < (int)btns.size()) icon = btns[i]["icon"] | "";
+      // Redraw label after flash
       if (label[0]) {
         tft.setTextColor(C_TXT, bg);
         int lw = tft.textWidth(label);
@@ -1431,23 +1367,6 @@ void handle_touch(int tx, int ty) {
         if (cx < x + 2) cx = x + 2;
         tft.setCursor(cx, cy);
         tft.print(label);
-      }
-      if (icon[0]) {
-        char ip[32]; snprintf(ip, sizeof(ip), "/i%s.ico", icon);
-        fs::File f = SPIFFS.open(ip, "r");
-        if (f && f.size() == ICON_W * ICON_H * 2) {
-          f.read((uint8_t*)icon_buf, sizeof(icon_buf));
-          int ix = x + (bw - ICON_W) / 2;
-          int iy = y + 4;
-          int max_iy = label[0] ? (y + bh - 16 - 4) : (y + bh - ICON_H - 4);
-          if (ix < x + 2) ix = x + 2;
-          if (iy + ICON_H <= max_iy && ix + ICON_W <= x + bw - 2) {
-            for (int pi = 0; pi < ICON_W * ICON_H; pi++)
-              icon_buf[pi] = (icon_buf[pi] << 8) | (icon_buf[pi] >> 8);
-            tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
-          }
-        }
-        f.close();
       }
       if (i < (int)btns.size()) do_action(btns[i]["action"]);
       return;
