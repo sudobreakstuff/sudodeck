@@ -1056,12 +1056,12 @@ void draw_grid() {
       if (f && f.size() == ICON_W * ICON_H * 2) {
         f.read((uint8_t*)icon_buf, sizeof(icon_buf));
         int ix = x + (bw - ICON_W) / 2;
-        int iy = y + (bh - ICON_H - 16 - 6) / 2;
+        int iy = y + 4;
+        int max_iy = label[0] ? (y + bh - 16 - 4) : (y + bh - ICON_H - 4);
         if (ix < x + 2) ix = x + 2;
-        if (iy < y + 4) iy = y + 4;
-        if (iy + ICON_H <= y + bh - 16) {
+        if (iy + ICON_H <= max_iy && ix + ICON_W <= x + bw - 2) {
           tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
-          label_y = iy + ICON_H + 2;
+          if (label[0]) label_y = iy + ICON_H + 2;
         }
       }
       f.close();

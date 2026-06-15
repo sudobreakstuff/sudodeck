@@ -1618,8 +1618,12 @@ function es(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 function uip(name) {
   var el = document.getElementById('iconPrev');
   if(!name) { el.textContent = 'none'; el.style.background = 'var(--surface2)'; return; }
-  el.textContent = name.length > 4 ? name.substring(0, 4) : name;
-  el.style.background = 'var(--surface2)';
+  var bg = document.getElementById('ec').value || '#16213E';
+  el.innerHTML = '<canvas id="ipc" width="32" height="32" style="width:36px;height:36px;border-radius:3px;"></canvas>';
+  var ctx = document.getElementById('ipc').getContext('2d');
+  ctx.fillStyle = bg; ctx.fillRect(0,0,32,32);
+  ctx.fillStyle = '#888'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(name.substring(0,2).toUpperCase(), 16, 16);
 }
 document.getElementById('uploadIconBtn').addEventListener('click', function() {
   document.getElementById('iconFileInput').click();
@@ -1630,34 +1634,70 @@ document.getElementById('clearIconBtn').addEventListener('click', function() {
 });
 document.getElementById('iconFileInput').addEventListener('change', function(e) {
   var f = e.target.files[0]; if(!f) return;
-  var img = new Image();
-  img.onload = function() {
-    var c = document.createElement('canvas');
-    c.width = 32; c.height = 32;
-    var ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, 32, 32);
-    ctx.drawImage(img, 0, 0, 32, 32);
-    var d = ctx.getImageData(0, 0, 32, 32).data;
-    var hex = '';
-    for (var i = 0; i < d.length; i += 4) {
-      var r = d[i] >> 3, g = d[i+1] >> 2, b = d[i+2] >> 3;
-      var p = (r << 11) | (g << 5) | b;
-      hex += ('000' + p.toString(16).toUpperCase()).slice(-4);
-    }
-    var name = document.getElementById('eic').value.trim();
-    if (!name) {
-      name = f.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9_-]/g, '').substring(0, 15);
-      document.getElementById('eic').value = name;
-    }
-    if (!name) { tm('Enter an icon name first', 'ng'); return; }
-    sc({cmd:'upload_button_icon', name:name, data:hex}).then(function(r) {
-      tm('Icon uploaded: '+name); uip(name);
-    }).catch(function(e) {
-      tm('Upload failed', 'ng');
-    });
-    URL.revokeObjectURL(img.src);
-  };
-  img.src = URL.createObjectURL(f);
+  // For SVG files, set MIME type for proper rendering on canvas
+  if(f.type === 'image/svg+xml' || f.name.endsWith('.svg')) {
+    var rdr = new FileReader();
+    rdr.onload = function(ev) {
+      var svgText = ev.target.result;
+      var svgBlob = new Blob([svgText], {type:'image/svg+xml'});
+      var url = URL.createObjectURL(svgBlob);
+      var img = new Image();
+      img.onload = function() {
+        var c = document.createElement('canvas');
+        c.width = 32; c.height = 32;
+        var ctx = c.getContext('2d');
+        var bg = document.getElementById('ec').value || '#16213E';
+        ctx.fillStyle = bg; ctx.fillRect(0, 0, 32, 32);
+        ctx.drawImage(img, 0, 0, 32, 32);
+        var d = ctx.getImageData(0, 0, 32, 32).data;
+        var hex = '';
+        for (var i = 0; i < d.length; i += 4) {
+          var r = d[i] >> 3, g = d[i+1] >> 2, b = d[i+2] >> 3;
+          hex += ('000' + ((r<<11)|(g<<5)|b).toString(16).toUpperCase()).slice(-4);
+        }
+        var name = document.getElementById('eic').value.trim();
+        if (!name) {
+          name = f.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9_-]/g, '').substring(0, 15);
+          document.getElementById('eic').value = name;
+        }
+        if (!name) { tm('Enter icon name first', 'ng'); return; }
+        sc({cmd:'upload_button_icon', name:name, data:hex}).then(function(r) {
+          tm('Icon: '+name); uip(name);
+        }).catch(function(e) { tm('Upload failed', 'ng'); });
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    };
+    rdr.readAsText(f);
+  } else {
+    // Raster image — fill background before draw
+    var img = new Image();
+    img.onload = function() {
+      var c = document.createElement('canvas');
+      c.width = 32; c.height = 32;
+      var ctx = c.getContext('2d');
+      var bg = document.getElementById('ec').value || '#16213E';
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, 32, 32);
+      ctx.drawImage(img, 0, 0, 32, 32);
+      var d = ctx.getImageData(0, 0, 32, 32).data;
+      var hex = '';
+      for (var i = 0; i < d.length; i += 4) {
+        var r = d[i] >> 3, g = d[i+1] >> 2, b = d[i+2] >> 3;
+        hex += ('000' + ((r<<11)|(g<<5)|b).toString(16).toUpperCase()).slice(-4);
+      }
+      var name = document.getElementById('eic').value.trim();
+      if (!name) {
+        name = f.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9_-]/g, '').substring(0, 15);
+        document.getElementById('eic').value = name;
+      }
+      if (!name) { tm('Enter icon name first', 'ng'); return; }
+      sc({cmd:'upload_button_icon', name:name, data:hex}).then(function(r) {
+        tm('Icon: '+name); uip(name);
+      }).catch(function(e) { tm('Upload failed', 'ng'); });
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(f);
+  }
   e.target.value = '';
 });
 
