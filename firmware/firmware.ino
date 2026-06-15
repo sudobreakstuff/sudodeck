@@ -333,7 +333,7 @@ void init_wifi() {
     delay(100);
   }
   WiFi.mode(WIFI_OFF);
-  delay(50);
+  delay(250);
   WiFi.mode(WIFI_STA);
   wifi_intentional_disconnect = false;
   wifi_retry_ms = 0;
