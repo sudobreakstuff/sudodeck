@@ -1078,6 +1078,16 @@
           </select>
         </div>
         <div id="af"></div>
+        <div class="er">
+          <label>Icon</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div id="iconPrev" style="width:36px;height:36px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--dim);overflow:hidden;">none</div>
+            <input type="text" id="eic" placeholder="icon name" style="flex:1;min-width:80px;">
+            <button class="btn" id="uploadIconBtn" style="font-size:0.7rem;">+ Image</button>
+            <button class="btn dan" id="clearIconBtn" style="font-size:0.7rem;padding:3px 8px;">X</button>
+          </div>
+          <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+        </div>
         <div class="br">
           <button class="btn pri" id="bae">Apply</button>
           <button class="btn" id="bce">Cancel</button>
@@ -1456,6 +1466,7 @@ function rg() {
     var d = p.buttons[i]||{label:'',color:'#16213E'};
     b.style.backgroundColor = d.color||'#16213E';
     b.innerHTML = '<span class="ix">'+(i+1)+'</span>'+(d.label||'...');
+    if(d.icon) b.innerHTML += '<span class="ix" style="background:var(--acc);color:var(--bg);font-size:0.5rem;padding:1px 4px;right:18px;">I</span>';
     b.addEventListener('click', function(idx) { return function() { sb=idx; rg(); se(idx); }; }(i));
     g.appendChild(b);
   }
@@ -1469,6 +1480,8 @@ function se(idx) {
   document.getElementById('el').value = b.label||'';
   document.getElementById('ec').value = b.color||'#16213E';
   document.getElementById('eat').value = b.action?b.action.type:'key';
+  document.getElementById('eic').value = b.icon||'';
+  uip(b.icon||'');
   uaf();
 }
 function uaf() {
@@ -1590,6 +1603,9 @@ document.getElementById('bae').addEventListener('click', function() {
   pg.buttons[sb].label = document.getElementById('el').value;
   pg.buttons[sb].color = document.getElementById('ec').value;
   pg.buttons[sb].action = gaf();
+  var ic = document.getElementById('eic').value.trim();
+  if(ic) pg.buttons[sb].icon = ic;
+  else delete pg.buttons[sb].icon;
   document.getElementById('ep').style.display = 'none';
   ra(); tm('Button updated');
 });
@@ -1598,6 +1614,52 @@ document.getElementById('bce').addEventListener('click', function() {
   sb = -1; rg();
 });
 function es(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&#34;'); }
+
+function uip(name) {
+  var el = document.getElementById('iconPrev');
+  if(!name) { el.textContent = 'none'; el.style.background = 'var(--surface2)'; return; }
+  el.textContent = name.length > 4 ? name.substring(0, 4) : name;
+  el.style.background = 'var(--surface2)';
+}
+document.getElementById('uploadIconBtn').addEventListener('click', function() {
+  document.getElementById('iconFileInput').click();
+});
+document.getElementById('clearIconBtn').addEventListener('click', function() {
+  document.getElementById('eic').value = '';
+  uip('');
+});
+document.getElementById('iconFileInput').addEventListener('change', function(e) {
+  var f = e.target.files[0]; if(!f) return;
+  var img = new Image();
+  img.onload = function() {
+    var c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    var ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, 32, 32);
+    ctx.drawImage(img, 0, 0, 32, 32);
+    var d = ctx.getImageData(0, 0, 32, 32).data;
+    var hex = '';
+    for (var i = 0; i < d.length; i += 4) {
+      var r = d[i] >> 3, g = d[i+1] >> 2, b = d[i+2] >> 3;
+      var p = (r << 11) | (g << 5) | b;
+      hex += ('000' + p.toString(16).toUpperCase()).slice(-4);
+    }
+    var name = document.getElementById('eic').value.trim();
+    if (!name) {
+      name = f.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9_-]/g, '').substring(0, 15);
+      document.getElementById('eic').value = name;
+    }
+    if (!name) { tm('Enter an icon name first', 'ng'); return; }
+    sc({cmd:'upload_button_icon', name:name, data:hex}).then(function(r) {
+      tm('Icon uploaded: '+name); uip(name);
+    }).catch(function(e) {
+      tm('Upload failed', 'ng');
+    });
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f);
+  e.target.value = '';
+});
 
 var nav = document.getElementById('nav');
 var navTicking = false;

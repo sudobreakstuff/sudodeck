@@ -57,11 +57,15 @@ int nav_dot_x = 0;
 
 #define MAX_WIDGETS 8
 
+#define ICON_W 32
+#define ICON_H 32
+
 int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
 int saver_timeout = DEFAULT_TIMEOUT;
 unsigned long last_touch_ms = 0;
 uint16_t* saver_img = nullptr;
+uint16_t icon_buf[ICON_W * ICON_H];
 // Image bounce state
 float saver_x, saver_y, saver_vx, saver_vy;
 // Matrix rain state
@@ -209,10 +213,10 @@ void do_action(JsonObject a) {
     } else {
       ble.press(0, KEY_MOD_LGUI);
     }
-    delay(50); ble.releaseAll();
-    delay(500);
+    delay(30); ble.releaseAll();
+    delay(150);
     ble.print(name);
-    delay(200);
+    delay(50);
     ble.tap(KEY_RETURN);
   } else if (!strcmp(t,"macro")) {
     JsonArray steps = a["steps"];
@@ -783,7 +787,7 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
-    r["name"]="SudoDeck"; r["version"]="2.0";
+    r["name"]="SudoDeck"; r["version"]="2.1";
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
@@ -886,6 +890,36 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"clear_saver_img")) {
     if (saver_img) { free(saver_img); saver_img = nullptr; }
     if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img");
+    JsonDocument r; s_ok(r);
+  }
+  else if (!strcmp(cmd,"upload_button_icon")) {
+    const char* name = req["name"]|"";
+    const char* data = req["data"]|"";
+    if (!name[0]) { s_err("no name"); return; }
+    for (int i = 0; name[i]; i++) {
+      char c = name[i];
+      if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')) { s_err("bad name"); return; }
+    }
+    int dlen = strlen(data);
+    if (dlen != ICON_W * ICON_H * 4) { s_err("bad size"); return; }
+    uint16_t* buf = (uint16_t*)malloc(ICON_W * ICON_H * 2);
+    if (!buf) { s_err("oom"); return; }
+    for (int i = 0; i < ICON_W * ICON_H; i++) {
+      char tmp[5] = {data[i*4], data[i*4+1], data[i*4+2], data[i*4+3], 0};
+      buf[i] = (uint16_t)strtol(tmp, nullptr, 16);
+    }
+    char path[32]; snprintf(path, sizeof(path), "/icons/%s.img", name);
+    fs::File f = SPIFFS.open(path, "w");
+    if (!f) { free(buf); s_err("write fail"); return; }
+    f.write((uint8_t*)buf, ICON_W * ICON_H * 2);
+    f.close(); free(buf);
+    JsonDocument r; s_ok(r);
+  }
+  else if (!strcmp(cmd,"delete_button_icon")) {
+    const char* name = req["name"]|"";
+    if (!name[0]) { s_err("no name"); return; }
+    char path[32]; snprintf(path, sizeof(path), "/icons/%s.img", name);
+    if (SPIFFS.exists(path)) SPIFFS.remove(path);
     JsonDocument r; s_ok(r);
   }
   else { s_err("unknown command"); }
@@ -1004,20 +1038,39 @@ void draw_grid() {
 
     uint16_t bg = C_BTN_BG;
     const char* label = "";
+    const char* icon = "";
     if (i < (int)btns.size()) {
       bg = hex_col(btns[i]["color"] | "#16213E");
       label = btns[i]["label"] | "";
+      icon = btns[i]["icon"] | "";
     }
 
     tft.fillRoundRect(x, y, bw, bh, 6, bg);
+
+    int label_y = y + (bh - 16) / 2;
+
+    if (icon[0]) {
+      char ip[32];
+      snprintf(ip, sizeof(ip), "/icons/%s.img", icon);
+      fs::File f = SPIFFS.open(ip, "r");
+      if (f && f.size() == ICON_W * ICON_H * 2) {
+        f.read((uint8_t*)icon_buf, sizeof(icon_buf));
+        int ix = x + (bw - ICON_W) / 2;
+        int iy = y + (bh - ICON_H - 16 - 6) / 2;
+        if (ix < x + 2) ix = x + 2;
+        if (iy < y + 2) iy = y + 2;
+        tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
+        label_y = iy + ICON_H + 2;
+      }
+      f.close();
+    }
 
     if (label[0]) {
       tft.setTextColor(C_TXT, bg);
       int lw = tft.textWidth(label);
       int cx = x + (bw - lw) / 2;
-      int cy = y + (bh - 16) / 2;
       if (cx < x + 2) cx = x + 2;
-      tft.setCursor(cx, cy);
+      tft.setCursor(cx, label_y);
       tft.print(label);
     }
   }
