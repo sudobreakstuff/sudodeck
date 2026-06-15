@@ -78,6 +78,7 @@ unsigned long wifi_retry_ms = 0;
 unsigned long wifi_connect_start_ms = 0;
 int wifi_last_status = -1;
 unsigned long wifi_conn_timeout = 30000; // 30s instead of 20s
+uint8_t wifi_last_reason = 0; // detailed WiFi disconnect reason
 
 // Widget data
 String widget_cache = "";
@@ -849,6 +850,7 @@ void proc_serial(const String& l) {
     r["wifi_status"] = WiFi.status();
     r["wifi_connecting"] = wifi_connecting;
     r["wifi_last_status"] = wifi_last_status;
+    r["wifi_last_reason"] = wifi_last_reason;
     r["wifi_retry_ms"] = (long)wifi_retry_ms;
     r["ble_connected"] = ble_ready && ble.isConnected();
     r["saver_active"] = saver_active;
@@ -966,6 +968,10 @@ void draw_header() {
       tft.setTextColor(TFT_RED, C_HDR);
       tft.print(" | W:OFF");
       if (wifi_last_status >= 0) { tft.print(" "); tft.print(wifi_status_str(wifi_last_status)); }
+      if (wifi_last_reason > 0 && wifi_last_status == WL_CONNECT_FAILED) {
+        tft.setTextColor(C_DIM, C_HDR);
+        tft.print(" r"); tft.print(wifi_last_reason);
+      }
       tft.setTextColor(C_ACC, C_HDR);
     }
   }
@@ -1404,6 +1410,10 @@ void setup() {
   load_cfg();
   apply_cfg();
   WiFi.mode(WIFI_STA);
+  WiFi.setAutoReconnect(true);
+  WiFi.onEvent([](arduino_event_id_t event, arduino_event_info_t info) {
+    wifi_last_reason = info.wifi_sta_disconnected.reason;
+  }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   init_wifi();
   load_saver_img();
   last_touch_ms = millis();
