@@ -1,183 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Configure — SudoDeck</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon.png">
-<link rel="icon" type="image/png" sizes="200x250" href="assets/sudodecklogo.png">
-<link rel="apple-touch-icon" href="assets/sudodecklogo.png">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
 
-<nav>
-  <a class="nl" href="index.html"><span class="s"><svg viewBox="0 0 100 125" fill="none" stroke="#00FF88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" /><path d="M18 36 L50 16 L82 36" /><path d="M18 36 L50 56 L82 36" /><path d="M50 56 L50 90" /></svg></span>Sudo<span class="g">Deck</span></a>
-  <ul class="nls">
-    <li><a href="index.html">Features</a></li>
-    <li><a href="index.html#compare">Compare</a></li>
-    <li><a href="buy.html">Buy</a></li>
-    <li><a href="guide.html">Guide</a></li>
-    <li><a href="app.html" class="active">Configure</a></li>
-    <li><a href="index.html#about">About</a></li>
-  </ul>
-</nav>
-
-<section id="firmware" class="section-reveal" style="padding-top:120px">
-  <div class="sec">
-    <h2><span class="g">Firmware</span></h2>
-    <p class="sd">Back up or update your SudoDeck firmware directly from the browser.</p>
-
-    <div class="fmw">
-      <div class="fmw-hdr">
-        <p class="fmw-note">Put your CYD in <strong>flash mode</strong>: hold the BOOT button, tap RESET, release BOOT — then click Connect.</p>
-        <button class="btn pri" id="btnFwConnect" onclick="fwConnect()">Connect for Flashing</button>
-        <span class="fmw-st" id="fwStatus">Disconnected</span>
-      </div>
-
-      <div class="fmw-actions">
-        <button class="btn" id="btnFwBackup" onclick="fwBackup()" disabled>Backup Firmware</button>
-        <div class="fmw-flash">
-          <select id="fwVersion" onchange="fwVersionChanged()">
-            <option value="">— Select version —</option>
-          </select>
-          <span class="fw-or">or</span>
-          <label class="btn" id="btnFwFlashLabel">
-            <input type="file" id="btnFwFile" accept=".bin" onchange="fwFileSelected()" hidden>
-            Custom .bin
-          </label>
-          <button class="btn dan" id="btnFwFlash" onclick="fwFlash()" disabled>Flash</button>
-        </div>
-      </div>
-
-      <pre class="fmw-log" id="fwLog">Ready.</pre>
-
-      <div class="fmw-bar-wrap">
-        <div class="fmw-bar" id="fwBar"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<section id="config" class="section-reveal">
-  <div class="inner">
-    <h2>Configure</h2>
-    <div class="cfg-box">
-      <div class="cfg-bar">
-        <div id="sb" class="badge off">
-          <div class="dot r"></div>
-          <span>DISCONNECTED</span>
-        </div>
-        <div class="tb" style="margin:0;">
-          <button class="btn pri" id="btnConnect">Connect</button>
-          <button class="btn" id="btnRead">Read</button>
-          <button class="btn pri" id="btnWrite">Write</button>
-          <button class="btn" id="btnExport">Export</button>
-          <button class="btn" id="btnImport" onclick="document.getElementById('fileInput').click()">Import</button>
-          <input type="file" id="fileInput" accept=".json" style="display:none">
-          <button class="btn dan" id="btnReset">Reset</button>
-        </div>
-      </div>
-      <div class="p-bar" id="pBar"></div>
-      <div id="gp" style="grid-template-columns:repeat(4,1fr)"></div>
-      <div class="ep" id="ep">
-        <h3>Edit Button</h3>
-        <div class="er">
-          <label>Label</label>
-          <input type="text" id="el" placeholder="Button label" maxlength="12">
-          <label>Color</label>
-          <input type="color" id="ec" value="#16213e">
-        </div>
-        <div class="er">
-          <label>Action</label>
-          <select id="eat">
-            <option value="key">Single Key</option>
-            <option value="combo">Key Combo</option>
-            <option value="text">Text String</option>
-            <option value="macro">Macro Sequence</option>
-            <option value="delay">Delay (ms)</option>
-            <option value="app">App Launcher</option>
-          </select>
-        </div>
-        <div id="af"></div>
-        <div class="br">
-          <button class="btn pri" id="bae">Apply</button>
-          <button class="btn" id="bce">Cancel</button>
-        </div>
-      </div>
-      <div class="lc">
-        <div class="cg">
-          <label>Columns</label>
-          <input type="number" id="lc" min="1" max="6" value="4">
-        </div>
-        <div class="cg">
-          <label>Rows</label>
-          <input type="number" id="lr" min="1" max="5" value="3">
-        </div>
-        <div class="cg">
-          <label>Pages</label>
-          <input type="number" id="lp" min="1" max="12" value="3">
-        </div>
-        <button class="btn pri" id="bal">Apply Layout</button>
-        <div class="cg" style="margin-left:auto">
-          <label>WiFi SSID</label>
-          <input type="text" id="wifiSsid" placeholder="SSID" style="width:120px">
-        </div>
-        <div class="cg">
-          <label>Password</label>
-          <input type="password" id="wifiPass" placeholder="password" style="width:120px">
-        </div>
-        <button class="btn" id="btnWifiSet" style="display:none">Set WiFi</button>
-      </div>
-      <div class="saver-fold">
-        <div class="saver-hdr" id="saverToggle">
-          <span>Screensaver</span>
-          <span class="saver-hint" id="saverHint">off</span>
-        </div>
-          <div class="saver-body" id="saverBody">
-          <div class="er">
-            <label>Timeout</label>
-            <input type="number" id="saverTimeout" min="5" max="600" value="30">
-            <span style="font-size:0.7rem;color:var(--dim)">sec</span>
-            <label style="min-width:auto;margin-left:8px;">Sleep</label>
-            <input type="number" id="saverSleep" min="0" max="600" value="60" style="width:60px;">
-            <span style="font-size:0.7rem;color:var(--dim)">sec (0=off)</span>
-            <button class="btn pri" id="btnSaverSet" style="margin-left:auto">Set</button>
-          </div>
-          <div class="er" style="margin-bottom:6px">
-            <label>Mode</label>
-            <select id="saverMode" style="flex:1">
-              <option value="matrix">Matrix Rain</option>
-              <option value="f1">F1 Standings</option>
-              <option value="custom">Custom Widgets</option>
-            </select>
-            <button class="btn pri" id="btnSaverModeSet" style="margin-left:auto">Set</button>
-          </div>
-        </div>
-      </div>
-      <div class="saver-fold" style="margin-top:6px">
-        <div class="saver-hdr" id="widgetToggle">
-          <span>Custom Widgets</span>
-          <span class="saver-hint" id="widgetHint">0 configured</span>
-        </div>
-        <div class="saver-body" id="widgetBody">
-          <div id="widgetList"></div>
-          <button class="btn pri" id="btnWidgetAdd" style="margin-top:8px">+ Add Widget</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <a href="https://github.com/sudobreakstuff/sudodeck">SudoDeck</a> &mdash; cheap. open. yours. &mdash; R1,099 in SA &mdash; built by Shahid Singh
-</footer>
-
-<script>
 const iv = new IntersectionObserver(function(es) {
   es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
 }, { threshold: 0.1 });
@@ -559,24 +380,25 @@ window.addEventListener('scroll', function() {
 });
 
 var hero = document.querySelector('.hero');
-var heroGlow = document.createElement('div');
-heroGlow.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity 0.3s;opacity:0;';
-hero.appendChild(heroGlow);
-var hTicking = false;
-document.addEventListener('mousemove', function(e) {
-  if (hero.getBoundingClientRect().bottom < 0) { heroGlow.style.opacity = '0'; return; }
-  if (!hTicking) {
-    requestAnimationFrame(function() {
-      var r = hero.getBoundingClientRect();
-      var x = ((e.clientX - r.left) / r.width) * 100;
-      var y = ((e.clientY - r.top) / r.height) * 100;
-      heroGlow.style.background = 'radial-gradient(circle at ' + x + '% ' + y + '%, rgba(0,255,136,0.06) 0%, transparent 60%)';
-      heroGlow.style.opacity = '1';
-      hTicking = false;
-    });
-    hTicking = true;
-  }
-});
+if (hero) {
+  var heroGlow = document.createElement('div');
+  heroGlow.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity 0.3s;opacity:0;';
+  hero.appendChild(heroGlow);
+  var hTicking = false;
+  document.addEventListener('mousemove', function(e) {
+    if (hero.getBoundingClientRect().bottom < 0) { heroGlow.style.opacity = '0'; return; }
+    if (!hTicking) {
+      requestAnimationFrame(function() {
+        var r = hero.getBoundingClientRect();
+        var x = ((e.clientX - r.left) / r.width) * 100;
+        var y = ((e.clientY - r.top) / r.height) * 100;
+        heroGlow.style.background = 'radial-gradient(circle at ' + x + '% ' + y + '%, rgba(0,255,136,0.06) 0%, transparent 60%)';
+        heroGlow.style.opacity = '1';
+        hTicking = false;
+      });
+    }
+  });
+}
 
 // Screensaver
 
@@ -871,6 +693,4 @@ async function fwFlash() {
   btn.disabled = false; btn.textContent = 'Flash';
 
 }
-</script>
-</body>
-</html>
+
