@@ -324,7 +324,14 @@ const char* wifi_status_str(int s) {
 void init_wifi() {
   if (wifi_ssid.length() == 0) return;
   if (WiFi.isConnected() && WiFi.SSID() == wifi_ssid) return;
-  if (WiFi.isConnected()) WiFi.disconnect(false);
+  // Full WiFi teardown to clear stale state before reconnecting
+  if (WiFi.isConnected()) {
+    WiFi.disconnect(true);
+    delay(100);
+  }
+  WiFi.mode(WIFI_OFF);
+  delay(50);
+  WiFi.mode(WIFI_STA);
   wifi_retry_ms = 0;
   wifi_connecting = false;
 }
@@ -833,6 +840,21 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"wifi_connect")) {
     init_wifi();
     JsonDocument r; r["ssid"] = wifi_ssid; r["connecting"] = wifi_ssid.length() > 0; s_ok(r);
+  }
+  else if (!strcmp(cmd,"get_debug")) {
+    JsonDocument r;
+    r["wifi_ssid"] = wifi_ssid;
+    r["wifi_pass_len"] = wifi_pass.length();
+    r["wifi_connected"] = WiFi.isConnected();
+    r["wifi_status"] = WiFi.status();
+    r["wifi_connecting"] = wifi_connecting;
+    r["wifi_last_status"] = wifi_last_status;
+    r["wifi_retry_ms"] = (long)wifi_retry_ms;
+    r["ble_connected"] = ble_ready && ble.isConnected();
+    r["saver_active"] = saver_active;
+    r["page"] = page;
+    r["num_pages"] = num_pages;
+    s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
     const char* data = req["data"]|"";
