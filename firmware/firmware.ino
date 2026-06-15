@@ -200,6 +200,25 @@ void do_action(JsonObject a) {
     }
   } else if (!strcmp(t,"text")) {
     ble.print(a["value"]|"");
+  } else if (!strcmp(t,"app")) {
+    const char* os = a["os"]|"windows";
+    const char* name = a["name"]|"";
+    if (!name[0]) return;
+    uint16_t kc; bool m;
+    if (!strcmp(os, "macos")) {
+      ble.press((uint8_t)KEY_SPACE, KEY_MOD_LGUI);
+    } else if (!strcmp(os, "linux")) {
+      if (key_lookup("F2", &kc, &m) && !m) ble.press((uint8_t)kc, KEY_MOD_LALT);
+    } else {
+      ble.press((uint8_t)KEY_R, KEY_MOD_LGUI);
+    }
+    delay(50); ble.releaseAll();
+    delay(500);
+    ble.print(name);
+    const char* args = a["args"]|"";
+    if (args[0]) { ble.print(" "); ble.print(args); }
+    delay(200);
+    ble.tap(KEY_RETURN);
   } else if (!strcmp(t,"macro")) {
     JsonArray steps = a["steps"];
     for (JsonObject s : steps) { do_action(s); int d = s["delay"]|0; if (d>0 && d<10000) delay(d); }

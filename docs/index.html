@@ -1074,6 +1074,7 @@
             <option value="text">Text String</option>
             <option value="macro">Macro Sequence</option>
             <option value="delay">Delay (ms)</option>
+            <option value="app">App Launcher</option>
           </select>
         </div>
         <div id="af"></div>
@@ -1487,6 +1488,12 @@ function uaf() {
     h = '<div class="er"><label>Text</label><input type="text" id="etv" value="'+es(a.value||'')+'" placeholder="Text to type"></div>';
   } else if(t==='delay') {
     h = '<div class="er"><label>Delay</label><input type="number" id="edv" value="'+(a.value||100)+'" min="1" max="10000"> <span style="font-size:0.7rem;color:var(--dim)">ms</span></div>';
+  } else if(t==='app') {
+    h = '<div class="er"><label>OS</label><select id="aos">'+
+      ['windows','macos','linux'].map(function(o){return '<option value="'+o+'"'+(a.os===o?' selected':'')+'>'+o.charAt(0).toUpperCase()+o.slice(1)+'</option>';}).join('')+
+      '</select></div>'+
+      '<div class="er"><label>App</label><input type="text" id="anv" value="'+es(a.name||'')+'" placeholder="calculator"></div>'+
+      '<div class="er"><label>Args</label><input type="text" id="aav" value="'+es(a.args||'')+'" placeholder="optional arguments"></div>';
   } else if(t==='macro') {
     h = '<div class="ab"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="color:var(--acc);font-size:0.7rem;">STEPS</span><button class="btn" id="bas">+ Add</button></div><div id="mss"></div></div>';
     setTimeout(function() {
@@ -1561,6 +1568,7 @@ function gaf() {
   if(t==='combo') return {type:'combo',mod:document.getElementById('ecm')?.value||'CTRL',key:document.getElementById('eck')?.value||''};
   if(t==='text') return {type:'text',value:document.getElementById('etv')?.value||''};
   if(t==='delay') return {type:'delay',value:parseInt(document.getElementById('edv')?.value)||100};
+  if(t==='app') return {type:'app',os:document.getElementById('aos')?.value||'windows',name:document.getElementById('anv')?.value||'',args:document.getElementById('aav')?.value||''};
   if(t==='macro') { return {type:'macro',steps:cd.pages[sp].buttons[sb].action?.steps||[]}; }
   return {type:'key',value:''};
 }
@@ -1572,6 +1580,7 @@ document.getElementById('eat').addEventListener('change', function() {
     if(nt==='key'||nt==='text') na.value='';
     if(nt==='combo') { na.mod='CTRL'; na.key=''; }
     if(nt==='delay') na.value=100;
+    if(nt==='app') { na.os='windows'; na.name=''; na.args=''; }
     if(nt==='macro') na.steps=[];
     pg.buttons[sb].action = na;
   }
