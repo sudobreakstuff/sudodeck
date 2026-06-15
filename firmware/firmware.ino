@@ -328,6 +328,7 @@ void init_wifi() {
   if (wifi_ssid.length() == 0) return;
   if (WiFi.isConnected() && WiFi.SSID() == wifi_ssid) return;
   // Full WiFi teardown to clear stale state before reconnecting
+  wifi_teardown_ms = millis();
   if (WiFi.isConnected()) {
     WiFi.disconnect(true);
     delay(100);
