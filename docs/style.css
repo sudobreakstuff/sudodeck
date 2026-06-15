@@ -106,24 +106,9 @@
     padding: 60px 20px;
     position: relative;
     overflow: hidden;
-  }
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-    opacity: 0.25;
-    filter: saturate(0.7) brightness(0.8);
-  }
-  .hero-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
     background:
-      linear-gradient(to bottom, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.5) 40%, rgba(10,14,23,0.3) 60%, rgba(10,14,23,0.95) 100%);
-    pointer-events: none;
+      linear-gradient(to bottom, rgba(10,14,23,0.92) 0%, rgba(10,14,23,0.4) 30%, rgba(10,14,23,0.2) 60%, rgba(10,14,23,0.92) 100%),
+      url('assets/hero.jpeg') center / cover no-repeat;
   }
   .hero::before {
     content: '';
@@ -309,7 +294,7 @@
     text-align: center;
     color: var(--dim);
     font-size: 0.92rem;
-    margin: -36px 0 48px;
+    margin: -36px 0 56px;
     line-height: 1.5;
   }
 
@@ -926,35 +911,7 @@
   }
   footer a { color: var(--acc); }
 
-  /* ─── gallery showcase ─── */
-  #gallery { padding: 80px 20px; }
-  .g-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    max-width: 800px;
-    margin: 32px auto 0;
-  }
-  .g-img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-    background: var(--surface);
-  }
-  .g-img:hover {
-    transform: translateY(-3px);
-    border-color: var(--acc-dim);
-    box-shadow: 0 8px 30px rgba(0,255,136,0.08);
-  }
-  .g-wide { grid-column: 1 / -1; height: 280px; }
-  @media (max-width: 640px) {
-    .g-grid { grid-template-columns: 1fr; }
-    .g-img { height: 200px; }
-    .g-wide { height: 200px; }
-  }
+
   .section-reveal {
     opacity: 0;
     transform: translateY(30px);
@@ -970,6 +927,7 @@
   .cmp-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin-top: 48px;
   }
   .cmp-table {
     width: 100%;
@@ -1033,28 +991,6 @@
   }
 
   /* ─── pricing / buy section ─── */
-  .buy-hero-img {
-    display: block;
-    width: 100%;
-    max-width: 400px;
-    height: auto;
-    margin: 32px auto 0;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    object-fit: cover;
-  }
-  .faq-img {
-    display: block;
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    margin: 0 0 16px 0;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    object-fit: cover;
-  }
   .pricing-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
