@@ -1411,10 +1411,10 @@ void setup() {
   apply_cfg();
   WiFi.mode(WIFI_STA);
   //WiFi.setAutoReconnect(true); // handled by manual retry logic below
+  init_wifi();
   WiFi.onEvent([](arduino_event_id_t event, arduino_event_info_t info) {
     wifi_last_reason = info.wifi_sta_disconnected.reason;
   }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-  init_wifi();
   load_saver_img();
   last_touch_ms = millis();
   draw_all();
@@ -1440,6 +1440,7 @@ void loop() {
       wifi_connecting = true;
       wifi_connect_start_ms = now;
       wifi_last_status = -1;
+      wifi_last_reason = 0;
       WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
       draw_header();
     }
