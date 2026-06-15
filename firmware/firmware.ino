@@ -1410,7 +1410,7 @@ void setup() {
   load_cfg();
   apply_cfg();
   WiFi.mode(WIFI_STA);
-  WiFi.setAutoReconnect(true);
+  //WiFi.setAutoReconnect(true); // handled by manual retry logic below
   WiFi.onEvent([](arduino_event_id_t event, arduino_event_info_t info) {
     wifi_last_reason = info.wifi_sta_disconnected.reason;
   }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
