@@ -1,6 +1,13 @@
 {
   "versions": [
     {
+      "version": "2.1.1",
+      "label": "SudoDeck v2.1.1",
+      "file": "sudodeck-2.1.1.bin",
+      "address": "0",
+      "notes": "Fixed icon/screensaver color rendering — pushImage now uses correct byte order for SPI display."
+    },
+    {
       "version": "2.1.0",
       "label": "SudoDeck v2.1.0",
       "file": "sudodeck-2.1.0.bin",

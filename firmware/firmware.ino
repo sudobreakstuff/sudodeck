@@ -787,7 +787,7 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
-    r["name"]="SudoDeck"; r["version"]="2.1";
+    r["name"]="SudoDeck"; r["version"]="2.1.1";
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
@@ -1060,7 +1060,10 @@ void draw_grid() {
         int max_iy = label[0] ? (y + bh - 16 - 4) : (y + bh - ICON_H - 4);
         if (ix < x + 2) ix = x + 2;
         if (iy + ICON_H <= max_iy && ix + ICON_W <= x + bw - 2) {
+          bool oldSwap = tft.getSwapBytes();
+          tft.setSwapBytes(true);
           tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
+          tft.setSwapBytes(oldSwap);
           if (label[0]) label_y = iy + ICON_H + 2;
         }
       }
@@ -1349,7 +1352,10 @@ void draw_saver() {
     if (saver_y > SCR_H - SAVER_H) { saver_y = SCR_H - SAVER_H; saver_vy = -saver_vy; }
     tft.fillScreen(C_BG);
     if (saver_img) {
+      bool oldSwap = tft.getSwapBytes();
+      tft.setSwapBytes(true);
       tft.pushImage((int)saver_x, (int)saver_y, SAVER_W, SAVER_H, saver_img);
+      tft.setSwapBytes(oldSwap);
     } else {
       int cx = (int)saver_x + SAVER_W/2, cy = (int)saver_y + SAVER_H/2;
       for (int i = 0; i < 7; i++) {
