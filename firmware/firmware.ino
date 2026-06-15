@@ -759,7 +759,7 @@ void s_serial() {
   while (Serial.available()) {
     char c = Serial.read();
     if (c == '\n') { serial_buf.trim(); if (serial_buf.length()) proc_serial(serial_buf); serial_buf=""; }
-    else if (c != '\r') { if (serial_buf.length() < 4096) serial_buf += c; }
+    else if (c != '\r') { if (serial_buf.length() < 16384) serial_buf += c; }
   }
 }
 void proc_serial(const String& l) {
@@ -908,7 +908,7 @@ void proc_serial(const String& l) {
       char tmp[5] = {data[i*4], data[i*4+1], data[i*4+2], data[i*4+3], 0};
       buf[i] = (uint16_t)strtol(tmp, nullptr, 16);
     }
-    char path[32]; snprintf(path, sizeof(path), "/icons/%s.img", name);
+    char path[32]; snprintf(path, sizeof(path), "/i%s.ico", name);
     fs::File f = SPIFFS.open(path, "w");
     if (!f) { free(buf); s_err("write fail"); return; }
     f.write((uint8_t*)buf, ICON_W * ICON_H * 2);
@@ -918,7 +918,7 @@ void proc_serial(const String& l) {
   else if (!strcmp(cmd,"delete_button_icon")) {
     const char* name = req["name"]|"";
     if (!name[0]) { s_err("no name"); return; }
-    char path[32]; snprintf(path, sizeof(path), "/icons/%s.img", name);
+    char path[32]; snprintf(path, sizeof(path), "/i%s.ico", name);
     if (SPIFFS.exists(path)) SPIFFS.remove(path);
     JsonDocument r; s_ok(r);
   }
@@ -1051,16 +1051,18 @@ void draw_grid() {
 
     if (icon[0]) {
       char ip[32];
-      snprintf(ip, sizeof(ip), "/icons/%s.img", icon);
+      snprintf(ip, sizeof(ip), "/i%s.ico", icon);
       fs::File f = SPIFFS.open(ip, "r");
       if (f && f.size() == ICON_W * ICON_H * 2) {
         f.read((uint8_t*)icon_buf, sizeof(icon_buf));
         int ix = x + (bw - ICON_W) / 2;
         int iy = y + (bh - ICON_H - 16 - 6) / 2;
         if (ix < x + 2) ix = x + 2;
-        if (iy < y + 2) iy = y + 2;
-        tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
-        label_y = iy + ICON_H + 2;
+        if (iy < y + 4) iy = y + 4;
+        if (iy + ICON_H <= y + bh - 16) {
+          tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
+          label_y = iy + ICON_H + 2;
+        }
       }
       f.close();
     }
