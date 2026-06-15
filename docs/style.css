@@ -1005,6 +1005,48 @@
     line-height: 1.6;
   }
 
+  /* ─── shop gallery (buy page) ─── */
+  .shop-gallery {
+    max-width: 600px;
+    margin: 40px auto 0;
+  }
+  .shop-main {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .shop-main img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .shop-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .shop-thumbs img {
+    display: block;
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .shop-thumbs img:hover {
+    border-color: var(--acc);
+  }
+
+  @media (max-width: 540px) {
+    .shop-thumbs { grid-template-columns: repeat(2, 1fr); }
+    .shop-thumbs img { height: 100px; }
+  }
+
   /* ─── pricing / buy section ─── */
   .pricing-grid {
     display: grid;

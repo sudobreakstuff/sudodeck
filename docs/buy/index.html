@@ -30,6 +30,18 @@
     <h2>Buy <span class="g">Sudo</span>Deck</h2>
     <p class="sd">Fully assembled, tested, and ready to ship anywhere in South Africa.</p>
 
+    <div class="shop-gallery">
+      <div class="shop-main">
+        <img src="../assets/angled.jpeg" alt="SudoDeck front-right angle" loading="lazy">
+      </div>
+      <div class="shop-thumbs">
+        <img src="../assets/front.jpeg" alt="SudoDeck straight on" loading="lazy">
+        <img src="../assets/top-angle.jpeg" alt="SudoDeck from above" loading="lazy">
+        <img src="../assets/back.jpeg" alt="SudoDeck back" loading="lazy">
+        <img src="../assets/box.jpeg" alt="SudoDeck box contents" loading="lazy">
+      </div>
+    </div>
+
     <div class="pricing-grid">
       <div class="pricing-card featured">
         <h3>Complete Kit</h3>
@@ -157,6 +169,16 @@ const iv = new IntersectionObserver(function(es) {
 }, { threshold: 0.1 });
 document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
 document.querySelectorAll('.section-reveal').forEach(function(el) { iv.observe(el); });
+
+// shop gallery: click thumbnail to swap into main
+document.querySelectorAll('.shop-thumbs img').forEach(function(t) {
+  t.addEventListener('click', function() {
+    var main = document.querySelector('.shop-main img');
+    var tempSrc = main.src;
+    main.src = this.src;
+    this.src = tempSrc;
+  });
+});
 </script>
 </body>
 </html>
