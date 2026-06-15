@@ -546,7 +546,7 @@ document.getElementById('bce').addEventListener('click', function() {
 });
 function es(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&#34;'); }
 
-var nav = document.getElementById('nav');
+var nav = document.querySelector('nav');
 var navTicking = false;
 window.addEventListener('scroll', function() {
   if (!navTicking) {
