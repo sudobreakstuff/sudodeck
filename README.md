@@ -90,7 +90,7 @@ If you already have a CYD and want to build your own:
 | Step | What to do |
 |------|------------|
 | **1** | Buy a CYD (ESP32-2432S028R or E32R28T) — ~R300-350 from [Robotics.org.za](https://robotics.org.za/E32R28T) |
-| **2** | 3D-print the enclosure ([STL files](docs/assets/)) |
+| **2** | 3D-print the enclosure (files in repo) |
 | **3** | [Flash the firmware](#building-the-firmware) to the device |
 | **4** | Open the [Web Config](https://sudobreakstuff.github.io/sudodeck) in Chrome/Edge |
 | **5** | Connect via Web Serial and configure your layout |
@@ -123,7 +123,7 @@ If you already have a CYD and want to build your own:
 ### For DIY builders
 
 1. **Hardware** — buy a CYD ([E32R28T from Robotics.org.za](https://robotics.org.za/E32R28T) — R342.70 incl VAT). Pin-compatible with ESP32-2432S028R
-2. **Enclosure** — STL files for 3D printing in `docs/assets/cydenclosure-front.stl` and `docs/assets/cydenclosure-back.stl`
+2. **Enclosure** — 3D-print your own
 3. **Flash** — put CYD in flash mode (hold BOOT, tap RESET, release BOOT), use the web flasher on the site or `esptool.py`
 4. **Assemble** — snap CYD into the front enclosure, attach the back plate
 5. **Configure** — connect to the web config tool, set up your buttons, pages, and screensavers
@@ -156,7 +156,7 @@ Widgets cycle every 10s on the CYD display with page-dot navigation.
 - **Connectivity** — Bluetooth 4.2 BLE + USB-C (CH340 serial)
 - **Storage** — 4MB flash (2MB app + 2MB SPIFFS config)
 - **Power** — USB-C 5V, built-in LiPo charger (IP5306)
-- **Enclosure** — 3D-printed PLA (STL files in repo)
+- **Enclosure** — 3D-printed PLA (files in repo)
 
 ### Pin Compatibility
 
@@ -179,8 +179,6 @@ sudodeck/
 │       ├── sudodecklogo.png
 │       ├── sudodecklogo-whitebg.png
 │       ├── favicon.png
-│       ├── cydenclosure-front.stl
-│       ├── cydenclosure-back.stl
 │       └── firmware/
 │           ├── manifest.json
 │           └── sudodeck-*.bin

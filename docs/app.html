@@ -217,55 +217,6 @@ function dc() {
         { label: "End", color: "#16213E", action: { type: "key", value: "END" } },
         { label: "PgUp", color: "#16213E", action: { type: "key", value: "PAGE_UP" } },
         { label: "PgDn", color: "#16213E", action: { type: "key", value: "PAGE_DOWN" } },
-        { label: "Del", color: "#3A1A1A", action: { type: "key", value: "DELETE" } },
-        { label: "BkSp", color: "#3A1A1A", action: { type: "key", value: "BACKSPACE" } }
-      ]},
-      { name: "Extra", buttons: new Array(12).fill(null).map(function() { return {label:"",color:"#111827",action:{}}; }) }
-    ]
-  };
-}
-
-// Macro state
-var __macroSteps = [];
-const iv = new IntersectionObserver(function(es) {
-  es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
-}, { threshold: 0.1 });
-document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
-document.querySelectorAll('.section-reveal').forEach(function(el) { iv.observe(el); });
-
-var dp = null, dr = null, dw = null, cd = null, sp = 0, sb = -1, __srl_buf = '', __busy = false;
-
-function dc() {
-  return {
-    name: "SudoDeck", grid: { cols: 4, rows: 3 },
-    wifi: { ssid: "", password: "" },
-    saver: { timeout: 30, sleep: 60, mode: 0 },
-    pages: [
-      { name: "Main", buttons: [
-        { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
-        { label: "Paste", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "v" } },
-        { label: "Cut", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "x" } },
-        { label: "Undo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "z" } },
-        { label: "Save", color: "#1A3A1A", action: { type: "combo", mod: "CTRL", key: "s" } },
-        { label: "Find", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "f" } },
-        { label: "SelAll", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "a" } },
-        { label: "Tab", color: "#16213E", action: { type: "key", value: "TAB" } },
-        { label: "Enter", color: "#1A2A1A", action: { type: "key", value: "ENTER" } },
-        { label: "Esc", color: "#3A1A1A", action: { type: "key", value: "ESC" } },
-        { label: "Vol+", color: "#1A1A3A", action: { type: "key", value: "MEDIA_VOLUME_UP" } },
-        { label: "Vol-", color: "#1A1A3A", action: { type: "key", value: "MEDIA_VOLUME_DOWN" } }
-      ]},
-      { name: "Media", buttons: [
-        { label: "Play", color: "#1A2A1A", action: { type: "key", value: "MEDIA_PLAY_PAUSE" } },
-        { label: "Next", color: "#16213E", action: { type: "key", value: "MEDIA_NEXT_TRACK" } },
-        { label: "Prev", color: "#16213E", action: { type: "key", value: "MEDIA_PREV_TRACK" } },
-        { label: "Mute", color: "#3A1A1A", action: { type: "key", value: "MEDIA_MUTE" } },
-        { label: "Br+", color: "#1A1A3A", action: { type: "key", value: "BRIGHTNESS_UP" } },
-        { label: "Br-", color: "#1A1A3A", action: { type: "key", value: "BRIGHTNESS_DOWN" } },
-        { label: "Home", color: "#16213E", action: { type: "key", value: "HOME" } },
-        { label: "End", color: "#16213E", action: { type: "key", value: "END" } },
-        { label: "PgUp", color: "#16213E", action: { type: "key", value: "PAGE_UP" } },
-        { label: "PgDn", color: "#16213E", action: { type: "key", value: "PAGE_DOWN" } },
         { label: "Screensht", color: "#3A2A1A", action: { type: "combo", mod: "CTRL_SHIFT", key: "s" } },
         { label: "Lock", color: "#3A1A1A", action: { type: "combo", mod: "CTRL_ALT", key: "l" } }
       ]},
@@ -920,4 +871,6 @@ async function fwFlash() {
   btn.disabled = false; btn.textContent = 'Flash';
 
 }
-</script></body></html>
+</script>
+</body>
+</html>

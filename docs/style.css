@@ -34,14 +34,14 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 24px;
     z-index: 100;
-    transition: background 0.3s, border-color 0.3s;
+    transition: background 0.3s ease, border-color 0.3s ease;
     background: transparent;
     border-bottom: 1px solid transparent;
   }
   nav.scrolled {
-    background: rgba(10,14,23,0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(10,14,23,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-color: var(--border);
   }
   nav .nl {
@@ -309,9 +309,9 @@
   .f-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 14px;
     padding: 28px 24px;
-    transition: all 0.25s;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
   }
@@ -322,14 +322,15 @@
     width: 3px;
     background: var(--acc);
     transform: scaleY(0);
-    transition: transform 0.25s ease;
+    transition: transform 0.3s ease;
     transform-origin: top;
   }
   .f-card:hover::before { transform: scaleY(1); }
   .f-card:hover {
     border-color: rgba(255,255,255,0.08);
     background: #141c2a;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
   }
   .f-card svg {
     width: 36px;
@@ -653,6 +654,12 @@
     .btn { font-size: 0.65rem; padding: 5px 10px; }
     nav { padding: 0 12px; }
     nav .nls a { padding: 6px 8px; font-size: 0.65rem; }
+    .hero h1 { font-size: 1.6rem; letter-spacing: 4px; }
+    .pricing-card { padding: 28px 16px; }
+    .pricing-email { font-size: 0.7rem; }
+    .f-grid { grid-template-columns: 1fr; }
+    .s-grid { grid-template-columns: 1fr; }
+    .cmp-table { min-width: 400px; }
   }
 
   /* ── Guide ── */
@@ -979,33 +986,26 @@
   .pricing-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 32px 28px;
+    border-radius: 16px;
+    padding: 36px 24px;
     text-align: center;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     position: relative;
+    display: flex;
+    flex-direction: column;
   }
   .pricing-card:hover {
     border-color: rgba(0,255,136,0.2);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
   }
   .pricing-card.featured {
     border-color: var(--acc);
-    background: linear-gradient(135deg, rgba(0,255,136,0.04) 0%, var(--surface) 100%);
+    background: linear-gradient(135deg, rgba(0,255,136,0.06) 0%, var(--surface) 100%);
+    box-shadow: 0 0 0 1px rgba(0,255,136,0.15), 0 8px 40px rgba(0,0,0,0.35);
   }
-  .pricing-card.featured::before {
-    content: 'RECOMMENDED';
-    position: absolute;
-    top: -10px; left: 50%;
-    transform: translateX(-50%);
-    background: var(--acc);
-    color: var(--bg);
-    font-size: 0.6rem;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    padding: 4px 14px;
-    border-radius: 20px;
+  .pricing-card.featured h3 {
+    color: var(--acc);
   }
   .pricing-card h3 {
     font-size: 0.85rem;
@@ -1046,16 +1046,19 @@
   .pricing-card ul li .check { color: var(--acc); font-weight: 700; }
   .pricing-card ul li .dim { color: var(--dim); }
   .btn-large {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 14px 36px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-family: var(--font);
     font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     text-decoration: none;
     background: var(--acc);
     color: var(--bg);
@@ -1068,10 +1071,10 @@
   .btn-large.sec {
     background: transparent;
     color: var(--text);
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--border);
   }
   .btn-large.sec:hover {
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.03);
     border-color: var(--dim);
     box-shadow: none;
   }
@@ -1082,6 +1085,20 @@
     flex-wrap: wrap;
     margin-top: 8px;
   }
+  .pricing-email {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+  }
+  .pricing-email a {
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .pricing-email a:hover {
+    color: var(--text);
+  }
 
   /* ─── FAQ ─── */
   .faq-grid {
@@ -1089,29 +1106,32 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
   .faq-item {
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 14px;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: var(--surface);
   }
-  .faq-item:hover { border-color: rgba(255,255,255,0.08); }
+  .faq-item:hover {
+    border-color: rgba(255,255,255,0.08);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
   .faq-q {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 18px 22px;
     cursor: pointer;
     font-size: 0.88rem;
     font-weight: 600;
     color: #fff;
-    background: var(--surface);
     user-select: none;
     transition: background 0.15s;
   }
-  .faq-q:hover { background: #141c2a; }
+  .faq-q:hover { background: rgba(255,255,255,0.02); }
   .faq-q .faq-arrow {
     font-size: 0.7rem;
     color: var(--dim);
