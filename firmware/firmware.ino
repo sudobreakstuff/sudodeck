@@ -1060,10 +1060,11 @@ void draw_grid() {
         int max_iy = label[0] ? (y + bh - 16 - 4) : (y + bh - ICON_H - 4);
         if (ix < x + 2) ix = x + 2;
         if (iy + ICON_H <= max_iy && ix + ICON_W <= x + bw - 2) {
-          bool oldSwap = tft.getSwapBytes();
-          tft.setSwapBytes(true);
+          for (int pi = 0; pi < ICON_W * ICON_H; pi++) {
+            uint16_t p = icon_buf[pi];
+            icon_buf[pi] = (p << 8) | (p >> 8);
+          }
           tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
-          tft.setSwapBytes(oldSwap);
           if (label[0]) label_y = iy + ICON_H + 2;
         }
       }
@@ -1147,6 +1148,8 @@ void load_saver_img() {
   if (!saver_img) { f.close(); return; }
   f.read((uint8_t*)saver_img, sz);
   f.close();
+  for (int i = 0; i < SAVER_W * SAVER_H; i++)
+    saver_img[i] = (saver_img[i] << 8) | (saver_img[i] >> 8);
 }
 
 uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
@@ -1352,10 +1355,7 @@ void draw_saver() {
     if (saver_y > SCR_H - SAVER_H) { saver_y = SCR_H - SAVER_H; saver_vy = -saver_vy; }
     tft.fillScreen(C_BG);
     if (saver_img) {
-      bool oldSwap = tft.getSwapBytes();
-      tft.setSwapBytes(true);
       tft.pushImage((int)saver_x, (int)saver_y, SAVER_W, SAVER_H, saver_img);
-      tft.setSwapBytes(oldSwap);
     } else {
       int cx = (int)saver_x + SAVER_W/2, cy = (int)saver_y + SAVER_H/2;
       for (int i = 0; i < 7; i++) {
@@ -1420,7 +1420,9 @@ void handle_touch(int tx, int ty) {
       tft.fillRoundRect(x, y, bw, bh, 6, hl);
       delay(60);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-      // Redraw label after flash
+      // Redraw label and icon after flash
+      const char* icon = "";
+      if (i < (int)btns.size()) icon = btns[i]["icon"] | "";
       if (label[0]) {
         tft.setTextColor(C_TXT, bg);
         int lw = tft.textWidth(label);
@@ -1429,6 +1431,23 @@ void handle_touch(int tx, int ty) {
         if (cx < x + 2) cx = x + 2;
         tft.setCursor(cx, cy);
         tft.print(label);
+      }
+      if (icon[0]) {
+        char ip[32]; snprintf(ip, sizeof(ip), "/i%s.ico", icon);
+        fs::File f = SPIFFS.open(ip, "r");
+        if (f && f.size() == ICON_W * ICON_H * 2) {
+          f.read((uint8_t*)icon_buf, sizeof(icon_buf));
+          int ix = x + (bw - ICON_W) / 2;
+          int iy = y + 4;
+          int max_iy = label[0] ? (y + bh - 16 - 4) : (y + bh - ICON_H - 4);
+          if (ix < x + 2) ix = x + 2;
+          if (iy + ICON_H <= max_iy && ix + ICON_W <= x + bw - 2) {
+            for (int pi = 0; pi < ICON_W * ICON_H; pi++)
+              icon_buf[pi] = (icon_buf[pi] << 8) | (icon_buf[pi] >> 8);
+            tft.pushImage(ix, iy, ICON_W, ICON_H, icon_buf);
+          }
+        }
+        f.close();
       }
       if (i < (int)btns.size()) do_action(btns[i]["action"]);
       return;

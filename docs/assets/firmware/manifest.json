@@ -5,7 +5,7 @@
       "label": "SudoDeck v2.1.1",
       "file": "sudodeck-2.1.1.bin",
       "address": "0",
-      "notes": "Fixed icon/screensaver color rendering — pushImage now uses correct byte order for SPI display."
+      "notes": "Fixed icon/screensaver color rendering (byte-swap data for SPI display). Icons now persist after button press — redrawn after flash effect."
     },
     {
       "version": "2.1.0",
