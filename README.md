@@ -32,11 +32,11 @@
 
 ### How to order
 
-Email **shahidsingh@sudodeck.co.za** or DM [@sudobreakstuff](https://github.com/sudobreakstuff) on GitHub. Payment via EFT. Shipping via The Courier Guy (~R80-120 nationwide, 1-3 business days).
+Email **shahidsingh1zn@gmail.com** or DM [@sudobreakstuff](https://github.com/sudobreakstuff) on GitHub. Payment via EFT. Shipping via The Courier Guy (~R80-120 nationwide, 1-3 business days).
 
 ### Local pickup
 
-Centurion or Stellenbosch — arrange via email.
+Newcastle, KZN — arrange via email.
 
 ---
 
@@ -50,7 +50,7 @@ Centurion or Stellenbosch — arrange via email.
 | **Open Source** | MIT ✅ | No ❌ | No ❌ |
 | **Config Software** | Built-in web page | Proprietary app | Proprietary app |
 | **Config on Device** | Yes — follows anywhere | No | No |
-| **Screensaver** | 7 modes | None | None |
+| **Screensaver** | 3 modes | None | None |
 | **Touch Screen** | Yes (2.8", 240×320) | No (LCD keys only) | No (LCD keys only) |
 | **Built In** | South Africa | Imported | Imported |
 
@@ -103,12 +103,12 @@ If you already have a CYD and want to build your own:
 - **Action types** — single keys, key combos (CTRL+C, ALT+TAB), text strings, macro sequences, app launcher
 - **App Launcher** — select OS (Windows/macOS/Linux), type app name, press button — device opens OS search and launches the app (~250ms)
 - **Macro Steps** — build multi-step macros with combo, text, and delay steps
-- **7 screensaver modes** — Matrix Rain, Particles, Stars, Bouncing Image, F1 Standings, Football Scores, Custom Widgets
+- **3 screensaver modes** — Matrix Rain, F1 Standings, Custom Widgets
 - **Custom live widgets** — define JSON API endpoints with dot-notation path extraction and display format
-- **WiFi screensavers** — live F1 standings, football scores, weather, or any custom API
+- **WiFi screensavers** — live F1 standings, weather, or any custom API
 - **Web Serial config** — no software install, configure from any browser
 - **Config persists on device** — unplug and go, your layout follows
-- **Web flasher** — update firmware directly from the browser, no tools needed
+- **Web flasher** — update firmware directly from the browser on the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html), no tools needed
 
 ## Documentation
 
@@ -116,9 +116,9 @@ If you already have a CYD and want to build your own:
 
 1. **Power on** — plug the USB-C cable into any USB port or 5V phone charger
 2. **Pair Bluetooth** — open Bluetooth settings on your PC/Mac/phone, look for "SudoDeck" and pair
-3. **Customise** — open [sudodeck.co.za](https://sudobreakstuff.github.io/sudodeck) in Chrome/Edge, click Connect, select the serial port, edit your layout, click Write
+3. **Customise** — open the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html) in Chrome/Edge, click Connect, select the serial port, edit your layout, click Write
 4. **Use it** — press any button to fire your macro. Swipe between pages. The screensaver activates after inactivity
-5. **Firmware updates** — visit the site, scroll to Firmware section, connect in flash mode (hold BOOT + tap RESET), select latest version, click Flash
+5. **Firmware updates** — visit the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html), connect in flash mode (hold BOOT + tap RESET), select latest version, click Flash
 
 ### For DIY builders
 
@@ -133,11 +133,7 @@ If you already have a CYD and want to build your own:
 | Mode | Description | Requires WiFi? |
 |---|---|---|
 | Matrix Rain | Falling green code rain | No |
-| Particles | Floating particles | No |
-| Stars | Twinkling night sky | No |
-| Bouncing Image | Uploaded PNG bounces off edges | No |
 | F1 Standings | Live FIA driver + constructor standings | Yes |
-| Football Scores | Live football match scores | Yes |
 | Custom Widgets | User-defined API endpoints as live data cards | Yes |
 
 ### Custom Widgets
@@ -174,7 +170,11 @@ sudodeck/
 │   ├── firmware.ino        # ESP32 firmware (Arduino)
 │   └── lv_conf.h           # LVGL config (unused)
 ├── docs/                   # GitHub Pages site
-│   ├── index.html          # Web config tool + landing page
+│   ├── index.html          # Landing: hero, features, compare, about
+│   ├── buy.html            # Buy page: pricing + FAQ
+│   ├── guide.html          # Guide page: full documentation
+│   ├── app.html            # Configure page: firmware flasher + config tool
+│   ├── style.css           # Shared styles
 │   └── assets/
 │       ├── sudodecklogo.png
 │       ├── sudodecklogo-whitebg.png
@@ -223,7 +223,7 @@ Put the CYD in flash mode: hold BOOT, tap RESET, release BOOT.
 
 ### Flash via Web (browser)
 
-Open the [config website](https://sudobreakstuff.github.io/sudodeck), scroll to the Firmware section, connect via Web Serial, select a version, and click Flash.
+Open the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html), connect via Web Serial, select a version, and click Flash.
 
 ## Default Layout
 

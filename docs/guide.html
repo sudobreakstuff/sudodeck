@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide — SudoDeck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="200x250" href="assets/sudodecklogo.png">
+<link rel="apple-touch-icon" href="assets/sudodecklogo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nl" href="index.html"><span class="s"><svg viewBox="0 0 100 125" fill="none" stroke="#00FF88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" /><path d="M18 36 L50 16 L82 36" /><path d="M18 36 L50 56 L82 36" /><path d="M50 56 L50 90" /></svg></span>Sudo<span class="g">Deck</span></a>
+  <ul class="nls">
+    <li><a href="index.html">Features</a></li>
+    <li><a href="index.html#compare">Compare</a></li>
+    <li><a href="buy.html">Buy</a></li>
+    <li><a href="guide.html" class="active">Guide</a></li>
+    <li><a href="app.html">Configure</a></li>
+    <li><a href="index.html#about">About</a></li>
+  </ul>
+</nav>
+
+<section id="guide" class="section-reveal" style="padding-top:120px">
+  <div class="inner">
+    <h2><span class="g">Guide</span></h2>
+    <p class="sd">From unboxing to pushing your first macro — here's how it all works.</p>
+
+    <div class="guide-grid">
+
+      <div class="guide-step">
+        <div class="guide-num">1</div>
+        <div class="guide-body">
+          <h3>Get a SudoDeck (or Build One)</h3>
+          <p><strong>Buy one pre-assembled</strong> — <a href="buy.html" style="color:var(--acc)">R1,099 shipped</a> in SA. Comes with E32R28T CYD, 3D-printed enclosure, USB-C cable, and firmware pre-flashed. Plug it in and you're ready.</p>
+          <p style="margin-top:6px"><strong>Or build your own</strong> — get a CYD (ESP32-2432S028R or <a href="https://robotics.org.za/E32R28T" target="_blank" style="color:var(--acc)">E32R28T</a> from Robotics.org.za for R342.70). 3D-print the enclosure <a href="https://github.com/sudobreakstuff/sudodeck/tree/main/docs/assets" target="_blank" style="color:var(--acc)">from the STL files</a>, flash the firmware, and assemble.</p>
+          <div class="guide-note">The E32R28T is fully compatible with all SudoDeck firmware — same pins, same driver, same everything.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">2</div>
+        <div class="guide-body">
+          <h3>Flash the Firmware <span style="font-size:0.7rem;color:var(--dim);font-weight:400;">(pre-assembled units: skip to step 3)</span></h3>
+          <p>If you bought a pre-assembled SudoDeck, the latest firmware is already installed — skip to step 3.</p>
+          <p style="margin-top:6px">For DIY builds: your CYD comes with factory demo software. Replace it with SudoDeck by entering <strong>flash mode</strong>: hold the <strong>BOOT</strong> button, tap <strong>RESET</strong>, release BOOT — the screen goes blank. Then use the firmware tool on the Configure page.</p>
+          <a class="guide-cta" href="app.html#firmware">Go to Firmware Tool</a>
+          <div class="guide-note">To update firmware later, repeat this step with the latest version from the tool.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div class="guide-body">
+          <h3>Connect to the Config Tool</h3>
+          <p>After flashing, the CYD boots into SudoDeck. Leave it plugged into USB (this powers the board and provides a data connection). Click <strong>Connect</strong> on the Configure page — your browser will ask which serial port to use.</p>
+          <a class="guide-cta" href="app.html#config">Go to Configure</a>
+          <div class="guide-note">Use Chrome or Edge. Web Serial requires a secure context — GitHub Pages (HTTPS) works.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div class="guide-body">
+          <h3>Configure Your Layout</h3>
+          <p>Once connected, the config tool reads your current layout from the device. Add pages, place buttons on the grid, pick colors, and assign actions (keyboard keys, media controls, text snippets, or combos). Hit <strong>Write</strong> to save to the CYD's flash.</p>
+          <div class="guide-note">The config is stored on the device. Unplug and move to another computer — your layout follows.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">5</div>
+        <div class="guide-body">
+          <h3>Pair via Bluetooth</h3>
+          <p>Unplug the USB (or keep it plugged for power — your choice). The CYD runs on USB power. Open Bluetooth settings on your computer, phone, or tablet. Look for <strong>SudoDeck</strong> in the device list and pair. Pair once, it stays paired.</p>
+          <div class="guide-note">No drivers. No daemons. No app install. Just standard Bluetooth HID.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">6</div>
+        <div class="guide-body">
+          <h3>Use It</h3>
+          <p>That's it. Push a button on the CYD — your macro fires on the paired device. Navigate pages, trigger combos, type snippets. After a period of inactivity (configurable in the config tool), the screensaver kicks in with your chosen mode.</p>
+          <div class="guide-note">Powered by <strong>BLE HID</strong> — your computer thinks it's a real keyboard. Reliable, fast, zero configuration.</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">7</div>
+        <div class="guide-body">
+          <h3>Screensaver &amp; Live Widgets</h3>
+          <p>Three screensaver modes are built in: <strong>Matrix Rain</strong>, <strong>F1 Standings</strong> (live driver + constructor standings), and <strong>Custom Widgets</strong> — user-defined API endpoints displayed as live data cards.</p>
+          <p>To use live data modes (F1, Custom), first set up <strong>WiFi</strong> in the config tool layout controls. For custom widgets, add one or more widget sources below the Screensaver section:</p>
+          <ul style="margin:6px 0 0 18px;font-size:0.8rem;color:var(--dim);line-height:1.6">
+            <li><strong>Label</strong> — name shown above the value on the CYD display</li>
+            <li><strong>URL</strong> — any JSON API endpoint (must return valid JSON, no auth headers needed)</li>
+            <li><strong>Path</strong> — dot-notation JSON path, e.g. <code>btc.usd</code> or <code>current_weather.temperature</code>. Array access with <code>[index]</code> is supported</li>
+            <li><strong>Format</strong> — display template with <code>{value}</code> placeholder, e.g. <code>${value}</code> or <code>{value}°C</code></li>
+            <li><strong>Interval</strong> — seconds between data refreshes (minimum 30s recommended)</li>
+          </ul>
+          <p style="margin-top:8px">Use the <strong>Test</strong> button on each widget to verify your URL and path before writing to the device. Widgets cycle every 10s on the CYD display with page-dot navigation.</p>
+          <div class="guide-note">No API keys required for the built-in F1 data (Jolpica API) or Open-Meteo weather. For custom APIs, choose free tiers with no auth.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/sudobreakstuff/sudodeck">SudoDeck</a> &mdash; cheap. open. yours. &mdash; R1,099 in SA &mdash; built by Shahid Singh
+</footer>
+
+<script>
+const iv = new IntersectionObserver(function(es) {
+  es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
+document.querySelectorAll('.section-reveal').forEach(function(el) { iv.observe(el); });
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buy SudoDeck — wireless macro deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="200x250" href="assets/sudodecklogo.png">
+<link rel="apple-touch-icon" href="assets/sudodecklogo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nl" href="index.html"><span class="s"><svg viewBox="0 0 100 125" fill="none" stroke="#00FF88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" /><path d="M18 36 L50 16 L82 36" /><path d="M18 36 L50 56 L82 36" /><path d="M50 56 L50 90" /></svg></span>Sudo<span class="g">Deck</span></a>
+  <ul class="nls">
+    <li><a href="index.html">Features</a></li>
+    <li><a href="index.html#compare">Compare</a></li>
+    <li><a href="buy.html" class="active">Buy</a></li>
+    <li><a href="guide.html">Guide</a></li>
+    <li><a href="app.html">Configure</a></li>
+    <li><a href="index.html#about">About</a></li>
+  </ul>
+</nav>
+
+<section id="buy" class="section-reveal" style="padding-top:120px">
+  <div class="inner">
+    <h2>Buy <span class="g">Sudo</span>Deck</h2>
+    <p class="sd">Fully assembled, tested, and ready to ship anywhere in South Africa.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card featured">
+        <h3>Complete Kit</h3>
+        <div class="big-price"><span class="cur">R</span>1,099</div>
+        <p class="price-note">incl VAT &middot; free local pickup in Newcastle, KZN</p>
+        <ul>
+          <li><span class="check">&#10003;</span> E32R28T CYD (ESP32-WROOM-32E + 2.8" touch)</li>
+          <li><span class="check">&#10003;</span> 3D-printed enclosure (front + back)</li>
+          <li><span class="check">&#10003;</span> USB-C cable (power + data)</li>
+          <li><span class="check">&#10003;</span> Firmware pre-flashed (latest version)</li>
+          <li><span class="check">&#10003;</span> Tested before shipping</li>
+          <li><span class="check">&#10003;</span> Yours forever &mdash; free firmware updates</li>
+        </ul>
+        <p style="font-size:0.78rem;color:var(--dim);margin-bottom:18px;line-height:1.5">
+          Shipping nationwide via The Courier Guy — R80–120.<br>
+          Free local pickup in Newcastle, KZN.
+        </p>
+        <p class="pricing-links">
+          <a class="btn-large" href="mailto:shahidsingh1zn@gmail.com">Order via Email</a>
+        </p>
+      </div>
+      <div class="pricing-card">
+        <h3>DIY Build</h3>
+        <div class="big-price" style="font-size:1.8rem;"><span class="cur">R</span>343</div>
+        <p class="price-note">CYD board only (E32R28T incl VAT)</p>
+        <ul>
+          <li><span class="dim">─</span> <a href="https://robotics.org.za/E32R28T" target="_blank" style="color:var(--text)">E32R28T CYD board</a> — R342.70</li>
+          <li><span class="dim">─</span> 3D-print your own enclosure (STL in repo)</li>
+          <li><span class="dim">─</span> Flash firmware yourself via browser</li>
+          <li><span class="dim">─</span> Full open source — MIT license</li>
+        </ul>
+        <p style="font-size:0.78rem;color:var(--dim);margin-bottom:18px;line-height:1.5">
+          All the files you need are on GitHub.<br>
+          Assembly guide in the <a href="guide.html" style="color:var(--acc)">Guide section</a>.
+        </p>
+        <p class="pricing-links">
+          <a class="btn-large sec" href="https://github.com/sudobreakstuff/sudodeck" target="_blank">View on GitHub</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="faq" class="section-reveal" style="padding:80px 20px;">
+  <div class="inner">
+    <h2>FAQ</h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          What's in the box?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">The complete kit includes the E32R28T CYD board (ESP32-WROOM-32E + 2.8" ILI9341 touch display), a 3D-printed PLA enclosure (front and back panels), a USB-C cable for power and data, and the latest SudoDeck firmware pre-flashed and tested.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          Do I need to install any software on my computer?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">No. SudoDeck uses standard Bluetooth HID — your computer sees it as a regular Bluetooth keyboard. No drivers, no daemons, no background apps. The config tool runs in your browser (Chrome/Edge) via Web Serial. Nothing to install.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          What can I do with the buttons?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">Each button can send a single key (F1, Enter, etc.), a key combination (CTRL+C, ALT+TAB), type a text string, run a multi-step macro, or launch an app (Windows/macOS/Linux). You can have up to 12 pages with configurable grid sizes.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          How do I configure the buttons?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">Open the <a href="app.html" style="color:var(--acc)">Configure page</a> in Chrome or Edge. Plug in your SudoDeck via USB, click Connect, select the serial port, and the config tool reads your current layout. Edit labels, colors, actions — then click Write to save to the device. All config lives on the device itself.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          How does Bluetooth pairing work?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">Unplug USB (or keep it plugged for power — your choice). Open Bluetooth settings on your computer, phone, or tablet. Look for "SudoDeck" in the device list and pair. Pair once, it stays paired permanently. The device appears as a standard keyboard — no special drivers needed.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          What is the battery life?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">The CYD does not include a built-in battery, but the board has a LiPo charger (IP5306) if you add one. For normal use, keep it plugged into USB or any 5V phone charger. The screensaver activates after inactivity (configurable, default 30s), and the display can sleep after a longer timeout (configurable, default 60s).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          Can I use this with my phone or tablet?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">Yes. SudoDeck works with any device that supports Bluetooth keyboards — iPhones, iPads, Android phones and tablets, smart TVs, and of course Windows, Mac, and Linux computers.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          Is SudoDeck open source?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">Yes — MIT licensed. The entire firmware, website, config tool, and enclosure designs are on GitHub. Fork it, hack it, build something new. There is no proprietary software or paid upgrade tier.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+          What if something goes wrong?
+          <span class="faq-arrow">&#9660;</span>
+        </div>
+        <div class="faq-a">Pre-assembled units come with a 6-month warranty covering hardware defects. If the board fails, we'll replace it. Open an issue on GitHub or email shahidsingh1zn@gmail.com for support.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/sudobreakstuff/sudodeck">SudoDeck</a> &mdash; cheap. open. yours. &mdash; R1,099 in SA &mdash; built by Shahid Singh
+</footer>
+
+<script>
+const iv = new IntersectionObserver(function(es) {
+  es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
+document.querySelectorAll('.section-reveal').forEach(function(el) { iv.observe(el); });
+</script>
+</body>
+</html>
