@@ -1,6 +1,13 @@
 {
   "versions": [
     {
+      "version": "2.0.1",
+      "label": "SudoDeck v2.0.1",
+      "file": "sudodeck-2.0.1.bin",
+      "address": "0",
+      "notes": "WiFi fixes: human-readable error messages, auto-connect after set_wifi, 30s timeout, SSID shown while connecting. BLE: health check ensures continuous advertising for Windows auto-connect."
+    },
+    {
       "version": "2.0.0",
       "label": "SudoDeck v2.0.0",
       "file": "sudodeck-2.0.0.bin",

@@ -34,6 +34,7 @@ XPT2046_Touchscreen ts(XP_CS, XP_IRQ);
 
 HijelHID_BLEKeyboard ble("SudoDeck", "shahid singh");
 bool ble_ready = false;
+bool ble_was_connected = false;
 
 
 int page = 0;
@@ -76,6 +77,7 @@ bool wifi_connecting = false;
 unsigned long wifi_retry_ms = 0;
 unsigned long wifi_connect_start_ms = 0;
 int wifi_last_status = -1;
+unsigned long wifi_conn_timeout = 30000; // 30s instead of 20s
 
 // Widget data
 String widget_cache = "";
@@ -307,13 +309,24 @@ void apply_cfg() {
   }
 }
 
+const char* wifi_status_str(int s) {
+  switch (s) {
+    case WL_IDLE_STATUS:      return "IDLE";
+    case WL_NO_SSID_AVAIL:    return "NO NET";
+    case WL_SCAN_COMPLETED:   return "SCAN";
+    case WL_CONNECT_FAILED:   return "AUTH FAIL";
+    case WL_CONNECTION_LOST:  return "LOST";
+    case WL_DISCONNECTED:     return "DOWN";
+    default:                  return "ERR";
+  }
+}
+
 void init_wifi() {
   if (wifi_ssid.length() == 0) return;
-  // Already connected to this network
   if (WiFi.isConnected() && WiFi.SSID() == wifi_ssid) return;
-  // Force reconnect with new credentials
   if (WiFi.isConnected()) WiFi.disconnect(false);
   wifi_retry_ms = 0;
+  wifi_connecting = false;
 }
 
 void fetch_widget_data() {
@@ -805,17 +818,21 @@ void proc_serial(const String& l) {
     config["wifi"]["ssid"] = wifi_ssid;
     config["wifi"]["password"] = wifi_pass;
     save_cfg();
-    JsonDocument r; s_ok(r);
+    init_wifi();
+    JsonDocument r; r["ssid"] = wifi_ssid; r["connecting"] = wifi_ssid.length() > 0; s_ok(r);
   }
   else if (!strcmp(cmd,"get_wifi")) {
     JsonDocument r;
     r["ssid"] = wifi_ssid;
     r["connected"] = WiFi.isConnected();
+    r["status"] = WiFi.status();
+    if (wifi_last_status >= 0) r["last_status"] = wifi_status_str(wifi_last_status);
+    r["connecting"] = wifi_connecting;
     s_ok(r);
   }
   else if (!strcmp(cmd,"wifi_connect")) {
     init_wifi();
-    JsonDocument r; s_ok(r);
+    JsonDocument r; r["ssid"] = wifi_ssid; r["connecting"] = wifi_ssid.length() > 0; s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
     const char* data = req["data"]|"";
@@ -914,12 +931,20 @@ void draw_header() {
   // WiFi status
   if (wifi_ssid.length() > 0) {
     if (WiFi.isConnected())
-      tft.print(" | WIFI: ON");
-    else if (wifi_connecting)
-      tft.print(" | WIFI:...");
-    else {
-      tft.print(" | WIFI: OFF");
-      if (wifi_last_status >= 0) { tft.setTextColor(TFT_RED, C_HDR); tft.print("("); tft.print(wifi_last_status); tft.print(")"); tft.setTextColor(C_ACC, C_HDR); }
+      tft.print(" | W:ON");
+    else if (wifi_connecting) {
+      tft.setTextColor(C_DIM, C_HDR);
+      tft.print(" | W: ");
+      // show SSID if short enough
+      int flen = tft.textWidth(wifi_ssid.c_str());
+      if (flen < 100) tft.print(wifi_ssid);
+      else { tft.print(wifi_ssid.substring(0, 12)); tft.print(".."); }
+      tft.setTextColor(C_ACC, C_HDR);
+    } else {
+      tft.setTextColor(TFT_RED, C_HDR);
+      tft.print(" | W:OFF");
+      if (wifi_last_status >= 0) { tft.print(" "); tft.print(wifi_status_str(wifi_last_status)); }
+      tft.setTextColor(C_ACC, C_HDR);
     }
   }
 }
@@ -1365,7 +1390,7 @@ void setup() {
   ble.setLogLevel(HIDLogLevel::Off);
   ble.setSecurityMode(BLEKeyboardSecurity::JustWorks);
   ble.onPairingComplete([](bool s) {
-    // Pairing events are NOT printed to serial to avoid corrupting JSON responses
+    (void)s;
   });
   ble.begin();
   ble_ready = true;
@@ -1382,10 +1407,12 @@ void loop() {
     if (wifi_retry_ms == 0 || now - wifi_retry_ms > 30000) {
       wifi_connecting = true;
       wifi_connect_start_ms = now;
+      wifi_last_status = -1;
       WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
+      draw_header();
     }
   }
-  if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || now - wifi_connect_start_ms > 20000)) {
+  if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL || now - wifi_connect_start_ms > wifi_conn_timeout)) {
     wifi_connecting = false;
     wifi_retry_ms = now;
     wifi_last_status = WiFi.status();
@@ -1394,6 +1421,7 @@ void loop() {
   if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
     wifi_connecting = false;
     wifi_retry_ms = 0;
+    wifi_last_status = -1;
     draw_header();
   }
 
@@ -1413,7 +1441,21 @@ void loop() {
     }
   }
 
+  // BLE health check — keep advertising alive when not connected
+  if (ble_ready && !ble.isConnected()) {
+    static unsigned long last_ble_check = 0;
+    if (now - last_ble_check > 10000) {
+      last_ble_check = now;
+      NimBLEDevice::startAdvertising();
+    }
+  }
+
   if (!saver_active) {
+    // BLE connection state change — update header immediately
+    if (ble_ready) {
+      bool bc = ble.isConnected();
+      if (bc != ble_was_connected) { ble_was_connected = bc; draw_header(); }
+    }
     static unsigned long last_hdr = 0;
     if (now - last_hdr > 2000) { draw_header(); last_hdr = now; }
 
