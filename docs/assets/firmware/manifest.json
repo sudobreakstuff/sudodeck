@@ -1,6 +1,13 @@
 {
   "versions": [
     {
+      "version": "2.0.2",
+      "label": "SudoDeck v2.0.2",
+      "file": "sudodeck-2.0.2.bin",
+      "address": "0",
+      "notes": "Stability: serial buffer OOM protection, removed periodic header redraw (flicker fix), non-blocking touch debounce. WiFi: clearer header status messages."
+    },
+    {
       "version": "2.0.1",
       "label": "SudoDeck v2.0.1",
       "file": "sudodeck-2.0.1.bin",

@@ -741,7 +741,7 @@ void s_serial() {
   while (Serial.available()) {
     char c = Serial.read();
     if (c == '\n') { serial_buf.trim(); if (serial_buf.length()) proc_serial(serial_buf); serial_buf=""; }
-    else if (c != '\r') serial_buf += c;
+    else if (c != '\r') { if (serial_buf.length() < 4096) serial_buf += c; }
   }
 }
 void proc_serial(const String& l) {
@@ -1473,14 +1473,10 @@ void loop() {
   }
 
   if (!saver_active) {
-    // BLE connection state change — update header immediately
     if (ble_ready) {
       bool bc = ble.isConnected();
       if (bc != ble_was_connected) { ble_was_connected = bc; draw_header(); }
     }
-    static unsigned long last_hdr = 0;
-    if (now - last_hdr > 2000) { draw_header(); last_hdr = now; }
-
     if (saver_timeout > 0 && now - last_touch_ms > (unsigned long)saver_timeout * 1000) {
       enter_saver();
     }
@@ -1489,23 +1485,25 @@ void loop() {
   if (saver_active) {
     draw_saver();
     s_serial();
-    if (ts.tirqTouched() && ts.touched()) {
+    static unsigned long tch = 0;
+    if (ts.tirqTouched() && ts.touched() && now - tch > 250) {
+      tch = now;
       TS_Point p = ts.getPoint();
       int tx = map(p.x, 200, 3700, 0, SCR_W);
       int ty = map(p.y, 240, 3800, 0, SCR_H);
       handle_touch(tx, ty);
-      while (ts.touched()) delay(5);
     }
     if (!Serial.available()) delay(33);
     return;
   }
 
-  if (ts.tirqTouched() && ts.touched()) {
+  static unsigned long tch = 0;
+  if (ts.tirqTouched() && ts.touched() && now - tch > 250) {
+    tch = now;
     TS_Point p = ts.getPoint();
     int tx = map(p.x, 200, 3700, 0, SCR_W);
     int ty = map(p.y, 240, 3800, 0, SCR_H);
     handle_touch(tx, ty);
-    while (ts.touched()) delay(5);
   }
 
   if (!Serial.available()) delay(10);
