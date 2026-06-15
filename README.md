@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://sudobreakstuff.github.io/sudodeck"><img src="https://img.shields.io/badge/web_config-00FF88?style=for-the-badge&logo=googlechrome&logoColor=000" alt="Web Config"></a>
   <a href="https://github.com/sudobreakstuff/sudodeck/issues"><img src="https://img.shields.io/badge/issues-FF4466?style=for-the-badge&logo=github&logoColor=fff" alt="Issues"></a>
-  <a href="https://github.com/sudobreakstuff/sudodeck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-00FF88?style=for-the-badge&logo=open-source-initiative&logoColor=fff" alt="MIT OR Apache-2.0"></a>
+  <a href="https://github.com/sudobreakstuff/sudodeck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-00FF88?style=for-the-badge&logo=open-source-initiative&logoColor=fff" alt="MIT License"></a>
 </p>
 
 ---
@@ -24,7 +24,7 @@ SudoDeck is a **Bluetooth macro keyboard** built on a CYD (Cheap Yellow Display 
 - **Zero host setup** — pair once, works forever
 - **Fully configurable** — edit buttons, labels, colors, actions from your browser
 - **Self-contained** — all config lives on the device's flash
-- **Open source** — MIT OR Apache-2.0 licensed. Fork it, build your own
+- **Open source** — MIT licensed. Fork it, build your own
 
 ## Quick Start
 
@@ -139,9 +139,7 @@ The firmware includes a built-in fallback config with 3 pages:
 
 ## License
 
-Dual-licensed under **MIT** or **Apache 2.0** — pick whichever works for you.
-
-See [LICENSE](LICENSE) (MIT) and [LICENSE-APACHE](LICENSE-APACHE) (Apache 2.0).
+MIT — do whatever you want. Build cool stuff. Help people.
 
 ## Built By
 
