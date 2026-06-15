@@ -47,6 +47,7 @@ int nav_dot_x = 0;
 #define SAVER_W 48
 #define SAVER_H 48
 #define DEFAULT_TIMEOUT 30
+#define DEFAULT_SLEEP 60
 #define SAVER_MATRIX 0
 #define SAVER_PARTICLES 1
 #define SAVER_STARS 2
@@ -59,7 +60,10 @@ int nav_dot_x = 0;
 
 int saver_mode = SAVER_MATRIX;
 bool saver_active = false;
+bool display_asleep = false;
 int saver_timeout = DEFAULT_TIMEOUT;
+int sleep_timeout = DEFAULT_SLEEP;
+unsigned long saver_start_ms = 0;
 unsigned long last_touch_ms = 0;
 uint16_t* saver_img = nullptr;
 // Image bounce state
@@ -224,7 +228,7 @@ void gen_default() {
   config.clear();
   config["name"]="SudoDeck"; config["grid"]["cols"]=4; config["grid"]["rows"]=3;
   config["wifi"]["ssid"]=""; config["wifi"]["password"]="";
-  config["saver"]["timeout"]=DEFAULT_TIMEOUT; config["saver"]["mode"]=SAVER_MATRIX;
+  config["saver"]["timeout"]=DEFAULT_TIMEOUT; config["saver"]["sleep"]=DEFAULT_SLEEP; config["saver"]["mode"]=SAVER_MATRIX;
   config["widgets"]=JsonArray();
   JsonArray pg = config["pages"].to<JsonArray>();
 
@@ -296,6 +300,8 @@ void apply_cfg() {
   if (config["saver"].is<JsonObject>()) {
     int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
     if (t >= 5 && t <= 600) saver_timeout = t;
+    int s = config["saver"]["sleep"]|DEFAULT_SLEEP;
+    if (s >= 0 && s <= 600) sleep_timeout = s;
     int sm = config["saver"]["mode"]|SAVER_MATRIX;
     if (sm >= SAVER_MATRIX && sm <= SAVER_CUSTOM) saver_mode = sm;
   }
@@ -783,13 +789,13 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
-    r["name"]="SudoDeck"; r["version"]="2.1.2";
+    r["name"]="SudoDeck"; r["version"]="2.1.3";
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
     s_ok(r);
   }
-  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; saver_timeout = DEFAULT_TIMEOUT; if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
+  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; saver_timeout = DEFAULT_TIMEOUT; sleep_timeout = DEFAULT_SLEEP; saver_active = false; display_asleep = false; CYD_TFT_BL_ON(); if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
   else if (!strcmp(cmd,"set_saver_mode")) {
@@ -813,10 +819,16 @@ void proc_serial(const String& l) {
       config["saver"]["timeout"] = t;
       save_cfg();
     }
-    JsonDocument r; r["timeout"] = saver_timeout; s_ok(r);
+    int s = req["sleep"]|-1;
+    if (s >= 0 && s <= 600) {
+      sleep_timeout = s;
+      config["saver"]["sleep"] = s;
+      save_cfg();
+    }
+    JsonDocument r; r["timeout"] = saver_timeout; r["sleep"] = sleep_timeout; s_ok(r);
   }
   else if (!strcmp(cmd,"get_saver")) {
-    JsonDocument r; r["timeout"] = saver_timeout;
+    JsonDocument r; r["timeout"] = saver_timeout; r["sleep"] = sleep_timeout;
     if (saver_mode == SAVER_PARTICLES) r["mode"] = "particles";
     else if (saver_mode == SAVER_STARS) r["mode"] = "stars";
     else if (saver_mode == SAVER_IMAGE) r["mode"] = "image";
@@ -861,6 +873,9 @@ void proc_serial(const String& l) {
     r["wifi_retry_ms"] = (long)wifi_retry_ms;
     r["ble_connected"] = ble_ready && ble.isConnected();
     r["saver_active"] = saver_active;
+    r["display_asleep"] = display_asleep;
+    r["sleep_timeout"] = sleep_timeout;
+    r["saver_timeout"] = saver_timeout;
     r["page"] = page;
     r["num_pages"] = num_pages;
     s_ok(r);
@@ -1163,6 +1178,7 @@ void gen_saver_preset(const char* name) {
 
 void enter_saver() {
   saver_active = true;
+  saver_start_ms = millis();
   f1_page = 0;
   if (saver_mode == SAVER_F1 || saver_mode == SAVER_FOOTBALL) {
     if (WiFi.isConnected()) fetch_widget_data();
@@ -1199,6 +1215,12 @@ void enter_saver() {
 
 void exit_saver() {
   saver_active = false;
+  if (display_asleep) {
+    display_asleep = false;
+    CYD_TFT_BL_ON();
+    tft.writecommand(0x29); // display on
+    delay(10);
+  }
   last_touch_ms = millis();
   draw_all();
 }
@@ -1384,6 +1406,8 @@ void setup() {
 
   tft.begin();
   tft.setRotation(1);
+  CYD_TFT_BL_ENABLE();
+  CYD_TFT_BL_ON();
 
   draw_splash();
 
@@ -1496,6 +1520,25 @@ void loop() {
   }
 
   if (saver_active) {
+    // sleep display after inactivity
+    if (!display_asleep && sleep_timeout > 0 && now - saver_start_ms > (unsigned long)sleep_timeout * 1000) {
+      display_asleep = true;
+      tft.writecommand(0x28);
+      CYD_TFT_BL_OFF();
+    }
+    if (display_asleep) {
+      s_serial();
+      static unsigned long tch = 0;
+      if (ts.tirqTouched() && ts.touched() && now - tch > 250) {
+        tch = now;
+        TS_Point p = ts.getPoint();
+        int tx = map(p.x, 200, 3700, 0, SCR_W);
+        int ty = map(p.y, 240, 3800, 0, SCR_H);
+        handle_touch(tx, ty);
+      }
+      if (!Serial.available()) delay(33);
+      return;
+    }
     draw_saver();
     s_serial();
     static unsigned long tch = 0;

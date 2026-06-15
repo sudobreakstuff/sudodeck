@@ -1,7 +1,7 @@
 # SudoDeck
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sudobreakstuff/sudodeck/main/docs/assets/logo.svg" alt="SudoDeck" width="140">
+  <img src="https://raw.githubusercontent.com/sudobreakstuff/sudodeck/main/docs/assets/sudodecklogo.png" alt="SudoDeck" width="140">
 </p>
 
 <p align="center">
@@ -83,7 +83,7 @@ sudodeck/
 ├── docs/                   # GitHub Pages site
 │   ├── index.html          # Web config tool + landing page
 │   └── assets/
-│       ├── logo.svg        # SudoDeck snake logo
+│       ├── sudodecklogo.png  # SudoDeck PNG logo
 │       └── firmware/       # Pre-built firmware binaries + manifest
 │           └── manifest.json
 ├── README.md               # This file

@@ -6,7 +6,8 @@
 <title>SudoDeck — wireless macro deck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230A0E17'/%3E%3Crect width='512' height='512' rx='96' fill='none' stroke='%2300ff88' stroke-width='2' opacity='0.15'/%3E%3Cpath d='M256 96 C320 96 360 140 360 200 C360 260 320 280 280 280 C240 280 220 260 220 220 C220 180 240 160 280 160 C320 160 340 180 340 220 C340 280 300 320 260 340 C220 360 200 380 200 410' stroke='%2300ff88' stroke-width='18' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cellipse cx='200' cy='410' rx='14' ry='10' fill='%2300ff88' transform='rotate(-15 200 410)'/%3E%3Ccircle cx='194' cy='407' r='2.5' fill='%230A0E17'/%3E%3Ccircle cx='188' cy='413' r='2.5' fill='%230A0E17'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="assets/sudodecklogo.png">
+<link rel="apple-touch-icon" href="assets/sudodecklogo.png">
 <style>
   :root {
     --bg: #0A0E17;
@@ -902,7 +903,7 @@
 
 <nav id="nav">
   <a class="nl" href="#">
-    <span class="s"><svg viewBox="0 0 512 512" fill="none"><path d="M256 96 C320 96 360 140 360 200 C360 260 320 280 280 280 C240 280 220 260 220 220 C220 180 240 160 280 160 C320 160 340 180 340 220 C340 280 300 320 260 340 C220 360 200 380 200 410" stroke="#00FF88" stroke-width="24" stroke-linecap="round" fill="none"/><circle cx="200" cy="410" r="8" fill="#00FF88"/></svg></span>
+    <span class="s"><img src="assets/sudodecklogo.png" alt="SudoDeck" style="width:100%;height:100%;object-fit:contain;"></span>
     <span class="g">S</span>UDO<span class="g">D</span>ECK
   </a>
   <ul class="nls">
@@ -915,21 +916,7 @@
 </nav>
 
 <section class="hero">
-  <svg class="snake-logo" viewBox="0 0 512 512" fill="none">
-    <defs>
-      <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00ff88"/>
-        <stop offset="100%" stop-color="#00cc66"/>
-      </linearGradient>
-    </defs>
-    <rect width="512" height="512" rx="96" fill="var(--surface)"/>
-    <rect width="512" height="512" rx="96" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.15"/>
-    <path d="M256 96 C320 96 360 140 360 200 C360 260 320 280 280 280 C240 280 220 260 220 220 C220 180 240 160 280 160 C320 160 340 180 340 220 C340 280 300 320 260 340 C220 360 200 380 200 410"
-          stroke="url(#sg)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <ellipse cx="200" cy="410" rx="14" ry="10" fill="url(#sg)" transform="rotate(-15 200 410)"/>
-    <circle cx="194" cy="407" r="2.5" fill="var(--bg)"/>
-    <circle cx="188" cy="413" r="2.5" fill="var(--bg)"/>
-  </svg>
+  <img src="assets/sudodecklogo.png" alt="SudoDeck" class="snake-logo">
   <h1><span class="g">S</span>UDO<span class="g">D</span>ECK</h1>
   <p class="sub">
     A $10 CYD display turned into a wireless macro deck.<br>
@@ -1273,11 +1260,14 @@
           <span>Screensaver</span>
           <span class="saver-hint" id="saverHint">off</span>
         </div>
-        <div class="saver-body" id="saverBody">
+          <div class="saver-body" id="saverBody">
           <div class="er">
             <label>Timeout</label>
             <input type="number" id="saverTimeout" min="5" max="600" value="30">
             <span style="font-size:0.7rem;color:var(--dim)">sec</span>
+            <label style="min-width:auto;margin-left:8px;">Sleep</label>
+            <input type="number" id="saverSleep" min="0" max="600" value="60" style="width:60px;">
+            <span style="font-size:0.7rem;color:var(--dim)">sec (0=off)</span>
             <button class="btn pri" id="btnSaverSet" style="margin-left:auto">Set</button>
           </div>
           <div class="er" style="margin-bottom:6px">
@@ -1400,7 +1390,7 @@ function dc() {
   return {
     name: "SudoDeck", grid: { cols: 4, rows: 3 },
     wifi: { ssid: "", password: "" },
-    saver: { timeout: 30, mode: 0 },
+    saver: { timeout: 30, sleep: 60, mode: 0 },
     pages: [
       { name: "Main", buttons: [
         { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
@@ -1518,7 +1508,9 @@ function ul() {
   document.getElementById('wifiSsid').value=cd.wifi.ssid||'';
   document.getElementById('wifiPass').value=cd.wifi.password||'';
   if(!cd.saver) cd.saver={timeout:30,mode:0};
+  if(cd.saver.sleep===undefined) cd.saver.sleep=60;
   document.getElementById('saverTimeout').value=cd.saver.timeout||30;
+  document.getElementById('saverSleep').value=cd.saver.sleep||60;
   document.getElementById('saverMode').value=modeToStr(cd.saver.mode||0);
 }
 function syncWifi() {
@@ -1531,8 +1523,9 @@ function syncWifi() {
 }
 function syncSaver() {
   if(!cd) return;
-  if(!cd.saver) cd.saver={timeout:30,mode:0};
+  if(!cd.saver) cd.saver={timeout:30,sleep:60,mode:0};
   cd.saver.timeout=parseInt(document.getElementById('saverTimeout').value)||30;
+  cd.saver.sleep=parseInt(document.getElementById('saverSleep').value)||0;
   cd.saver.mode=modeToInt(document.getElementById('saverMode').value);
 }
 function syncWidgets() {
@@ -1806,17 +1799,20 @@ async function saverSync() {
   if(!dw) return;
   try { var r = await sc({cmd:'get_saver'}); 
     document.getElementById('saverTimeout').value = r.timeout || 30;
-    document.getElementById('saverHint').textContent = r.timeout + 's ' + (r.mode||'matrix');
+    document.getElementById('saverSleep').value = r.sleep != null ? r.sleep : 60;
+    document.getElementById('saverHint').textContent = r.timeout + 's / sleep ' + (r.sleep || 'off');
     if(r.mode) document.getElementById('saverMode').value = r.mode;
     document.getElementById('saverImgArea').style.display = r.mode === 'image' ? 'flex' : 'none';
-    if(cd && cd.saver) { cd.saver.timeout=r.timeout||30; cd.saver.mode=modeToInt(r.mode||'matrix'); }
+    if(cd && cd.saver) { cd.saver.timeout=r.timeout||30; cd.saver.sleep=r.sleep||60; cd.saver.mode=modeToInt(r.mode||'matrix'); }
   } catch(e) {}
 }
 document.getElementById('btnSaverSet').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
   var t = parseInt(document.getElementById('saverTimeout').value) || 30;
+  var s = parseInt(document.getElementById('saverSleep').value) || 0;
   if(t < 5) t = 5; if(t > 600) t = 600;
-  try { await sc({cmd:'set_saver',timeout:t}); cd.saver.timeout=t; tm('Timeout set to ' + t + 's'); saverSync(); } catch(e) { tm('Failed', 'ng'); }
+  if(s < 0) s = 0; if(s > 600) s = 600;
+  try { await sc({cmd:'set_saver',timeout:t,sleep:s}); cd.saver.timeout=t; cd.saver.sleep=s; tm('Timeout ' + t + 's, sleep ' + (s||'off')); saverSync(); } catch(e) { tm('Failed', 'ng'); }
 });
 document.getElementById('saverFileInput').addEventListener('change', function(e) {
   var f = e.target.files[0]; if(!f) return;
