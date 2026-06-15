@@ -1504,12 +1504,24 @@ function rms(steps) {
   var c = document.getElementById('mss'); if(!c) return;
   c.innerHTML = '';
   steps = steps||[];
+  var mods = ['CTRL','ALT','SHIFT','GUI','CTRL_SHIFT','CTRL_ALT','CTRL_GUI','ALT_SHIFT','ALT_GUI','SHIFT_GUI','CTRL_ALT_SHIFT','CTRL_ALT_GUI','CTRL_SHIFT_GUI','ALT_SHIFT_GUI','CTRL_ALT_SHIFT_GUI'];
   steps.forEach(function(s,i) {
     var d = document.createElement('div'); d.className = 'ms';
-    d.innerHTML = '<span style="color:var(--dim);font-size:0.6rem;min-width:18px;font-family:var(--mono)">#'+(i+1)+'</span>'+
-      '<select class="mt" data-idx="'+i+'">'+['key','combo','text','delay'].map(function(t){return '<option value="'+t+'"'+(s.type===t?' selected':'')+'>'+t.charAt(0).toUpperCase()+t.slice(1)+'</option>';}).join('')+
-      '</select><input type="text" class="mv" value="'+es(s.value||s.key||'')+'" data-idx="'+i+'" placeholder="value" style="flex:1">'+
-      '<button class="btn dan md" data-idx="'+i+'" style="padding:3px 8px;font-size:0.65rem;">X</button>';
+    var inner = '<span style="color:var(--dim);font-size:0.6rem;min-width:18px;font-family:var(--mono)">#'+(i+1)+'</span>'+
+      '<select class="mt" data-idx="'+i+'">'+['key','combo','text','delay'].map(function(t){return '<option value="'+t+'"'+(s.type===t?' selected':'')+'>'+t.charAt(0).toUpperCase()+t.slice(1)+'</option>';}).join('')+'</select>';
+    if(s.type==='combo') {
+      inner += '<select class="mm" data-idx="'+i+'" style="flex:0 1 auto;max-width:100px;">'+
+        mods.map(function(m){return '<option value="'+m+'"'+(s.mod===m?' selected':'')+'>'+m.replace(/_/g,'+')+'</option>';}).join('')+
+        '</select>'+
+        '<input type="text" class="mv" value="'+es(s.key||'')+'" data-idx="'+i+'" placeholder="key (c, v...)" style="flex:1">';
+    } else if(s.type==='delay') {
+      inner += '<input type="number" class="mv" value="'+(s.value||100)+'" data-idx="'+i+'" min="1" max="10000" style="width:80px;">'+
+        '<span style="color:var(--dim);font-size:0.65rem;">ms</span>';
+    } else {
+      inner += '<input type="text" class="mv" value="'+es(s.value||'')+'" data-idx="'+i+'" placeholder="value" style="flex:1">';
+    }
+    inner += '<button class="btn dan md" data-idx="'+i+'" style="padding:3px 8px;font-size:0.65rem;">X</button>';
+    d.innerHTML = inner;
     c.appendChild(d);
   });
   c.querySelectorAll('.mt').forEach(function(s) {
@@ -1524,9 +1536,16 @@ function rms(steps) {
       var idx = parseInt(e.target.dataset.idx);
       if(cd.pages[sp].buttons[sb].action.steps) {
         var s2 = cd.pages[sp].buttons[sb].action.steps[idx];
-        if(s2.type==='key'||s2.type==='text'||s2.type==='delay') s2.value = e.target.value;
+        if(s2.type==='key'||s2.type==='text') s2.value = e.target.value;
         else if(s2.type==='combo') s2.key = e.target.value;
+        else if(s2.type==='delay') s2.value = parseInt(e.target.value)||100;
       }
+    });
+  });
+  c.querySelectorAll('.mm').forEach(function(s) {
+    s.addEventListener('change', function(e) {
+      var idx = parseInt(e.target.dataset.idx);
+      if(cd.pages[sp].buttons[sb].action.steps) { cd.pages[sp].buttons[sb].action.steps[idx].mod = e.target.value; }
     });
   });
   c.querySelectorAll('.md').forEach(function(b) {
