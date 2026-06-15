@@ -734,105 +734,6 @@
   }
 
   /* ─── CYD device mockup ─── */
-  /* ─── snake watermark ─── */
-  .snake-watermark {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80vmin; height: 80vmin;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.03;
-  }
-  .snake-watermark svg { width: 100%; height: 100%; }
-
-  /* ─── terminal decoration ─── */
-  .terminal-line {
-    font-family: var(--mono);
-    font-size: 0.55rem;
-    color: var(--dim);
-    position: absolute;
-    left: 24px; bottom: 80px;
-    opacity: 0.25;
-    z-index: 0;
-    pointer-events: none;
-    line-height: 1.8;
-  }
-  .terminal-line span { color: var(--acc); opacity: 0.6; }
-  @media (max-width: 640px) { .terminal-line { display: none; } }
-
-  /* ─── code badge ─── */
-  .code-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    padding: 4px 10px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--dim);
-    background: var(--surface);
-    margin-bottom: 20px;
-  }
-  .code-badge .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  /* ─── hero code decoration ─── */
-  .hero-code {
-    position: absolute;
-    right: 40px; top: 50%;
-    transform: translateY(-50%);
-    font-family: var(--mono);
-    font-size: 0.55rem;
-    color: var(--dim);
-    opacity: 0.08;
-    text-align: right;
-    line-height: 2.2;
-    z-index: 0;
-    pointer-events: none;
-    letter-spacing: 0.3px;
-  }
-  .hero-code .k { color: #7dd3fc; }
-  .hero-code .s { color: var(--acc); }
-  .hero-code .c { color: var(--dim); }
-  @media (max-width: 768px) { .hero-code { display: none; } }
-
-  /* ─── typewriter cursor ─── */
-  .tw-cursor::after {
-    content: '|';
-    color: var(--acc);
-    animation: blink 1s step-end infinite;
-    font-weight: 300;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  /* ─── snake trail dots ─── */
-  .snake-dots {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .snake-dot {
-    position: absolute;
-    width: 2px; height: 2px;
-    background: var(--acc);
-    border-radius: 50%;
-    opacity: 0;
-    animation: dotFade 4s ease-in-out infinite;
-  }
-  @keyframes dotFade {
-    0%, 100% { opacity: 0; transform: translateY(0); }
-    10% { opacity: 0.6; }
-    90% { opacity: 0.6; }
-    100% { opacity: 0; transform: translateY(-20px); }
-  }
-
   /* ─── stats ─── */
   .stats {
     display: grid;
@@ -1014,33 +915,6 @@
 </nav>
 
 <section class="hero">
-  <div class="snake-watermark">
-    <svg viewBox="0 0 512 512" fill="none">
-      <path d="M256 96 C320 96 360 140 360 200 C360 260 320 280 280 280 C240 280 220 260 220 220 C220 180 240 160 280 160 C320 160 340 180 340 220 C340 280 300 320 260 340 C220 360 200 380 200 410"
-            stroke="#00ff88" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <ellipse cx="200" cy="410" rx="14" ry="10" fill="#00ff88" transform="rotate(-15 200 410)"/>
-    </svg>
-  </div>
-  <div class="hero-code">
-    <span class="k">class</span> <span class="s">SudoDeck</span> <span class="k">extends</span> <span class="s">MacroDeck</span> &#123;<br>
-    &nbsp;&nbsp;<span class="c">// $10. no subs. yours.</span><br>
-    &nbsp;&nbsp;<span class="k">constructor</span>() &#123;<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="k">this</span>.<span class="s">cost</span> = <span class="c">"$10"</span>;<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="k">this</span>.<span class="s">open</span> = <span class="k">true</span>;<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="k">this</span>.<span class="s">bluetooth</span>()<span class="k">;</span><br>
-    &nbsp;&nbsp;&#125;<br>
-    &#125;
-  </div>
-  <div class="snake-dots">
-    <div class="snake-dot" style="top:15%;left:20%;animation-delay:0s;"></div>
-    <div class="snake-dot" style="top:25%;left:75%;animation-delay:0.5s;"></div>
-    <div class="snake-dot" style="top:45%;left:15%;animation-delay:1s;"></div>
-    <div class="snake-dot" style="top:60%;left:80%;animation-delay:1.5s;"></div>
-    <div class="snake-dot" style="top:75%;left:30%;animation-delay:2s;"></div>
-    <div class="snake-dot" style="top:35%;left:60%;animation-delay:2.5s;"></div>
-    <div class="snake-dot" style="top:80%;left:70%;animation-delay:3s;"></div>
-    <div class="snake-dot" style="top:10%;left:50%;animation-delay:3.5s;"></div>
-  </div>
   <svg class="snake-logo" viewBox="0 0 512 512" fill="none">
     <defs>
       <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1056,12 +930,8 @@
     <circle cx="194" cy="407" r="2.5" fill="var(--bg)"/>
     <circle cx="188" cy="413" r="2.5" fill="var(--bg)"/>
   </svg>
-  <div class="code-badge">
-    <div class="dot" style="background:var(--acc)"></div>
-    sudodeck v2.1.2 &mdash; ready to pair
-  </div>
   <h1><span class="g">S</span>UDO<span class="g">D</span>ECK</h1>
-  <p class="sub tw-cursor">
+  <p class="sub">
     A $10 CYD display turned into a wireless macro deck.<br>
     No subscriptions. No proprietary software. Just open source.
   </p>
@@ -1070,11 +940,6 @@
     <a class="btn-h sec" href="#features">Learn More</a>
   </div>
   <div class="sc"><a href="#features"></a></div>
-  <div class="terminal-line">
-    <span>$</span> git clone https://github.com/sudobreakstuff/sudodeck.git<br>
-    <span>$</span> cd sudodeck &amp;&amp; make flash<br>
-    <span>$</span> █
-  </div>
 </section>
 
 <section id="features">
@@ -1914,7 +1779,6 @@ document.addEventListener('mousemove', function(e) {
       var y = ((e.clientY - r.top) / r.height) * 100;
       heroGlow.style.background = 'radial-gradient(circle at ' + x + '% ' + y + '%, rgba(0,255,136,0.06) 0%, transparent 60%)';
       heroGlow.style.opacity = '1';
-      // Remove old CYD tilt code
       hTicking = false;
     });
     hTicking = true;
