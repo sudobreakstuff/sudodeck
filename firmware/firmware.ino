@@ -79,6 +79,7 @@ unsigned long wifi_connect_start_ms = 0;
 int wifi_last_status = -1;
 unsigned long wifi_conn_timeout = 30000; // 30s instead of 20s
 uint8_t wifi_last_reason = 0; // detailed WiFi disconnect reason
+bool wifi_intentional_disconnect = false; // suppress event handler during init_wifi()
 
 // Widget data
 String widget_cache = "";
@@ -325,6 +326,7 @@ const char* wifi_status_str(int s) {
 void init_wifi() {
   if (wifi_ssid.length() == 0) return;
   if (WiFi.isConnected() && WiFi.SSID() == wifi_ssid) return;
+  wifi_intentional_disconnect = true;
   // Full WiFi teardown to clear stale state before reconnecting
   if (WiFi.isConnected()) {
     WiFi.disconnect(true);
@@ -333,6 +335,7 @@ void init_wifi() {
   WiFi.mode(WIFI_OFF);
   delay(50);
   WiFi.mode(WIFI_STA);
+  wifi_intentional_disconnect = false;
   wifi_retry_ms = 0;
   wifi_connecting = false;
 }
@@ -1413,7 +1416,7 @@ void setup() {
   //WiFi.setAutoReconnect(true); // handled by manual retry logic below
   init_wifi();
   WiFi.onEvent([](arduino_event_id_t event, arduino_event_info_t info) {
-    wifi_last_reason = info.wifi_sta_disconnected.reason;
+    if (!wifi_intentional_disconnect) wifi_last_reason = info.wifi_sta_disconnected.reason;
   }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   load_saver_img();
   last_touch_ms = millis();
