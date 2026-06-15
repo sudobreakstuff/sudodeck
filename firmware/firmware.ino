@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 #include <HijelHID_BLEKeyboard.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 #include <HTTPClient.h>
 
 #define XP_IRQ 36
@@ -79,7 +80,7 @@ unsigned long wifi_connect_start_ms = 0;
 int wifi_last_status = -1;
 unsigned long wifi_conn_timeout = 30000; // 30s instead of 20s
 uint8_t wifi_last_reason = 0; // detailed WiFi disconnect reason
-bool wifi_pending_reason = false; // capture disconnect reason only during active connection attempt
+unsigned long wifi_teardown_ms = 0; // timestamp of last init_wifi() teardown
 
 // Widget data
 String widget_cache = "";
@@ -334,6 +335,7 @@ void init_wifi() {
   WiFi.mode(WIFI_OFF);
   delay(50);
   WiFi.mode(WIFI_STA);
+  wifi_teardown_ms = millis();
   wifi_retry_ms = 0;
   wifi_connecting = false;
 }
@@ -1414,7 +1416,9 @@ void setup() {
   //WiFi.setAutoReconnect(true); // handled by manual retry logic below
   init_wifi();
   WiFi.onEvent([](arduino_event_id_t event, arduino_event_info_t info) {
-    if (wifi_pending_reason) wifi_last_reason = info.wifi_sta_disconnected.reason;
+    if (millis() - wifi_teardown_ms > 500) {
+      wifi_last_reason = info.wifi_sta_disconnected.reason;
+    }
   }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   load_saver_img();
   last_touch_ms = millis();
@@ -1442,20 +1446,17 @@ void loop() {
       wifi_connect_start_ms = now;
       wifi_last_status = -1;
       wifi_last_reason = 0;
-      wifi_pending_reason = true;
       WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
       draw_header();
     }
   }
   if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL || now - wifi_connect_start_ms > wifi_conn_timeout)) {
-    wifi_pending_reason = false;
     wifi_connecting = false;
     wifi_retry_ms = now;
     wifi_last_status = WiFi.status();
     draw_header();
   }
   if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
-    wifi_pending_reason = false;
     wifi_connecting = false;
     wifi_retry_ms = 0;
     wifi_last_status = -1;
