@@ -235,6 +235,24 @@ The firmware includes a built-in fallback config with 3 pages:
 | **Media** | Play, Next, Prev, Mute, Br+, Br-, Home, End, PgUp, PgDn, Screenshot, Lock |
 | **Studio** | Split, Undo, Redo, Snip, FullScr, Timeline, Render, New Project, Export, Import, Delete/Replace, Add Text |
 
+## Product Photos
+
+<p align="center">
+  <img src="docs/assets/shop-1.jpeg" alt="SudoDeck product photo" width="49%">
+  <img src="docs/assets/shop-2.jpeg" alt="SudoDeck product photo" width="49%">
+</p>
+<p align="center">
+  <img src="docs/assets/shop-3.jpeg" alt="SudoDeck product photo" width="49%">
+  <img src="docs/assets/shop-4.jpeg" alt="SudoDeck product photo" width="49%">
+</p>
+<p align="center">
+  <img src="docs/assets/shop-5.jpeg" alt="SudoDeck product photo" width="49%">
+  <img src="docs/assets/shop-6.jpeg" alt="SudoDeck product photo" width="49%">
+</p>
+<p align="center">
+  <img src="docs/assets/shop-7.jpeg" alt="SudoDeck product photo" width="49%">
+</p>
+
 ## License
 
 MIT — do whatever you want. Build cool stuff. Help people.
