@@ -238,19 +238,19 @@ The firmware includes a built-in fallback config with 3 pages:
 ## Product Photos
 
 <p align="center">
-  <img src="docs/assets/shop-1.jpeg" alt="SudoDeck product photo" width="49%">
+  <img src="docs/assets/shop-1.jpeg" alt="SudoDeck product photo" width="100%">
+</p>
+<p align="center">
   <img src="docs/assets/shop-2.jpeg" alt="SudoDeck product photo" width="49%">
-</p>
-<p align="center">
   <img src="docs/assets/shop-3.jpeg" alt="SudoDeck product photo" width="49%">
-  <img src="docs/assets/shop-4.jpeg" alt="SudoDeck product photo" width="49%">
 </p>
 <p align="center">
+  <img src="docs/assets/shop-4.jpeg" alt="SudoDeck product photo" width="49%">
   <img src="docs/assets/shop-5.jpeg" alt="SudoDeck product photo" width="49%">
-  <img src="docs/assets/shop-6.jpeg" alt="SudoDeck product photo" width="49%">
 </p>
 <p align="center">
   <img src="docs/assets/shop-7.jpeg" alt="SudoDeck product photo" width="49%">
+  <img src="docs/assets/shop-6.jpeg" alt="SudoDeck product photo" width="49%">
 </p>
 
 ## License
