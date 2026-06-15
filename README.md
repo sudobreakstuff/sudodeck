@@ -1,81 +1,77 @@
 # SudoDeck
 
-<h1 align="center">
-  <br>
-  <a href="https://sudobreakstuff.github.io/sudodeck"><img src="https://raw.githubusercontent.com/sudobreakstuff/sudodeck/main/assets/logo.svg" alt="SudoDeck" width="200"></a>
-  <br>
-  SudoDeck
-  <br>
-</h1>
-
-<h4 align="center">A $10 CYD display turned into a wireless macro deck — no subscriptions, no proprietary software, no bullshit.</h4>
-
 <p align="center">
-  <a href="https://sudobreakstuff.github.io/sudodeck">🌐 Web Config</a> •
-  <a href="#building-the-firmware">🔧 Build</a> •
-  <a href="#configuring-buttons">⚙️ Configure</a> •
-  <a href="#license">📜 License</a>
+  <img src="https://raw.githubusercontent.com/sudobreakstuff/sudodeck/main/docs/assets/logo.svg" alt="SudoDeck" width="140">
 </p>
 
 <p align="center">
-  <strong>Built by <a href="https://github.com/sudobreakstuff">Shahid Singh</a></strong>
+  <strong>A $10 CYD display turned into a wireless macro deck.</strong><br>
+  No subscriptions. No proprietary software. No bullshit.
+</p>
+
+<p align="center">
+  <a href="https://sudobreakstuff.github.io/sudodeck"><img src="https://img.shields.io/badge/web_config-00FF88?style=for-the-badge&logo=googlechrome&logoColor=000" alt="Web Config"></a>
+  <a href="https://github.com/sudobreakstuff/sudodeck/issues"><img src="https://img.shields.io/badge/issues-FF4466?style=for-the-badge&logo=github&logoColor=fff" alt="Issues"></a>
+  <a href="https://github.com/sudobreakstuff/sudodeck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-00FF88?style=for-the-badge&logo=open-source-initiative&logoColor=fff" alt="MIT License"></a>
 </p>
 
 ---
 
-## Our Mission
+## What is SudoDeck?
 
-Affordable tech for everyone. If you can dream it, you can build it.
+SudoDeck is a **Bluetooth macro keyboard** built on a CYD (Cheap Yellow Display — ESP32 + ILI9341 touchscreen). It appears as a standard Bluetooth keyboard on any PC, Mac, or phone. No drivers, no daemons, no downloads. Just pair and press.
 
-SudoDeck is proof that great tools don't need to cost hundreds of dollars. A cheap yellow display, some open-source code, and you've got a fully customizable wireless macro deck that works on any computer.
-
----
-
-## What Is It
-
-SudoDeck is a Bluetooth macro keyboard built on a CYD (Cheap Yellow Display — ESP32 + ILI9341 touchscreen). It appears as a standard Bluetooth keyboard on any PC, Mac, or phone. No drivers, no scripts, no downloads.
-
-- **Zero host setup** — pair once via Bluetooth, works forever
+- **Zero host setup** — pair once, works forever
 - **Fully configurable** — edit buttons, labels, colors, actions from your browser
-- **Self-contained** — all config lives on the device's flash memory. Unplug it, take it anywhere
-- **Open source** — MIT licensed. Modify it, remix it, build your own
+- **Self-contained** — all config lives on the device's flash
+- **Open source** — MIT licensed. Fork it, build your own
 
----
+## Quick Start
+
+| Step | What to do |
+|------|------------|
+| **1** | Buy a CYD (ESP32-2432S028R) — ~$10 on AliExpress |
+| **2** | [Flash the firmware](#building-the-firmware) to the device |
+| **3** | Open the [Web Config](https://sudobreakstuff.github.io/sudodeck) in Chrome/Edge |
+| **4** | Connect via Web Serial and configure your layout |
+| **5** | Pair "SudoDeck" in your Bluetooth settings |
+| **6** | Press buttons — they send keystrokes over BLE |
+
+## Features
+
+- **BLE HID** — your computer sees a real keyboard. Instant, reliable, zero software
+- **Multi-page grid** — up to 12 pages, 30 buttons per page
+- **Action types** — single keys, key combos (CTRL+C, ALT+TAB), text strings, macro sequences, app launcher
+- **App Launcher** — select OS (Windows/macOS/Linux), type app display name, press button — device opens OS search and launches the app (~250ms)
+- **Macro Steps** — build multi-step macros with combo, text, and delay steps
+- **7 screensaver modes** — Matrix Rain, Particles, Stars, Bouncing Image, F1 Standings, Football Scores, Custom Widgets
+- **Custom live widgets** — define JSON API endpoints with dot-notation path extraction and display format
+- **WiFi screensavers** — live F1 standings, football scores, weather, or any custom API
+- **Web Serial config** — no software install, configure from any browser
+- **Config persists on device** — unplug and go, your layout follows
 
 ## How It Works
 
 ```
-    ┌──────────────┐     Bluetooth (BLE HID)     ┌──────────────┐
-    │   CYD/ESP32  │ ──────────────────────────► │   ANY PC     │
-    │   SudoDeck    │     keystrokes, no drivers   │              │
-    │              │                              │              │
-    │              │◄──── USB serial ───────────── │              │
-    └──────────────┘     (config only)            └──────────────┘
-                                                    │
-                                                    ▼
-                                              ┌──────────────┐
-                                              │  sudobreakstuff │
-                                              │  .github.io    │
-                                              │  /sudodeck     │
-                                              │  (config site) │
-                                              └──────────────┘
+┌──────────────┐     Bluetooth (BLE HID)     ┌──────────────┐
+│   CYD/ESP32  │ ──────────────────────────► │   ANY PC     │
+│   SudoDeck    │     keystrokes, no drivers   │              │
+│              │                              │              │
+│              │◄──── USB serial ───────────── │              │
+└──────────────┘     (config only)            └──────────────┘
 ```
 
 1. **Plug in** CYD via USB for power
-2. **Pair** "SudoDeck" in your Bluetooth settings (one time, 5 seconds)
-3. **Push buttons** — they send keystrokes over Bluetooth
-4. **To customize** — open the config website, connect via Web Serial, edit anything
-
----
+2. **Pair** "SudoDeck" in your Bluetooth settings (one time)
+3. **Push buttons** — they send keystrokes over BLE
+4. **To customize** — open the [config website](https://sudobreakstuff.github.io/sudodeck), connect via Web Serial, edit anything
 
 ## Hardware
 
-- **CYD** — ESP32-2432S028 (Cheap Yellow Display) — ~$10 on AliExpress
-- **Screen** — 320x240 ILI9341 TFT with XPT2046 touch
-- **Connectivity** — built-in ESP32 Bluetooth + CH340 USB serial
-- **Storage** — 4MB flash (config stored in SPIFFS)
-
----
+- **CYD** — ESP32-2432S028R (Cheap Yellow Display) — ~$10 on AliExpress
+- **Screen** — 320×240 ILI9341 TFT with XPT2046 touch
+- **Connectivity** — ESP32 Bluetooth + CH340 USB serial
+- **Storage** — 4MB flash (config in SPIFFS)
 
 ## Project Structure
 
@@ -83,92 +79,68 @@ SudoDeck is a Bluetooth macro keyboard built on a CYD (Cheap Yellow Display — 
 sudodeck/
 ├── firmware/
 │   ├── firmware.ino        # ESP32 firmware (Arduino)
-│   ├── data/
-│   │   └── config.json     # default button layout for SPIFFS
-├── docs/
-│   ├── index.html          # GitHub Pages config website
+│   └── lv_conf.h           # LVGL config (unused, placeholder)
+├── docs/                   # GitHub Pages site
+│   ├── index.html          # Web config tool + landing page
 │   └── assets/
-│       └── logo.svg        # SudoDeck snake logo
-├── web/
-│   └── index.html          # same as docs/ for local dev
-├── assets/
-│   └── logo.svg            # snake logo source
-├── README.md               # this file
+│       ├── logo.svg        # SudoDeck snake logo
+│       └── firmware/       # Pre-built firmware binaries + manifest
+│           └── manifest.json
+├── README.md               # This file
 └── LICENSE
 ```
-
----
 
 ## Building the Firmware
 
 ### Requirements
 
-- [Arduino CLI](https://arduino.github.io/arduino-cli/) or Arduino IDE
-- ESP32 board package (`arduino-cli core install esp32:esp32`)
+- [Arduino CLI](https://arduino.github.io/arduino-cli/)
+- ESP32 board package: `arduino-cli core install esp32:esp32`
 - Libraries:
-  - **TFT_eSPI** (`arduino-cli lib install "TFT_eSPI"`)
-  - **XPT2046_Touchscreen** (`arduino-cli lib install "XPT2046 Touchscreen"`)
-  - **HijelHID_BLEKeyboard** (`arduino-cli lib install HijelHID_BLEKeyboard`)
-  - **NimBLE-Arduino** (installed as dependency)
-  - **ArduinoJson** (`arduino-cli lib install ArduinoJson`)
+  - `arduino-cli lib install "TFT_eSPI"`
+  - `arduino-cli lib install "XPT2046 Touchscreen"`
+  - `arduino-cli lib install HijelHID_BLEKeyboard`
+  - `arduino-cli lib install ArduinoJson`
 
-### Compile & Flash
+### Compile
 
 ```bash
 cd sudodeck/firmware
-
-# Compile for CYD
-arduino-cli compile --fqbn esp32:esp32:jczn_2432s028r firmware.ino
-
-# Upload to CYD (adjust port as needed)
-arduino-cli upload -p /dev/ttyUSB1 \
-  --fqbn esp32:esp32:jczn_2432s028r \
-  --input-dir /tmp/fw
+arduino-cli compile \
+  --fqbn esp32:esp32:jczn_2432s028r:PartitionScheme=no_ota \
+  --build-path build \
+  firmware.ino
 ```
 
-> **Note**: The firmware includes a built-in fallback config. Even without SPIFFS data uploaded, the CYD boots with a usable 3-page layout. Use the website to customize.
+The `no_ota` partition scheme gives 2MB for the app (required for v2.0.0+).
 
----
+### Flash via esptool
 
-## Configuring Buttons
+```bash
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 \
+  write-flash -z 0x0 build/firmware.ino.merged.bin
+```
 
-1. Open **https://sudobreakstuff.github.io/sudodeck** in Chrome/Edge
-2. Click **Connect CYD** — pick the CH340 serial device
-3. Click **Read from CYD** to load current config
-4. Edit buttons: label, color, action type, action value
-5. Click **Write to CYD** — the device refreshes instantly
+Put the CYD in flash mode: hold BOOT, tap RESET, release BOOT.
 
-### Action Types
+### Flash via Web (browser)
 
-| Type | Description | Example |
-|---|---|---|
-| `key` | Single keystroke | `ENTER`, `F5`, `MEDIA_VOLUME_UP`, `a` |
-| `combo` | Modifier + key | `CTRL+C`, `ALT+F4`, `SHIFT+TAB` |
-| `text` | Type a string | `hello@world.com` |
-| `macro` | Sequence of actions | Open terminal, type command, press enter |
-| `delay` | Wait within a macro | `500` ms |
+Open the [config website](https://sudobreakstuff.github.io/sudodeck), scroll to the Firmware section, connect via Web Serial, select a version, and click Flash.
 
-### Modifiers
+## Default Layout
 
-`CTRL`, `ALT`, `SHIFT`, `CTRL_SHIFT`, `CTRL_ALT`, `ALT_SHIFT`, `CTRL_ALT_SHIFT`
+The firmware includes a built-in fallback config with 3 pages:
 
-### Supported Keys
-
-All standard keyboard keys (A-Z, 0-9, F1-F24, ENTER, ESC, TAB, HOME, END, PgUp, PgDn, arrows, DEL, INS, etc.)
-
-Media keys: `MEDIA_VOLUME_UP`, `MEDIA_VOLUME_DOWN`, `MEDIA_MUTE`, `MEDIA_PLAY_PAUSE`, `MEDIA_NEXT_TRACK`, `MEDIA_PREV_TRACK`, `BRIGHTNESS_UP`, `BRIGHTNESS_DOWN`
-
----
+| Page | Buttons |
+|------|---------|
+| **Main** | Copy, Paste, Cut, Undo, Save, Find, Select All, Tab, Enter, Esc, Vol+, Vol- |
+| **Media** | Play, Next, Prev, Mute, Br+, Br-, Home, End, PgUp, PgDn, Screenshot, Lock |
+| **Studio** | Split, Undo, Redo, Snip, FullScr, Timeline, Render, New Project, Export, Import, Delete/Replace, Add Text |
 
 ## License
 
 MIT — do whatever you want. Build cool stuff. Help people.
 
----
+## Built By
 
-## Credits
-
-- **Shahid Singh** — concept, hardware, firmware, website
-- **NimBLE** — Bluetooth Low Energy stack for ESP32
-- **ArduinoJson** — JSON for embedded systems
-- The open source community — stand on the shoulders of giants
+**Shahid Singh** — [GitHub](https://github.com/sudobreakstuff)
