@@ -63,7 +63,7 @@ Newcastle, KZN — arrange via email.
 SudoDeck is a **Bluetooth macro keyboard** built on a CYD (ESP32 + ILI9341 touchscreen). It appears as a standard Bluetooth keyboard on any PC, Mac, or phone. No drivers, no daemons, no downloads. Just pair and press.
 
 - **Zero host setup** — pair once, works forever
-- **Fully configurable** — edit buttons, labels, colors, actions from your browser
+- **Fully configurable** — edit buttons, labels, colors, actions from your browser; export/import JSON configs
 - **Self-contained** — all config lives on the device's flash
 - **Open source** — MIT licensed. Fork it, build your own
 
@@ -107,8 +107,10 @@ If you already have a CYD and want to build your own:
 - **Custom live widgets** — define JSON API endpoints with dot-notation path extraction and display format
 - **WiFi screensavers** — live F1 standings, weather, or any custom API
 - **Web Serial config** — no software install, configure from any browser
+- **Export/Import JSON** — save your layout as a JSON file, share with others, restore backups
 - **Config persists on device** — unplug and go, your layout follows
 - **Web flasher** — update firmware directly from the browser on the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html), no tools needed
+- **Shareable configs** — export your layout as JSON, share with others, import on any device
 
 ## Documentation
 
@@ -116,7 +118,7 @@ If you already have a CYD and want to build your own:
 
 1. **Power on** — plug the USB-C cable into any USB port or 5V phone charger
 2. **Pair Bluetooth** — open Bluetooth settings on your PC/Mac/phone, look for "SudoDeck" and pair
-3. **Customise** — open the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html) in Chrome/Edge, click Connect, select the serial port, edit your layout, click Write
+3. **Customise** — open the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html) in Chrome/Edge, click Connect, select the serial port, edit your layout, click Write. Export layouts as JSON to share or back up.
 4. **Use it** — press any button to fire your macro. Swipe between pages. The screensaver activates after inactivity
 5. **Firmware updates** — visit the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html), connect in flash mode (hold BOOT + tap RESET), select latest version, click Flash
 
