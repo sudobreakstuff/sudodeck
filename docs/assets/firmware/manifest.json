@@ -5,10 +5,15 @@
       "label": "SudoDeck v2.1.3",
       "file": "sudodeck-2.1.3.bin",
       "address": "0",
-      "notes": "Display sleep: screen turns off after inactivity to reduce heat (configurable sleep timeout). New logo."
+      "notes": "Display sleep + new PNG logo on boot splash"
     },
     {
       "version": "2.1.2",
+      "label": "SudoDeck v2.1.2",
+      "file": "sudodeck-2.1.2.bin",
+      "address": "0",
+      "notes": "Removed button icon support (to revisit later). Switched to no_ota partition scheme (69% flash)."
+    },
     {
       "version": "2.1.1",
       "label": "SudoDeck v2.1.1",

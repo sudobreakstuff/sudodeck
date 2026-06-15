@@ -6,6 +6,7 @@
 #include <HijelHID_BLEKeyboard.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include "logo_img.h"
 
 #define XP_IRQ 36
 #define XP_MOSI 32
@@ -922,20 +923,8 @@ void draw_splash() {
   tft.fillRect(0, 0, SCR_W, 4, C_ACC);
   tft.fillRect(0, SCR_H - 4, SCR_W, 4, C_ACC);
 
-  // Snake logo — smooth S-curve body
-  int cx = 160, cy = 42;
-  for (int i = 0; i < 8; i++) {
-    float t = (float)i / 7.0 * 2.0 * PI;
-    int x = cx + (int)(42.0 * sin(t));
-    int y = cy + i * 11;
-    int r = 10 - i;
-    if (r < 3) r = 3;
-    tft.fillCircle(x, y, r, C_ACC);
-  }
-  // Snake head
-  tft.fillCircle(cx, cy, 14, C_TXT);
-  tft.fillCircle(cx + 10, cy - 5, 4, C_BG);
-  tft.fillCircle(cx + 10, cy + 5, 4, C_BG);
+  // Logo — from transparent PNG
+  tft.pushImage((SCR_W - LOGO_W) / 2, 15, LOGO_W, LOGO_H, logo_img);
 
   // SUDODECK title
   tft.setTextColor(C_TXT, C_BG);
