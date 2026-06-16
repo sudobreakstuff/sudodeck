@@ -303,9 +303,8 @@ void apply_theme() {
   else if (!strcmp(t,"monochrome")) { c_bg=0x10A2; c_hdr=0x2124; c_acc=0xBDF7; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x2124; }
   else if (!strcmp(t,"ocean")) { c_bg=0x0000; c_hdr=0x0210; c_acc=0x07EF; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x0880; }
   else { c_bg=0x0000; c_hdr=0x0862; c_acc=0x07F1; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1107; }
-  if (!strcmp(s,"glassy")) button_style=1;
-  else if (!strcmp(s,"outlined")) button_style=2;
-  else if (!strcmp(s,"neon")) button_style=3;
+  if (!strcmp(s,"outlined")) button_style=1;
+  else if (!strcmp(s,"neon")) button_style=2;
   else button_style=0;
 }
 void apply_cfg() {
@@ -1043,20 +1042,16 @@ void draw_grid() {
       bg = hex_col(btns[i]["color"] | "#16213E");
       label = btns[i]["label"] | "";
     }
-    if (button_style == 1) { // glassy
-      tft.fillRoundRect(x, y, bw, bh, 6, bg);
-      uint16_t hl = tft.alphaBlend(120, bg, 0xFFFF);
-      tft.fillRoundRect(x + 3, y + 2, bw - 6, bh / 3, 4, hl);
-    } else if (button_style == 2) { // outlined
+    if (button_style == 1) { // outlined
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
-    } else if (button_style == 3) { // neon
+    } else if (button_style == 2) { // neon
       tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     } else { // flat
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     }
     if (label[0]) {
-      uint16_t txt_bg = (button_style == 2) ? c_bg : bg;
+      uint16_t txt_bg = (button_style == 1) ? c_bg : bg;
       tft.setTextColor(c_txt, txt_bg);
       int max_lw = bw - 4;
       int lw = tft.textWidth(label);
@@ -1411,13 +1406,9 @@ void handle_touch(int tx, int ty) {
       uint16_t hl = tft.alphaBlend(255, bg, 0xFFFF);
       tft.fillRoundRect(x, y, bw, bh, 6, hl);
       delay(60);
-    if (button_style == 1) { // glassy
-      tft.fillRoundRect(x, y, bw, bh, 6, bg);
-      uint16_t hl = tft.alphaBlend(120, bg, 0xFFFF);
-      tft.fillRoundRect(x + 3, y + 2, bw - 6, bh / 3, 4, hl);
-    } else if (button_style == 2) { // outlined
+    if (button_style == 1) { // outlined
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
-    } else if (button_style == 3) { // neon
+    } else if (button_style == 2) { // neon
       tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     } else { // flat
