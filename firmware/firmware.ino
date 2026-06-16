@@ -295,7 +295,7 @@ void apply_cfg() {
   rows = constrain(config["grid"]["rows"]|3, 1, 5);
   num_pages = config["pages"].size();
   if (num_pages < 1) num_pages = 1;
-  if (num_pages > 30) num_pages = 30;
+  if (num_pages > 18) num_pages = 18;
   total_btns = cols * rows;
   if (page >= num_pages) page = 0;
   if (config["saver"].is<JsonObject>()) {

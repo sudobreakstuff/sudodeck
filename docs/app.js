@@ -188,7 +188,7 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 document.getElementById('bal').addEventListener('click', function() {
   var c=Math.max(1,Math.min(6,parseInt(document.getElementById('lc').value)||4));
   var r=Math.max(1,Math.min(5,parseInt(document.getElementById('lr').value)||3));
-  var pc=Math.max(1,Math.min(30,parseInt(document.getElementById('lp').value)||1));
+  var pc=Math.max(1,Math.min(18,parseInt(document.getElementById('lp').value)||1));
   cd.grid.cols=c; cd.grid.rows=r; var tb=c*r;
   while(cd.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); cd.pages.push({name:'Page '+(cd.pages.length+1),buttons:bt}); }
   while(cd.pages.length>pc) cd.pages.pop();
