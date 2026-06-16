@@ -22,12 +22,10 @@
 #define GRID_Y HEAD_H
 #define GRID_H (SCR_H - HEAD_H - BOT_H)
 
-#define C_BG     TFT_BLACK
-#define C_HDR    0x0862
-#define C_ACC    0x07F1
-#define C_TXT    TFT_WHITE
-#define C_DIM    0x632C
-#define C_BTN_BG 0x1107
+// theme state
+uint16_t c_bg=0x0000, c_hdr=0x0862, c_acc=0x07F1;
+uint16_t c_txt=0xFFFF, c_dim=0x632C, c_btn_bg=0x1107;
+int button_style = 0; // 0=flat 1=glassy 2=outlined 3=neon
 
 TFT_eSPI tft = TFT_eSPI();
 SPIClass tspi(VSPI);
@@ -230,6 +228,7 @@ void gen_default() {
   config["wifi"]["ssid"]=""; config["wifi"]["password"]="";
   config["saver"]["timeout"]=DEFAULT_TIMEOUT; config["saver"]["sleep"]=DEFAULT_SLEEP; config["saver"]["mode"]=SAVER_MATRIX;
   config["widgets"]=JsonArray();
+  config["theme"]["name"]="default"; config["theme"]["button_style"]="flat";
   JsonArray pg = config["pages"].to<JsonArray>();
 
   JsonObject p1 = pg.add<JsonObject>(); p1["name"]="Main";
@@ -290,7 +289,27 @@ void save_cfg() {
   fs::File f = SPIFFS.open("/config.json","w");
   if (f) { serializeJson(config, f); f.close(); }
 }
+void apply_theme() {
+  if (!config["theme"].is<JsonObject>()) { 
+    c_bg=0x0000; c_hdr=0x0862; c_acc=0x07F1; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1107;
+    button_style=0; return;
+  }
+  const char* t = config["theme"]["name"]|"default";
+  const char* s = config["theme"]["button_style"]|"flat";
+  if (!strcmp(t,"midnight")) { c_bg=0x0000; c_hdr=0x0015; c_acc=0xA17C; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1008; }
+  else if (!strcmp(t,"forest")) { c_bg=0x0000; c_hdr=0x0200; c_acc=0x07E0; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x0A00; }
+  else if (!strcmp(t,"amber")) { c_bg=0x0000; c_hdr=0x2000; c_acc=0xFDC0; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x2000; }
+  else if (!strcmp(t,"cyberpunk")) { c_bg=0x0000; c_hdr=0x2008; c_acc=0xF811; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1808; }
+  else if (!strcmp(t,"monochrome")) { c_bg=0x10A2; c_hdr=0x2124; c_acc=0xBDF7; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x2124; }
+  else if (!strcmp(t,"ocean")) { c_bg=0x0000; c_hdr=0x0210; c_acc=0x07EF; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x0880; }
+  else { c_bg=0x0000; c_hdr=0x0862; c_acc=0x07F1; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1107; }
+  if (!strcmp(s,"glassy")) button_style=1;
+  else if (!strcmp(s,"outlined")) button_style=2;
+  else if (!strcmp(s,"neon")) button_style=3;
+  else button_style=0;
+}
 void apply_cfg() {
+  apply_theme();
   cols = constrain(config["grid"]["cols"]|4, 1, 6);
   rows = constrain(config["grid"]["rows"]|3, 1, 5);
   num_pages = config["pages"].size();
@@ -381,7 +400,7 @@ void fetch_widget_data() {
 }
 
 uint16_t team_color(const char* name) {
-  if (!name || !name[0]) return C_ACC;
+  if (!name || !name[0]) return c_acc;
   if (!strcmp(name, "Mercedes")) return 0x07B6;
   if (!strcmp(name, "Ferrari")) return 0xF800;
   if (!strcmp(name, "McLaren")) return 0xFD20;
@@ -393,18 +412,18 @@ uint16_t team_color(const char* name) {
   if (!strcmp(name, "Audi")) return 0xF001;
   if (!strcmp(name, "Cadillac F1 Team")) return 0x7B6D;
   if (!strcmp(name, "Aston Martin")) return 0x0362;
-  return C_ACC;
+  return c_acc;
 }
 
 void draw_widget_f1_standings() {
-  tft.fillScreen(C_BG);
-  tft.setTextColor(C_ACC, C_BG);
+  tft.fillScreen(c_bg);
+  tft.setTextColor(c_acc, c_bg);
   tft.setTextSize(2);
   tft.setCursor(10, 4);
   tft.print("F1 STANDINGS");
-  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  tft.drawLine(0, 24, SCR_W, 24, c_acc);
   if (widget_cache.length() == 0) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setTextSize(1);
     tft.setCursor(10, 40);
     if (wifi_ssid.length() == 0) tft.print("no wifi configured");
@@ -416,7 +435,7 @@ void draw_widget_f1_standings() {
   JsonDocument doc;
   DeserializationError err = deserializeJson(doc, widget_cache);
   if (err) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setCursor(10, 40);
     tft.print("parse error");
     return;
@@ -437,20 +456,20 @@ void draw_widget_f1_standings() {
     if (n == 0) pc = 0xFD20;
     else if (n == 1) pc = 0xC618;
     else if (n == 2) pc = 0xCB40;
-    else pc = C_TXT;
-    tft.setTextColor(pc, C_BG);
+    else pc = c_txt;
+    tft.setTextColor(pc, c_bg);
     tft.setCursor(14, y);
     tft.print(pos);
-    tft.setTextColor(C_TXT, C_BG);
+    tft.setTextColor(c_txt, c_bg);
     tft.print(" ");
     tft.print(code);
     tft.print("  ");
     tft.print(pts);
     tft.print("  ");
-    tft.setTextColor(tc, C_BG);
+    tft.setTextColor(tc, c_bg);
     tft.print(team);
     if (strcmp(wins, "0") != 0 && wins[0] != 0) {
-      tft.setTextColor(C_DIM, C_BG);
+      tft.setTextColor(c_dim, c_bg);
       tft.print(" ");
       tft.print(wins);
       tft.print("W");
@@ -462,14 +481,14 @@ void draw_widget_f1_standings() {
 }
 
 void draw_widget_f1_nextrace() {
-  tft.fillScreen(C_BG);
-  tft.setTextColor(C_ACC, C_BG);
+  tft.fillScreen(c_bg);
+  tft.setTextColor(c_acc, c_bg);
   tft.setTextSize(2);
   tft.setCursor(10, 4);
   tft.print("NEXT RACE");
-  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  tft.drawLine(0, 24, SCR_W, 24, c_acc);
   if (f1_race_cache.length() == 0) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setTextSize(1);
     tft.setCursor(10, 40);
     if (widget_fetching) tft.print("loading...");
@@ -480,7 +499,7 @@ void draw_widget_f1_nextrace() {
   JsonDocument doc;
   DeserializationError err = deserializeJson(doc, f1_race_cache);
   if (err) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setCursor(10, 40);
     tft.print("parse error");
     return;
@@ -495,19 +514,19 @@ void draw_widget_f1_nextrace() {
   char buf[48];
   int y = 32;
 
-  tft.setTextColor(C_TXT, C_BG);
+  tft.setTextColor(c_txt, c_bg);
   tft.setCursor(10, y);
   tft.print(name);
   y += 18;
 
-  tft.setTextColor(C_DIM, C_BG);
+  tft.setTextColor(c_dim, c_bg);
   tft.setCursor(10, y);
   tft.print(circuit);
   y += 18;
 
   if (strlen(locality) > 0 && strlen(country) > 0) {
-    tft.setTextColor(C_ACC, C_BG);
-    tft.fillRect(4, y + 3, 4, 4, C_ACC);
+    tft.setTextColor(c_acc, c_bg);
+    tft.fillRect(4, y + 3, 4, 4, c_acc);
     snprintf(buf, sizeof(buf), " %s, %s", locality, country);
     tft.setCursor(12, y);
     tft.print(buf);
@@ -519,7 +538,7 @@ void draw_widget_f1_nextrace() {
     sscanf(raceDate, "%d-%d-%d", &yr, &mo, &dy);
     if (mo >= 1 && mo <= 12) {
       snprintf(buf, sizeof(buf), "%s %d, %d", months[mo-1], dy, yr);
-      tft.setTextColor(C_TXT, C_BG);
+      tft.setTextColor(c_txt, c_bg);
       tft.setCursor(10, y);
       tft.print(buf);
       y += 18;
@@ -534,7 +553,7 @@ void draw_widget_f1_nextrace() {
     sscanf(qTime, "%d:%d", &hr, &mn);
     if (mo >= 1 && mo <= 12) {
       snprintf(buf, sizeof(buf), "Quali %s %d %02d:%02d", months[mo-1], dy, hr, mn);
-      tft.setTextColor(C_DIM, C_BG);
+      tft.setTextColor(c_dim, c_bg);
       tft.setCursor(10, y);
       tft.print(buf);
       y += 18;
@@ -547,8 +566,8 @@ void draw_widget_f1_nextrace() {
     sscanf(raceDate, "%d-%d-%d", &yr, &mo, &dy);
     sscanf(rTime, "%d:%d", &hr, &mn);
     if (mo >= 1 && mo <= 12) {
-      tft.setTextColor(C_ACC, C_BG);
-      tft.fillRect(4, y + 3, 4, 4, C_ACC);
+      tft.setTextColor(c_acc, c_bg);
+      tft.fillRect(4, y + 3, 4, 4, c_acc);
       snprintf(buf, sizeof(buf), " Race %s %d %02d:%02d", months[mo-1], dy, hr, mn);
       tft.setCursor(12, y);
       tft.print(buf);
@@ -559,14 +578,14 @@ void draw_widget_f1_nextrace() {
 }
 
 void draw_widget_f1_constructors() {
-  tft.fillScreen(C_BG);
-  tft.setTextColor(C_ACC, C_BG);
+  tft.fillScreen(c_bg);
+  tft.setTextColor(c_acc, c_bg);
   tft.setTextSize(2);
   tft.setCursor(10, 4);
   tft.print("CONSTRUCTORS");
-  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  tft.drawLine(0, 24, SCR_W, 24, c_acc);
   if (f1_constructor_cache.length() == 0) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setTextSize(1);
     tft.setCursor(10, 40);
     if (widget_fetching) tft.print("loading...");
@@ -577,7 +596,7 @@ void draw_widget_f1_constructors() {
   JsonDocument doc;
   DeserializationError err = deserializeJson(doc, f1_constructor_cache);
   if (err) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setCursor(10, 40);
     tft.print("parse error");
     return;
@@ -597,19 +616,19 @@ void draw_widget_f1_constructors() {
     if (n == 0) pc = 0xFD20;
     else if (n == 1) pc = 0xC618;
     else if (n == 2) pc = 0xCB40;
-    else pc = C_TXT;
-    tft.setTextColor(pc, C_BG);
+    else pc = c_txt;
+    tft.setTextColor(pc, c_bg);
     tft.setCursor(14, y);
     tft.print(pos);
-    tft.setTextColor(C_TXT, C_BG);
+    tft.setTextColor(c_txt, c_bg);
     tft.print("  ");
-    tft.setTextColor(tc, C_BG);
+    tft.setTextColor(tc, c_bg);
     tft.print(team);
-    tft.setTextColor(C_TXT, C_BG);
+    tft.setTextColor(c_txt, c_bg);
     tft.print("  ");
     tft.print(pts);
     if (strcmp(wins, "0") != 0 && wins[0] != 0) {
-      tft.setTextColor(C_DIM, C_BG);
+      tft.setTextColor(c_dim, c_bg);
       tft.print(" ");
       tft.print(wins);
       tft.print("W");
@@ -625,7 +644,7 @@ void draw_widget_f1() {
   else if (f1_page == 1) draw_widget_f1_standings();
   else draw_widget_f1_constructors();
   for (int i = 0; i < 3; i++) {
-    tft.fillCircle(SCR_W - 24 + i * 8, 12, 3, f1_page == i ? C_ACC : C_DIM);
+    tft.fillCircle(SCR_W - 24 + i * 8, 12, 3, f1_page == i ? c_acc : c_dim);
   }
   f1_page = (f1_page + 1) % 3;
 }
@@ -671,14 +690,14 @@ void fetch_custom_widget(int idx) {
 }
 
 void draw_widget_custom() {
-  tft.fillScreen(C_BG);
-  tft.setTextColor(C_ACC, C_BG);
+  tft.fillScreen(c_bg);
+  tft.setTextColor(c_acc, c_bg);
   tft.setTextSize(2);
   tft.setCursor(10, 4);
   tft.print("CUSTOM");
-  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  tft.drawLine(0, 24, SCR_W, 24, c_acc);
   if (cwidget_count == 0) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setTextSize(1);
     tft.setCursor(10, 40);
     tft.print("no widgets configured");
@@ -687,26 +706,26 @@ void draw_widget_custom() {
   CustomWidget& w = cwidgets[cwidget_idx];
   int nd = cwidget_count < 8 ? cwidget_count : 8;
   for (int i = 0; i < nd; i++) {
-    tft.fillCircle(SCR_W - 24 + i * 8, 12, 3, i == cwidget_idx ? C_ACC : C_DIM);
+    tft.fillCircle(SCR_W - 24 + i * 8, 12, 3, i == cwidget_idx ? c_acc : c_dim);
   }
   if (w.label.length() > 0) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setTextSize(1);
     tft.setCursor(10, 32);
     tft.print(w.label);
   }
-  tft.setTextColor(C_TXT, C_BG);
+  tft.setTextColor(c_txt, c_bg);
   tft.setTextSize(2);
   tft.setCursor(10, 52);
   if (w.cache.length() == 0 && w.url.length() > 0) {
     tft.setTextSize(1);
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.print("loading...");
     return;
   }
   if (w.cache.length() == 0) {
     tft.setTextSize(1);
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.print("no data");
     return;
   }
@@ -714,7 +733,7 @@ void draw_widget_custom() {
   DeserializationError de = deserializeJson(pd, w.cache);
   if (de) {
     tft.setTextSize(1);
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.print("parse error");
     return;
   }
@@ -735,14 +754,14 @@ void draw_widget_custom() {
 }
 
 void draw_widget_football() {
-  tft.fillScreen(C_BG);
-  tft.setTextColor(C_ACC, C_BG);
+  tft.fillScreen(c_bg);
+  tft.setTextColor(c_acc, c_bg);
   tft.setTextSize(2);
   tft.setCursor(10, 4);
   tft.print("FOOTBALL");
-  tft.drawLine(0, 24, SCR_W, 24, C_ACC);
+  tft.drawLine(0, 24, SCR_W, 24, c_acc);
   if (widget_cache.length() == 0) {
-    tft.setTextColor(C_DIM, C_BG);
+    tft.setTextColor(c_dim, c_bg);
     tft.setTextSize(1);
     tft.setCursor(10, 40);
     if (wifi_ssid.length() == 0) tft.print("no wifi configured");
@@ -751,7 +770,7 @@ void draw_widget_football() {
     return;
   }
   tft.setTextSize(1);
-  tft.setTextColor(C_TXT, C_BG);
+  tft.setTextColor(c_txt, c_bg);
   tft.setCursor(10, 40);
   tft.print(widget_cache.substring(0, 2000));
 }
@@ -812,6 +831,18 @@ void proc_serial(const String& l) {
     config["saver"]["mode"] = saver_mode;
     save_cfg();
     JsonDocument r; r["mode"] = m; s_ok(r);
+  }
+  else if (!strcmp(cmd,"set_theme")) {
+    if (!req["theme"].is<JsonObject>()) { s_err("bad theme"); return; }
+    JsonObject t = req["theme"];
+    const char* n = t["name"]|"default";
+    const char* s = t["button_style"]|"flat";
+    config["theme"]["name"] = n;
+    config["theme"]["button_style"] = s;
+    save_cfg();
+    apply_theme();
+    draw_all();
+    JsonDocument r; r["ok"]=true; s_ok(r);
   }
   else if (!strcmp(cmd,"set_saver")) {
     int t = req["timeout"]|DEFAULT_TIMEOUT;
@@ -908,7 +939,7 @@ void proc_serial(const String& l) {
 }
 
 uint16_t hex_col(const char* s) {
-  if (!s || strlen(s) < 6) return C_BTN_BG;
+  if (!s || strlen(s) < 6) return c_btn_bg;
   long v = strtol(s+1, nullptr, 16);
   uint8_t r = (v >> 16) & 0xFF;
   uint8_t g = (v >> 8) & 0xFF;
@@ -917,45 +948,45 @@ uint16_t hex_col(const char* s) {
 }
 
 void draw_splash() {
-  tft.fillScreen(C_BG);
+  tft.fillScreen(c_bg);
 
   // Top / bottom accent stripes
-  tft.fillRect(0, 0, SCR_W, 4, C_ACC);
-  tft.fillRect(0, SCR_H - 4, SCR_W, 4, C_ACC);
+  tft.fillRect(0, 0, SCR_W, 4, c_acc);
+  tft.fillRect(0, SCR_H - 4, SCR_W, 4, c_acc);
 
   // Logo — from transparent PNG
   tft.pushImage((SCR_W - LOGO_W) / 2, 15, LOGO_W, LOGO_H, logo_img);
 
   // SUDODECK title
-  tft.setTextColor(C_TXT, C_BG);
+  tft.setTextColor(c_txt, c_bg);
   tft.setTextSize(2);
   int tw = tft.textWidth("SUDODECK");
   tft.setCursor((SCR_W - tw) / 2, 130);
   tft.print("SUDODECK");
 
   // Divider
-  tft.drawLine(60, 158, 260, 158, C_ACC);
+  tft.drawLine(60, 158, 260, 158, c_acc);
 
   // Tagline
   tft.setTextSize(1);
-  tft.setTextColor(C_DIM, C_BG);
+  tft.setTextColor(c_dim, c_bg);
   int tw2 = tft.textWidth("cheap. open. yours.");
   tft.setCursor((SCR_W - tw2) / 2, 170);
   tft.print("cheap. open. yours.");
 
   // Author
-  tft.setTextColor(0x6B6D, C_BG);
+  tft.setTextColor(0x6B6D, c_bg);
   int tw3 = tft.textWidth("built by shahid singh");
   tft.setCursor((SCR_W - tw3) / 2, 186);
   tft.print("built by shahid singh");
 
   // Progress bar outline
-  tft.drawRoundRect(60, 208, 200, 10, 5, C_DIM);
+  tft.drawRoundRect(60, 208, 200, 10, 5, c_dim);
 }
 
 void draw_header() {
-  tft.fillRect(0, 0, SCR_W, HEAD_H, C_HDR);
-  tft.setTextColor(C_ACC, C_HDR);
+  tft.fillRect(0, 0, SCR_W, HEAD_H, c_hdr);
+  tft.setTextColor(c_acc, c_hdr);
   tft.setCursor(4, 4);
   if (ble_ready && ble.isConnected())
     tft.print("SudoDeck | BLE: ON");
@@ -968,22 +999,22 @@ void draw_header() {
     if (WiFi.isConnected())
       tft.print(" | W:ON");
     else if (wifi_connecting) {
-      tft.setTextColor(C_DIM, C_HDR);
+      tft.setTextColor(c_dim, c_hdr);
       tft.print(" | W: ");
       // show SSID if short enough
       int flen = tft.textWidth(wifi_ssid.c_str());
       if (flen < 100) tft.print(wifi_ssid);
       else { tft.print(wifi_ssid.substring(0, 12)); tft.print(".."); }
-      tft.setTextColor(C_ACC, C_HDR);
+      tft.setTextColor(c_acc, c_hdr);
     } else {
-      tft.setTextColor(TFT_RED, C_HDR);
+      tft.setTextColor(TFT_RED, c_hdr);
       tft.print(" | W:OFF");
       if (wifi_last_status >= 0) { tft.print(" "); tft.print(wifi_status_str(wifi_last_status)); }
       if (wifi_last_reason > 0 && wifi_last_status == WL_CONNECT_FAILED) {
-        tft.setTextColor(C_DIM, C_HDR);
+        tft.setTextColor(c_dim, c_hdr);
         tft.print(" r"); tft.print(wifi_last_reason);
       }
-      tft.setTextColor(C_ACC, C_HDR);
+      tft.setTextColor(c_acc, c_hdr);
     }
   }
 }
@@ -995,7 +1026,7 @@ void draw_grid() {
   if (bw < 44) bw = 44;
   if (bh < 34) bh = 34;
 
-  tft.fillRect(0, GRID_Y, SCR_W, GRID_H, C_BG);
+  tft.fillRect(0, GRID_Y, SCR_W, GRID_H, c_bg);
 
   JsonArray btns;
   if (num_pages > 0 && page < num_pages) btns = config["pages"][page]["buttons"];
@@ -1006,7 +1037,7 @@ void draw_grid() {
     int x = pad + col * (bw + pad);
     int y = GRID_Y + pad + r * (bh + pad);
 
-    uint16_t bg = C_BTN_BG;
+    uint16_t bg = c_btn_bg;
     const char* label = "";
     if (i < (int)btns.size()) {
       bg = hex_col(btns[i]["color"] | "#16213E");
@@ -1014,7 +1045,7 @@ void draw_grid() {
     }
     tft.fillRoundRect(x, y, bw, bh, 6, bg);
     if (label[0]) {
-      tft.setTextColor(C_TXT, bg);
+      tft.setTextColor(c_txt, bg);
       int max_lw = bw - 4;
       int lw = tft.textWidth(label);
       String dlabel = label;
@@ -1032,22 +1063,22 @@ void draw_grid() {
 }
 
 void draw_bottom() {
-  tft.fillRect(0, SCR_H - BOT_H, SCR_W, BOT_H, C_HDR);
+  tft.fillRect(0, SCR_H - BOT_H, SCR_W, BOT_H, c_hdr);
   int cy = SCR_H - BOT_H + 4;
 
   int nav_l = 4, nav_w = 32;
 
   if (num_pages > 1) {
-    tft.fillRoundRect(nav_l, cy - 2, nav_w, 18, 4, C_BTN_BG);
-    tft.setTextColor(C_TXT, C_BTN_BG);
+    tft.fillRoundRect(nav_l, cy - 2, nav_w, 18, 4, c_btn_bg);
+    tft.setTextColor(c_txt, c_btn_bg);
     tft.setCursor(nav_l + 11, cy);
     tft.print("<");
   }
 
   if (num_pages > 1) {
     int bx = SCR_W - nav_w - nav_l;
-    tft.fillRoundRect(bx, cy - 2, nav_w, 18, 4, C_BTN_BG);
-    tft.setTextColor(C_TXT, C_BTN_BG);
+    tft.fillRoundRect(bx, cy - 2, nav_w, 18, 4, c_btn_bg);
+    tft.setTextColor(c_txt, c_btn_bg);
     tft.setCursor(bx + 11, cy);
     tft.print(">");
   }
@@ -1067,12 +1098,12 @@ void draw_bottom() {
   if (name_max < 10) name_max = 10;
   if (pw > name_max) pw = name_max;
   int name_x = lx + (avail - psw - pw) / 2;
-  tft.setTextColor(C_DIM, C_HDR);
+  tft.setTextColor(c_dim, c_hdr);
   tft.setCursor(name_x, cy);
   tft.print(pname);
 
   // page counter after page name
-  tft.setTextColor(C_ACC, C_HDR);
+  tft.setTextColor(c_acc, c_hdr);
   tft.setCursor(name_x + pw + 8, cy);
   tft.print(pageStr.c_str());
 }
@@ -1223,7 +1254,7 @@ void draw_saver() {
   if (saver_mode == SAVER_PARTICLES) {
     if (now - saver_last_frame < 40) return;
     saver_last_frame = now;
-    tft.fillScreen(C_BG);
+    tft.fillScreen(c_bg);
     for (int i = 0; i < 25; i++) {
       saver_parts[i].x += saver_parts[i].vx;
       saver_parts[i].y += saver_parts[i].vy;
@@ -1243,7 +1274,7 @@ void draw_saver() {
   } else if (saver_mode == SAVER_STARS) {
     if (now - saver_last_frame < 100) return;
     saver_last_frame = now;
-    tft.fillScreen(C_BG);
+    tft.fillScreen(c_bg);
     for (int i = 0; i < 40; i++) {
       saver_stars[i].br += random(-10, 11);
       if (saver_stars[i].br < 20) saver_stars[i].br = 20;
@@ -1279,7 +1310,7 @@ void draw_saver() {
         int py = (saver_drops[i].y + j) * 10;
         if (py < -8 || py >= SCR_H) continue;
         uint16_t col;
-        if (j == saver_drops[i].len - 1) col = C_ACC;
+        if (j == saver_drops[i].len - 1) col = c_acc;
         else col = rgb565(0, 40 + j * 24, 0);
         tft.drawChar(px, py, saver_drops[i].ch[j], col, 0x0001, 1);
       }
@@ -1306,7 +1337,7 @@ void draw_saver() {
     if (saver_x > SCR_W - SAVER_W) { saver_x = SCR_W - SAVER_W; saver_vx = -saver_vx; }
     if (saver_y < 0) { saver_y = 0; saver_vy = -saver_vy; }
     if (saver_y > SCR_H - SAVER_H) { saver_y = SCR_H - SAVER_H; saver_vy = -saver_vy; }
-    tft.fillScreen(C_BG);
+    tft.fillScreen(c_bg);
     if (saver_img) {
       tft.pushImage((int)saver_x, (int)saver_y, SAVER_W, SAVER_H, saver_img);
     } else {
@@ -1315,11 +1346,11 @@ void draw_saver() {
         float t = (float)i / 6.0 * 2.0 * PI;
         int x = cx + (int)(14.0 * sin(t));
         int y = cy - 8 + i * 5;
-        tft.fillCircle(x, y, 4, C_ACC);
+        tft.fillCircle(x, y, 4, c_acc);
       }
-      tft.fillCircle(cx, cy, 7, C_TXT);
-      tft.fillCircle(cx + 4, cy - 2, 2, C_BG);
-      tft.fillCircle(cx + 4, cy + 2, 2, C_BG);
+      tft.fillCircle(cx, cy, 7, c_txt);
+      tft.fillCircle(cx + 4, cy - 2, 2, c_bg);
+      tft.fillCircle(cx + 4, cy + 2, 2, c_bg);
     }
   }
 }
@@ -1357,7 +1388,7 @@ void handle_touch(int tx, int ty) {
     int x = pad + col * (bw + pad);
     int y = GRID_Y + pad + r * (bh + pad);
     if (tx >= x && tx <= x + bw && ty >= y && ty <= y + bh) {
-      uint16_t bg = C_BTN_BG;
+      uint16_t bg = c_btn_bg;
       const char* label = "";
       JsonArray btns;
       if (num_pages > 0 && page < num_pages) btns = config["pages"][page]["buttons"];
@@ -1368,10 +1399,23 @@ void handle_touch(int tx, int ty) {
       uint16_t hl = tft.alphaBlend(255, bg, 0xFFFF);
       tft.fillRoundRect(x, y, bw, bh, 6, hl);
       delay(60);
+    if (button_style == 1) { // glassy
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
+      uint16_t hl = tft.alphaBlend(180, bg, 0xFFFF);
+      tft.fillRect(x + 3, y + 3, bw - 6, bh / 4, hl);
+      uint16_t sd = tft.alphaBlend(80, bg, 0x0000);
+      tft.fillRect(x + 3, y + bh - bh / 4 - 2, bw - 6, bh / 4, sd);
+    } else if (button_style == 2) { // outlined
+      tft.drawRoundRect(x, y, bw, bh, 6, bg);
+    } else if (button_style == 3) { // neon
+      tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    } else { // flat
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    }
       // Redraw label after flash
       if (label[0]) {
-        tft.setTextColor(C_TXT, bg);
+        tft.setTextColor(c_txt, bg);
         String dlabel = label;
         int max_lw = bw - 4;
         int lw = tft.textWidth(label);
@@ -1412,14 +1456,14 @@ void setup() {
   ts.begin(tspi);
 
   // Boot animation
-  tft.setTextColor(C_DIM, C_BG);
+  tft.setTextColor(c_dim, c_bg);
   int bx = (SCR_W - tft.textWidth("booting...")) / 2;
   for (int p = 0; p <= 100; p += 1) {
     int bw = (p * 196) / 100;
-    tft.fillRect(62, 210, 196, 6, C_BG);
-    if (bw > 3) tft.fillRoundRect(62, 210, bw, 6, 3, C_ACC);
+    tft.fillRect(62, 210, 196, 6, c_bg);
+    if (bw > 3) tft.fillRoundRect(62, 210, bw, 6, 3, c_acc);
     int nd = (p / 6) % 4;
-    tft.fillRect(bx, 224, 70, 10, C_BG);
+    tft.fillRect(bx, 224, 70, 10, c_bg);
     tft.setCursor(bx, 224);
     tft.print("booting");
     for (int d = 0; d < nd; d++) tft.print(".");
@@ -1427,8 +1471,8 @@ void setup() {
   }
 
   if (!SPIFFS.begin(true)) {
-    tft.fillScreen(C_BG);
-    tft.setTextColor(TFT_RED, C_BG);
+    tft.fillScreen(c_bg);
+    tft.setTextColor(TFT_RED, c_bg);
     tft.drawString("SPIFFS fail", 100, 110);
     while (1) delay(1000);
   }

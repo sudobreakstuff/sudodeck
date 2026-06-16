@@ -12,6 +12,7 @@ function dc() {
     name: "SudoDeck", grid: { cols: 4, rows: 3 },
     wifi: { ssid: "", password: "" },
     saver: { timeout: 30, sleep: 60, mode: 0 },
+    theme: { name: "default", button_style: "flat" },
     pages: [
       { name: "Main", buttons: [
         { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
@@ -93,7 +94,7 @@ document.getElementById('btnRead').addEventListener('click', async function() {
 document.getElementById('btnWrite').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
   if(__busy) return; __busy = true; var btn = this; btn.disabled = true;
-  syncWifi(); syncSaver(); syncWidgets();
+  syncWifi(); syncSaver(); syncWidgets(); syncTheme();
   try { var r = await sc({cmd:'set_config',config:cd}, 15000); if(r && r.error) { console.log('Write ERR:',r); var s = r.got||''; tm('CYD: '+r.error+' (len:'+r.len+') "'+s.substring(0,60)+'"', 'ng'); return; } tm('Written to CYD'); } catch(e) { console.error('Write failed:', e); tm('Write failed: '+(e.message||e), 'ng'); } finally { __busy = false; btn.disabled = false; }
 });
 document.getElementById('btnExport').addEventListener('click', function() {
@@ -196,7 +197,7 @@ document.getElementById('bal').addEventListener('click', function() {
   syncWifi(); syncSaver();
   sp=0; sb=-1; ra(); tm('Layout updated');
 });
-function ra() { rpb(); rg(); ul(); syncWidgets(); }
+function ra() { rpb(); rg(); ul(); syncWidgets(); syncThemeUI(); }
 function rpb() {
   var b = document.getElementById('pBar'); b.innerHTML = '';
   if(!cd) return;
@@ -431,8 +432,60 @@ document.getElementById('btnSaverModeSet').addEventListener('click', async funct
   try { var r = await sc({cmd:'set_saver_mode',mode:m}); if(r&&r.error) { tm('Mode error: '+r.error,'ng'); return; } cd.saver.mode=modeToInt(m); tm('Saver mode: '+m); saverSync(); } catch(e) { tm('Mode command failed','ng'); }
 });
 
+// ── Theme ──
 
-// Patch connect to also sync saver status
+var themePresets = {
+  default:    { bg:"#000000", hdr:"#084228", acc:"#00FF88", txt:"#FFFFFF", dim:"#637282", btn:"#084228" },
+  midnight:   { bg:"#000000", hdr:"#000028", acc:"#A17CFF", txt:"#FFFFFF", dim:"#637282", btn:"#100820" },
+  forest:     { bg:"#000000", hdr:"#022000", acc:"#00FF00", txt:"#FFFFFF", dim:"#637282", btn:"#0A2000" },
+  amber:      { bg:"#000000", hdr:"#200000", acc:"#FFC000", txt:"#FFFFFF", dim:"#637282", btn:"#200000" },
+  cyberpunk:  { bg:"#000000", hdr:"#200820", acc:"#FF0088", txt:"#FFFFFF", dim:"#637282", btn:"#180820" },
+  monochrome: { bg:"#101210", hdr:"#212424", acc:"#BDBFBF", txt:"#FFFFFF", dim:"#637282", btn:"#212424" },
+  ocean:      { bg:"#000000", hdr:"#022010", acc:"#00EFEF", txt:"#FFFFFF", dim:"#637282", btn:"#082000" },
+};
+
+function syncThemeUI() {
+  if(!cd) return;
+  if(!cd.theme) cd.theme = { name:"default", button_style:"flat" };
+  document.getElementById('themeName').value = cd.theme.name||'default';
+  document.getElementById('themeStyle').value = cd.theme.button_style||'flat';
+  var p = themePresets[cd.theme.name]||themePresets.default;
+  var tp = document.getElementById('themePreview');
+  tp.style.cssText = 'display:flex;gap:6px;align-items:center;padding:8px;border-radius:6px;background:'+p.bg+';';
+  tp.innerHTML =
+    '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.hdr+'"></span>'+
+    '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.acc+'"></span>'+
+    '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.txt+';border:1px solid #333"></span>'+
+    '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.dim+'"></span>'+
+    '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.btn+'"></span>'+
+    '<span style="color:'+p.txt+';font-size:0.7rem;margin-left:4px;">'+cd.theme.name+'</span>';
+  var styles = ['flat','glassy','outlined','neon'];
+  document.getElementById('themeStylePreview').innerHTML = styles.map(function(s) {
+    var sel = s === (cd.theme.button_style||'flat') ? ' style="border:2px solid var(--acc);"' : '';
+    return '<span class="ts-pill" data-style="'+s+'"'+sel+'>'+s+'</span>';
+  }).join('');
+}
+
+function syncTheme() {
+  if(!cd) return;
+  cd.theme.name = document.getElementById('themeName').value;
+  cd.theme.button_style = document.getElementById('themeStyle').value;
+}
+
+document.getElementById('themeName').addEventListener('change', function() {
+  syncTheme(); syncThemeUI();
+});
+document.getElementById('themeStyle').addEventListener('change', function() {
+  syncTheme(); syncThemeUI();
+});
+
+document.getElementById('btnThemeSet').addEventListener('click', async function() {
+  if(!dw) { tm('Connect first', 'ng'); return; }
+  syncTheme();
+  try { await sc({cmd:'set_theme', theme: cd.theme}); tm('Theme: ' + cd.theme.name + ', ' + cd.theme.button_style); } catch(e) { tm('Theme command failed','ng'); }
+});
+
+// ── Patch connect to also sync saver status ──
 (function() {
   var btn = document.getElementById('btnConnect');
   var clone = btn.cloneNode(true);
@@ -447,6 +500,11 @@ document.getElementById('btnSaverModeSet').addEventListener('click', async funct
     } catch(e) { if(e.message!=='The device has been lost.') tm('Connection failed', 'ng'); ss(false); }
   });
 })();
+
+document.getElementById('themeToggle').addEventListener('click', function() {
+  var b = document.getElementById('themeBody');
+  b.classList.toggle('open');
+});
 
 document.getElementById('widgetToggle').addEventListener('click', function() {
   var b = document.getElementById('widgetBody');

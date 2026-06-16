@@ -159,6 +159,38 @@
           </div>
         </div>
       </div>
+      <div class="saver-fold">
+        <div class="saver-hdr" id="themeToggle">
+          <span>Theme</span>
+          <span class="saver-hint" id="themeHint">default</span>
+        </div>
+        <div class="saver-body" id="themeBody">
+          <div id="themePreview"></div>
+          <div class="er">
+            <label>Theme</label>
+            <select id="themeName">
+              <option value="default">Default (green)</option>
+              <option value="midnight">Midnight (purple)</option>
+              <option value="forest">Forest (green)</option>
+              <option value="amber">Amber (orange)</option>
+              <option value="cyberpunk">Cyberpunk (pink)</option>
+              <option value="monochrome">Monochrome (grey)</option>
+              <option value="ocean">Ocean (cyan)</option>
+            </select>
+          </div>
+          <div class="er">
+            <label>Button Style</label>
+            <select id="themeStyle">
+              <option value="flat">Flat</option>
+              <option value="glassy">Glassy</option>
+              <option value="outlined">Outlined</option>
+              <option value="neon">Neon</option>
+            </select>
+          </div>
+          <div id="themeStylePreview" style="display:flex;gap:4px;margin-top:4px"></div>
+          <button class="btn pri" id="btnThemeSet" style="margin-top:8px">Set Theme</button>
+        </div>
+      </div>
       <div class="saver-fold" style="margin-top:6px">
         <div class="saver-hdr" id="widgetToggle">
           <span>Custom Widgets</span>

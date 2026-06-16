@@ -1,6 +1,13 @@
 {
   "versions": [
     {
+      "version": "2.1.6",
+      "label": "SudoDeck v2.1.6",
+      "file": "firmware-v2.1.6.bin",
+      "address": "0",
+      "notes": "Themes! 7 presets (default, midnight, forest, amber, cyberpunk, monochrome, ocean) + 4 button styles (flat, glassy, outlined, neon). Set via config tool or set_theme command."
+    },
+    {
       "version": "2.1.5",
       "label": "SudoDeck v2.1.5",
       "file": "sudodeck-2.1.5.bin",
