@@ -88,7 +88,7 @@ window.addEventListener('beforeunload', async function() {
 });
 document.getElementById('btnRead').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }
-  try { var r = await sc({cmd:'get_config'}); if(r.config) { cd=r.config; sp=0; sb=-1; ra(); tm('Config loaded'); } } catch(e) { console.error('Read failed:', e); tm('Read failed', 'ng'); }
+  try { var r = await sc({cmd:'get_config'}, 15000); if(r.config) { cd=r.config; sp=0; sb=-1; ra(); tm('Config loaded'); } } catch(e) { console.error('Read failed:', e); tm('Read failed', 'ng'); }
 });
 document.getElementById('btnWrite').addEventListener('click', async function() {
   if(!dw) { tm('Connect first', 'ng'); return; }

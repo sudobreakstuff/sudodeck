@@ -761,8 +761,8 @@ void s_err(const char* m) { JsonDocument r; r["error"]=m; serializeJson(r,Serial
 void s_serial() {
   while (Serial.available()) {
     char c = Serial.read();
-    if (c == '\n') { serial_buf.trim(); if (serial_buf.length()) proc_serial(serial_buf); serial_buf=""; }
-    else if (c != '\r') { if (serial_buf.length() < 16384) serial_buf += c; }
+    if (c == '\n') { serial_buf.trim(); if (serial_buf.length()) { String l=serial_buf; serial_buf=""; proc_serial(l); } else serial_buf=""; }
+    else if (c != '\r') { if (serial_buf.length() < 131072) serial_buf += c; }
   }
 }
 void proc_serial(const String& l) {
