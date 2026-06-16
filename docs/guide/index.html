@@ -25,7 +25,7 @@
   </ul>
 </nav>
 
-<section id="guide" class="section-reveal" style="padding-top:120px">
+<section id="guide" style="padding-top:120px">
   <div class="inner">
     <h2><span class="g">Guide</span></h2>
     <p class="sd">From unboxing to pushing your first macro — everything you need to know.</p>
@@ -620,7 +620,6 @@ const iv = new IntersectionObserver(function(es) {
   es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
 }, { threshold: 0.1 });
 document.querySelectorAll('.rv').forEach(function(el) { iv.observe(el); });
-document.querySelectorAll('.section-reveal').forEach(function(el) { iv.observe(el); });
 </script>
 </body>
 </html>
