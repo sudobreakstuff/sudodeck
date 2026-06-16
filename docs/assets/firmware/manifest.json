@@ -1,12 +1,14 @@
 {
   "versions": [
     {
-      "version": "2.1.3",
-      "label": "SudoDeck v2.1.3",
-      "file": "sudodeck-2.1.3.bin",
+      "version": "2.1.4",
+      "label": "SudoDeck v2.1.4",
+      "file": "sudodeck-2.1.4.bin",
       "address": "0",
-      "notes": "Display sleep + new PNG logo on boot splash"
+      "notes": "Long button labels now show ellipsis (...) on the display instead of overflowing"
     },
+    {
+      "version": "2.1.3",
     {
       "version": "2.1.2",
       "label": "SudoDeck v2.1.2",

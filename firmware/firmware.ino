@@ -1015,11 +1015,18 @@ void draw_grid() {
     tft.fillRoundRect(x, y, bw, bh, 6, bg);
     if (label[0]) {
       tft.setTextColor(C_TXT, bg);
+      int max_lw = bw - 4;
       int lw = tft.textWidth(label);
-      int cx = x + (bw - lw) / 2;
+      String dlabel = label;
+      if (lw > max_lw) {
+        while (dlabel.length() > 0 && tft.textWidth(dlabel + "...") > max_lw) dlabel.remove(dlabel.length() - 1);
+        dlabel += "...";
+      }
+      int dlw = tft.textWidth(dlabel.c_str());
+      int cx = x + (bw - dlw) / 2;
       if (cx < x + 2) cx = x + 2;
       tft.setCursor(cx, y + (bh - 16) / 2);
-      tft.print(label);
+      tft.print(dlabel.c_str());
     }
   }
 }
@@ -1372,12 +1379,19 @@ void handle_touch(int tx, int ty) {
       // Redraw label after flash
       if (label[0]) {
         tft.setTextColor(C_TXT, bg);
+        String dlabel = label;
+        int max_lw = bw - 4;
         int lw = tft.textWidth(label);
-        int cx = x + (bw - lw) / 2;
+        if (lw > max_lw) {
+          while (dlabel.length() > 0 && tft.textWidth(dlabel + "...") > max_lw) dlabel.remove(dlabel.length() - 1);
+          dlabel += "...";
+        }
+        int dlw = tft.textWidth(dlabel.c_str());
+        int cx = x + (bw - dlw) / 2;
         int cy = y + (bh - 16) / 2;
         if (cx < x + 2) cx = x + 2;
         tft.setCursor(cx, cy);
-        tft.print(label);
+        tft.print(dlabel.c_str());
       }
       if (i < (int)btns.size()) do_action(btns[i]["action"]);
       return;
