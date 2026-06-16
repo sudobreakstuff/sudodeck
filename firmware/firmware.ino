@@ -1045,10 +1045,8 @@ void draw_grid() {
     }
     if (button_style == 1) { // glassy
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-      uint16_t hl = tft.alphaBlend(180, bg, 0xFFFF);
-      tft.fillRect(x + 3, y + 3, bw - 6, bh / 4, hl);
-      uint16_t sd = tft.alphaBlend(80, bg, 0x0000);
-      tft.fillRect(x + 3, y + bh - bh / 4 - 2, bw - 6, bh / 4, sd);
+      uint16_t hl = tft.alphaBlend(120, bg, 0xFFFF);
+      tft.fillRoundRect(x + 3, y + 2, bw - 6, bh / 3, 4, hl);
     } else if (button_style == 2) { // outlined
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
     } else if (button_style == 3) { // neon
@@ -1415,10 +1413,8 @@ void handle_touch(int tx, int ty) {
       delay(60);
     if (button_style == 1) { // glassy
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-      uint16_t hl = tft.alphaBlend(180, bg, 0xFFFF);
-      tft.fillRect(x + 3, y + 3, bw - 6, bh / 4, hl);
-      uint16_t sd = tft.alphaBlend(80, bg, 0x0000);
-      tft.fillRect(x + 3, y + bh - bh / 4 - 2, bw - 6, bh / 4, sd);
+      uint16_t hl = tft.alphaBlend(120, bg, 0xFFFF);
+      tft.fillRoundRect(x + 3, y + 2, bw - 6, bh / 3, 4, hl);
     } else if (button_style == 2) { // outlined
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
     } else if (button_style == 3) { // neon
