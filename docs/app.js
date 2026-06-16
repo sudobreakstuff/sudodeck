@@ -192,7 +192,7 @@ document.getElementById('bal').addEventListener('click', function() {
   cd.grid.cols=c; cd.grid.rows=r; var tb=c*r;
   while(cd.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); cd.pages.push({name:'Page '+(cd.pages.length+1),buttons:bt}); }
   while(cd.pages.length>pc) cd.pages.pop();
-  for(var i=0;i<cd.pages.length;i++) { while(cd.pages[i].buttons.length<tb) cd.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); while(cd.pages[i].buttons.length>tb) cd.pages[i].buttons.pop(); }
+  for(var i=0;i<cd.pages.length;i++) { while(cd.pages[i].buttons.length<tb) cd.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); }
   syncWifi(); syncSaver();
   sp=0; sb=-1; ra(); tm('Layout updated');
 });
