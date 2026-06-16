@@ -1,6 +1,13 @@
 {
   "versions": [
     {
+      "version": "2.1.5",
+      "label": "SudoDeck v2.1.5",
+      "file": "sudodeck-2.1.5.bin",
+      "address": "0",
+      "notes": "30 pages max, serial buffer 128KB for large configs, dot nav replaced with page counter"
+    },
+    {
       "version": "2.1.4",
       "label": "SudoDeck v2.1.4",
       "file": "sudodeck-2.1.4.bin",
