@@ -538,7 +538,8 @@ function fwSetStatus(s) {
 }
 
 function fwBaseUrl() {
-  return window.location.pathname.replace(/\/[^/]*$/, '') + '/assets/firmware';
+  var p = window.location.pathname.replace(/\/$/, '');
+  return p.substring(0, p.lastIndexOf('/')) + '/assets/firmware';
 }
 async function fwLoadManifest() {
   try {
