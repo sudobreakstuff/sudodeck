@@ -744,6 +744,34 @@
     .guide-step { flex-direction: column; }
   }
 
+  /* ── Guide TOC ── */
+  .guide-toc {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px;
+    margin-top: 32px;
+  }
+  .guide-toc h3 {
+    margin: 0 0 16px; font-size: 0.85rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--dim);
+  }
+  .guide-toc-grid {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .guide-toc-sect {
+    color: var(--acc); text-decoration: none; font-size: 0.88rem;
+    font-weight: 600; padding: 4px 0; margin-top: 6px;
+  }
+  .guide-toc-sect:first-child { margin-top: 0; }
+  .guide-toc-item {
+    color: var(--dim); text-decoration: none; font-size: 0.85rem;
+    padding: 3px 0 3px 20px; border-left: 1px solid var(--border);
+    margin-left: 4px; transition: color 0.15s, border-color 0.15s;
+  }
+  .guide-toc-item:hover {
+    color: var(--acc); border-left-color: var(--acc);
+  }
+
   /* ── Firmware Section ── */
   .fmw {
     background: var(--surface);
