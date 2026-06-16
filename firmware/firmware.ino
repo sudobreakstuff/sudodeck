@@ -1043,9 +1043,23 @@ void draw_grid() {
       bg = hex_col(btns[i]["color"] | "#16213E");
       label = btns[i]["label"] | "";
     }
-    tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    if (button_style == 1) { // glassy
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+      uint16_t hl = tft.alphaBlend(180, bg, 0xFFFF);
+      tft.fillRect(x + 3, y + 3, bw - 6, bh / 4, hl);
+      uint16_t sd = tft.alphaBlend(80, bg, 0x0000);
+      tft.fillRect(x + 3, y + bh - bh / 4 - 2, bw - 6, bh / 4, sd);
+    } else if (button_style == 2) { // outlined
+      tft.drawRoundRect(x, y, bw, bh, 6, bg);
+    } else if (button_style == 3) { // neon
+      tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    } else { // flat
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    }
     if (label[0]) {
-      tft.setTextColor(c_txt, bg);
+      uint16_t txt_bg = (button_style == 2) ? c_bg : bg;
+      tft.setTextColor(c_txt, txt_bg);
       int max_lw = bw - 4;
       int lw = tft.textWidth(label);
       String dlabel = label;
