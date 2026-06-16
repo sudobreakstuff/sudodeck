@@ -42,7 +42,6 @@ int page = 0;
 int num_pages = 0;
 int cols = 4, rows = 3;
 int total_btns = 0;
-int nav_dot_x = 0;
 
 // Screensaver
 #define SAVER_W 48
@@ -296,6 +295,7 @@ void apply_cfg() {
   rows = constrain(config["grid"]["rows"]|3, 1, 5);
   num_pages = config["pages"].size();
   if (num_pages < 1) num_pages = 1;
+  if (num_pages > 30) num_pages = 30;
   total_btns = cols * rows;
   if (page >= num_pages) page = 0;
   if (config["saver"].is<JsonObject>()) {
@@ -1059,25 +1059,22 @@ void draw_bottom() {
   if (num_pages > 0 && page < num_pages) pname = config["pages"][page]["name"] | "";
   int pw = tft.textWidth(pname);
 
-  // dots positioned between page name and right edge
-  int ndots = num_pages < 12 ? num_pages : 12;
-  int dot_w = ndots * 10 - 4;
+  // page name centered between < > and page counter
+  String pageStr = String(page + 1) + "/" + String(num_pages);
+  int psw = tft.textWidth(pageStr.c_str());
   int avail = rx - lx;
-  int name_max = avail - dot_w - 8;
+  int name_max = avail - psw - 12;
   if (name_max < 10) name_max = 10;
   if (pw > name_max) pw = name_max;
-  int name_x = lx + (avail - dot_w - pw) / 2;
+  int name_x = lx + (avail - psw - pw) / 2;
   tft.setTextColor(C_DIM, C_HDR);
   tft.setCursor(name_x, cy);
   tft.print(pname);
 
-  // dots after page name
-  nav_dot_x = name_x + pw + 8;
-  for (int i = 0; i < ndots; i++) {
-    if (nav_dot_x + i * 10 < rx) {
-      tft.fillCircle(nav_dot_x + i * 10, cy + 8, 3, i == page ? C_ACC : C_DIM);
-    }
-  }
+  // page counter after page name
+  tft.setTextColor(C_ACC, C_HDR);
+  tft.setCursor(name_x + pw + 8, cy);
+  tft.print(pageStr.c_str());
 }
 
 void draw_all() {
@@ -1342,10 +1339,6 @@ void handle_touch(int tx, int ty) {
     if (num_pages > 1 && tx >= SCR_W - nav_l - nav_w - 4 && tx <= SCR_W - nav_l + 4) {
       if (page < num_pages - 1) { page++; draw_grid(); draw_bottom(); }
       return;
-    }
-    for (int i = 0; i < num_pages && i < 12; i++) {
-      int dx = nav_dot_x + i * 10;
-      if (tx >= dx - 9 && tx <= dx + 9) { page = i; draw_grid(); draw_bottom(); return; }
     }
     return;
   }

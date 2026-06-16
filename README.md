@@ -99,7 +99,7 @@ If you already have a CYD and want to build your own:
 ## Features
 
 - **BLE HID** — your computer sees a real keyboard. Instant, reliable, zero software
-- **Multi-page grid** — up to 12 pages, 30 buttons per page, swipe to navigate
+- **Multi-page grid** — up to 30 pages, 30 buttons per page, swipe to navigate
 - **Action types** — single keys, key combos (CTRL+C, ALT+TAB), text strings, macro sequences, app launcher
 - **App Launcher** — select OS (Windows/macOS/Linux), type app name, press button — device opens OS search and launches the app (~250ms)
 - **Macro Steps** — build multi-step macros with combo, text, and delay steps
