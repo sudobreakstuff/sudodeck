@@ -537,9 +537,13 @@ function fwSetStatus(s) {
   el.style.color = s === 'Connected' ? 'var(--acc)' : 'var(--dim)';
 }
 
+function fwBaseUrl() {
+  return window.location.pathname.replace(/\/[^/]*$/, '') + '/assets/firmware';
+}
 async function fwLoadManifest() {
   try {
-    var r = await fetch('../assets/firmware/manifest.json');
+    var r = await fetch(fwBaseUrl() + '/manifest.json');
+    if (!r.ok) { fwLog('HTTP ' + r.status); return; }
     fwManifest = await r.json();
     var sel = document.getElementById('fwVersion');
     fwManifest.versions.forEach(function(v) {
@@ -566,7 +570,7 @@ async function fwVersionChanged() {
   var label = sel.options[sel.selectedIndex].textContent;
   fwLog('Downloading ' + label + '...');
   try {
-    var r = await fetch('../assets/firmware/' + sel.value);
+    var r = await fetch(fwBaseUrl() + '/' + sel.value);
     fwFileData = await r.arrayBuffer();
     fwFlashAddr = parseInt(sel.options[sel.selectedIndex].dataset.address);
     fwLog('Ready: ' + label + ' (' + (fwFileData.byteLength / 1024 / 1024).toFixed(1) + ' MB)');
