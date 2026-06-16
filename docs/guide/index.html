@@ -28,86 +28,582 @@
 <section id="guide" class="section-reveal" style="padding-top:120px">
   <div class="inner">
     <h2><span class="g">Guide</span></h2>
-    <p class="sd">From unboxing to pushing your first macro — here's how it all works.</p>
+    <p class="sd">From unboxing to pushing your first macro — everything you need to know.</p>
 
-    <div class="guide-grid">
+    <div class="guide-toc" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:32px">
+      <h3 style="margin:0 0 12px;font-size:0.95rem;color:var(--dim)">Contents</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+        <a href="#setup" style="color:var(--acc);text-decoration:none;font-size:0.88rem">Setup</a>
+        <a href="#section-flash" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">2. Flash Firmware</a>
+        <a href="#section-connect" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">3. Connect &amp; Configure</a>
+        <a href="#section-pair" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">4. Pair via Bluetooth</a>
+        <a href="#section-use" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">5. Use It</a>
+        <a href="#features" style="color:var(--acc);text-decoration:none;font-size:0.88rem">Features</a>
+        <a href="#section-actions" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">6. Action Types</a>
+        <a href="#section-layout" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">7. Layouts, Export &amp; Import</a>
+        <a href="#section-screensaver" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">8. Screensaver &amp; Widgets</a>
+        <a href="#section-wifi" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">9. WiFi Setup</a>
+        <a href="#maintenance" style="color:var(--acc);text-decoration:none;font-size:0.88rem">Maintenance</a>
+        <a href="#section-update" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">10. Firmware Updates</a>
+        <a href="#section-reset" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">11. Factory Reset</a>
+        <a href="#troubleshooting" style="color:var(--acc);text-decoration:none;font-size:0.88rem">Troubleshooting</a>
+        <a href="#section-tshoot" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">12. Common Issues</a>
+        <a href="#reference" style="color:var(--acc);text-decoration:none;font-size:0.88rem">Reference</a>
+        <a href="#section-limits" style="padding-left:16px;color:var(--dim);text-decoration:none;font-size:0.85rem">13. Limits &amp; Specs</a>
+      </div>
+    </div>
+
+    <div class="guide-grid" style="margin-top:24px">
+
+      <!-- ─── Section: Setup ─── -->
+      <div id="setup" style="margin:24px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Setup</h3></div>
 
       <div class="guide-step">
         <div class="guide-num">1</div>
         <div class="guide-body">
-          <h3>Get a SudoDeck (or Build One)</h3>
-          <p><strong>Buy one pre-assembled</strong> — <a href="../buy/" style="color:var(--acc)">R1,099 shipped</a> in SA. Comes with E32R28T CYD, 3D-printed enclosure, USB-C cable, and firmware pre-flashed. Plug it in and you're ready.</p>
+          <h3>Buy or Build</h3>
+          <p><strong>Buy one pre-assembled</strong> — <a href="../buy/" style="color:var(--acc)">R1,099 shipped</a> in SA. You get the device in a 3D-printed enclosure, a USB-C cable, and the latest firmware pre-flashed. Available for free local pickup in Newcastle KZN.</p>
           <img src="../assets/top-angle.jpeg" alt="SudoDeck from above" class="guide-img" loading="lazy">
-          <p style="margin-top:6px"><strong>Or build your own</strong> — get a CYD (ESP32-2432S028R or <a href="https://robotics.org.za/E32R28T" target="_blank" style="color:var(--acc)">E32R28T</a> from Robotics.org.za for R342.70). 3D-print your own enclosure, flash the firmware, and assemble.</p>
-          <div class="guide-note">The E32R28T is fully compatible with all SudoDeck firmware — same pins, same driver, same everything.</div>
+          <p style="margin-top:8px"><strong>Or build your own</strong> — source the parts and assemble it yourself:</p>
+          <ul style="margin:6px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>CYD:</strong> <a href="https://robotics.org.za/E32R28T" target="_blank" style="color:var(--acc)">E32R28T</a> from Robotics.org.za (R342.70 incl VAT) — or any ESP32-2432S028R / "Cheap Yellow Display". The E32R28T is pin-compatible with the standard CYD and works with all SudoDeck firmware</li>
+            <li><strong>Enclosure:</strong> 3D-printed shell — from NDE3D ~R170, or print your own from the open-source STL files</li>
+            <li><strong>USB cable:</strong> Any USB-C data cable (charge-only cables won't work for serial/flashing)</li>
+          </ul>
+          <p style="margin-top:8px">Total DIY cost: ~R515 + your time. Assembly takes about 10 minutes — slide the CYD into the enclosure, plug in the USB, done.</p>
+          <div class="guide-note">E32R28T and standard CYD (ESP32-2432S028R) use the same pins, same TFT driver, same touch controller. All firmware, config, and accessories are fully interchangeable.</div>
         </div>
       </div>
 
-      <div class="guide-step">
+      <div class="guide-step" id="section-flash">
         <div class="guide-num">2</div>
         <div class="guide-body">
-          <h3>Flash the Firmware <span style="font-size:0.7rem;color:var(--dim);font-weight:400;">(pre-assembled units: skip to step 3)</span></h3>
+          <h3>Flash the Firmware</h3>
           <p>If you bought a pre-assembled SudoDeck, the latest firmware is already installed — skip to step 3.</p>
-          <p style="margin-top:6px">For DIY builds: your CYD comes with factory demo software. Replace it with SudoDeck by entering <strong>flash mode</strong>: hold the <strong>BOOT</strong> button, tap <strong>RESET</strong>, release BOOT — the screen goes blank. Then use the firmware tool on the Configure page.</p>
+          <p style="margin-top:8px">For DIY builds: your CYD comes with factory demo software. You need to replace it with SudoDeck by putting the board into <strong>flash mode</strong>:</p>
+          <ol style="margin:8px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Plug the CYD into your computer via USB</li>
+            <li>Hold the <strong>BOOT</strong> button (GPIO0, top-left edge of the board)</li>
+            <li>While holding BOOT, tap <strong>RESET</strong> (EN, top-right edge) — the screen goes blank</li>
+            <li>Release BOOT — the CYD is now in download mode, waiting for firmware</li>
+            <li>On the <a href="../app/#firmware" style="color:var(--acc)">Configure page</a>, click <strong>Connect for Flashing</strong> and select the CYD's serial port in the browser dialog</li>
+            <li>Pick a firmware version from the dropdown (or choose a .bin file with "Custom .bin") and click <strong>Flash</strong></li>
+            <li>Wait for the progress bar to reach 100% — the CYD reboots automatically and boots into SudoDeck</li>
+          </ol>
           <a class="guide-cta" href="../app/#firmware">Go to Firmware Tool</a>
-          <div class="guide-note">To update firmware later, repeat this step with the latest version from the tool.</div>
+          <div class="guide-note">The flash process writes to the app partition only — the bootloader is in a protected region and can't be damaged by a bad flash. If something goes wrong, just flash again. Use <strong>Backup Firmware</strong> to dump the entire 4MB flash for safekeeping before updating.</div>
         </div>
       </div>
 
-      <div class="guide-step">
+      <div class="guide-step" id="section-connect">
         <div class="guide-num">3</div>
         <div class="guide-body">
-          <h3>Connect to the Config Tool</h3>
-          <p>After flashing, the CYD boots into SudoDeck. Leave it plugged into USB (this powers the board and provides a data connection). Click <strong>Connect</strong> on the Configure page — your browser will ask which serial port to use.</p>
-          <img src="../assets/back.jpeg" alt="SudoDeck back showing USB and reset" class="guide-img" loading="lazy">
+          <h3>Connect &amp; Configure</h3>
+          <p>Once flashed, the CYD boots into SudoDeck. The display shows a grid of buttons (default 4×3) and a status bar. Leave it plugged into USB — this provides both power and a serial data connection to the config tool.</p>
+          <ol style="margin:8px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Open the <a href="../app/#config" style="color:var(--acc)">Configure page</a> in <strong>Chrome or Edge</strong> (Web Serial is not supported in Firefox or Safari)</li>
+            <li>Click <strong>Connect</strong> — your browser will show a list of serial devices. Select "USB Serial Device" or "CP2102/CH340" (the CYD's USB-serial chip)</li>
+            <li>Once connected, the badge switches from red DISCONNECTED to green CONNECTED</li>
+            <li>Click <strong>Read</strong> to pull the current layout from the device into the browser</li>
+            <li>Edit pages, place buttons, pick colors, and assign actions</li>
+            <li>Click <strong>Write</strong> to save your layout to the CYD's flash memory</li>
+          </ol>
+          <img src="../assets/back.jpeg" alt="SudoDeck back showing USB-C and reset" class="guide-img" loading="lazy">
+          <p style="margin-top:6px;color:var(--dim);font-size:0.85rem">The reset button (small hole) and USB-C port are on the back. The BOOT button is on the top edge inside the enclosure.</p>
           <a class="guide-cta" href="../app/#config">Go to Configure</a>
-          <div class="guide-note">Use Chrome or Edge. Web Serial requires a secure context — GitHub Pages (HTTPS) works.</div>
+          <div class="guide-note">The config is saved to the device's SPIFFS partition — it persists across reboots and USB disconnects. Move the CYD to another computer and your layout is still there. Export a .json backup to be safe. The config is only erased when you flash new firmware over the full flash.</div>
         </div>
       </div>
 
-      <div class="guide-step">
+      <div class="guide-step" id="section-pair">
         <div class="guide-num">4</div>
         <div class="guide-body">
-          <h3>Configure Your Layout</h3>
-          <p>Once connected, the config tool reads your current layout from the device. Add pages, place buttons on the grid, pick colors, and assign actions (keyboard keys, media controls, text snippets, or combos). Hit <strong>Write</strong> to save to the CYD's flash.</p>
-          <p style="margin-top:6px">Use <strong>Export</strong> to save your layout as a JSON file — keep backups, share with friends, or build a library of configs for different workflows. Use <strong>Import</strong> to load a previously saved JSON file and write it to your device.</p>
-          <div class="guide-note">The config is stored on the device. Unplug and move to another computer — your layout follows. Export your config anytime to share or back it up.</div>
+          <h3>Pair via Bluetooth</h3>
+          <p>The CYD announces itself as a Bluetooth keyboard. Pair it with your computer, phone, or tablet just like any other Bluetooth device.</p>
+          <ol style="margin:8px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Keep the CYD powered (USB plugged in) — there is no battery, it needs USB power to run</li>
+            <li>Open Bluetooth settings on your target device</li>
+            <li>Look for <strong>SudoDeck</strong> in the list of available devices and select it to pair</li>
+            <li>Some devices will show a confirmation code — confirm it</li>
+            <li>Once paired, the CYD's header shows a Bluetooth icon (macOS/iOS) or "BT" text (Windows/Android/Linux)</li>
+          </ol>
+          <p style="margin-top:8px">Pairing is stored on both sides — you only need to do it once. The CYD will auto-reconnect whenever it's in range and powered on.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Bluetooth Details</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Range:</strong> ~10 metres (33 feet) open air, less through walls</li>
+            <li><strong>Reconnection:</strong> automatic — when the CYD powers on and the paired device is in range, it connects within a few seconds</li>
+            <li><strong>Single device:</strong> BLE HID can only be connected to <strong>one</strong> device at a time. To switch devices, unpair from the current one and pair with the new one</li>
+            <li><strong>Standard HID:</strong> no drivers, no software, no configuration needed. Your OS sees it as a regular Bluetooth keyboard and mouse (keyboard only in the current firmware)</li>
+            <li><strong>Connection indicator:</strong> top-left of the CYD display — Bluetooth icon (Apple-style) when paired to macOS/iOS, "BT" text for anything else. No icon means BLE is initializing or failed</li>
+          </ul>
+          <div class="guide-note">If the CYD has been paired to a device before and you want to pair it to a different one, you may need to "forget" the CYD in the old device's Bluetooth settings first. BLE only remembers one paired host at a time.</div>
         </div>
       </div>
 
-      <div class="guide-step">
+      <div class="guide-step" id="section-use">
         <div class="guide-num">5</div>
         <div class="guide-body">
-          <h3>Pair via Bluetooth</h3>
-          <p>Unplug the USB (or keep it plugged for power — your choice). The CYD runs on USB power. Open Bluetooth settings on your computer, phone, or tablet. Look for <strong>SudoDeck</strong> in the device list and pair. Pair once, it stays paired.</p>
-          <div class="guide-note">No drivers. No daemons. No app install. Just standard Bluetooth HID.</div>
+          <h3>Use It</h3>
+          <p>Once paired, every button press on the CYD sends the assigned action to the connected device — just like pressing keys on a keyboard.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Display Overview</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Top bar (status):</strong> shows Bluetooth connection icon, WiFi status, and current time. The bar is dark teal</li>
+            <li><strong>Grid area:</strong> your configured buttons, each with a background color and label. Buttons are rounded rectangles with the label centered</li>
+            <li><strong>Bottom bar (navigation):</strong> <strong>&lt;</strong> and <strong>&gt;</strong> arrows to move between pages. The center shows the current page name and a counter like <strong>3/12</strong></li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">How Buttons Work</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Tap a button on the touchscreen — it flashes briefly (highlight color) then fires the action</li>
+            <li>Labels longer than the button width are truncated with <strong>...</strong> automatically — keep labels short (under ~12 characters for 4-column layouts)</li>
+            <li>Empty buttons (no label, no action) appear dark and do nothing when tapped</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Page Navigation</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Tap <strong>&lt;</strong> (bottom-left) to go to the previous page</li>
+            <li>Tap <strong>&gt;</strong> (bottom-right) to go to the next page</li>
+            <li>The page counter in the bottom bar shows your current position, e.g. <strong>5/18</strong></li>
+            <li>The page name is editable in the config tool (double-click the page tab)</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Display Sleep</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>After the <strong>screensaver timeout</strong> (default 30s, configurable 5-600s), the screensaver activates</li>
+            <li>After the <strong>sleep timeout</strong> (default 60s, configurable 0-600s, 0=off), the display backlight turns off entirely to save power</li>
+            <li>Tap the touchscreen anywhere to wake from screensaver or sleep — the grid reappears instantly</li>
+            <li>Sleep only affects the display — Bluetooth stays connected and buttons still work if pressed (but you can't see them until you wake the screen)</li>
+          </ul>
+
+          <div class="guide-note">The CYD has no battery. It must remain plugged into USB to function. Power draw is roughly 200-300mA depending on screen brightness — a standard phone charger or laptop USB port works fine.</div>
         </div>
       </div>
 
-      <div class="guide-step">
+      <!-- ─── Section: Features ─── -->
+      <div id="features" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Features</h3></div>
+
+      <div class="guide-step" id="section-actions">
         <div class="guide-num">6</div>
         <div class="guide-body">
-          <h3>Use It</h3>
-          <p>That's it. Push a button on the CYD — your macro fires on the paired device. Navigate pages, trigger combos, type snippets. After a period of inactivity (configurable in the config tool), the screensaver kicks in with your chosen mode.</p>
-          <div class="guide-note">Powered by <strong>BLE HID</strong> — your computer thinks it's a real keyboard. Reliable, fast, zero configuration.</div>
+          <h3>Action Types</h3>
+          <p>Each button can be assigned one of six action types. Here's what they do and when to use them:</p>
+          <table class="cmp-table" style="margin-top:12px;width:100%">
+            <tr>
+              <th>Action</th>
+              <th>What it does</th>
+              <th>Example</th>
+              <th>Use case</th>
+            </tr>
+            <tr>
+              <td><strong>Single Key</strong></td>
+              <td>Presses and releases one key</td>
+              <td><code>ENTER</code>, <code>F5</code>, <code>MEDIA_PLAY_PAUSE</code></td>
+              <td>Media controls, function keys, shortcuts like <code>ESC</code></td>
+            </tr>
+            <tr>
+              <td><strong>Key Combo</strong></td>
+              <td>One or more modifiers + one key</td>
+              <td><code>CTRL+C</code>, <code>ALT+TAB</code>, <code>CTRL+SHIFT+ESC</code></td>
+              <td>Keyboard shortcuts, app commands</td>
+            </tr>
+            <tr>
+              <td><strong>Text String</strong></td>
+              <td>Types a string of text character by character</td>
+              <td><code>hello@email.com</code></td>
+              <td>Login details, canned responses, code snippets</td>
+            </tr>
+            <tr>
+              <td><strong>Macro</strong></td>
+              <td>A sequence of steps — each step can be a key, combo, text string, or delay</td>
+              <td><code>CTRL+ALT+T</code> → wait 500ms → type <code>htop</code> → <code>ENTER</code></td>
+              <td>Complex multi-step workflows, automation sequences</td>
+            </tr>
+            <tr>
+              <td><strong>App Launcher</strong></td>
+              <td>Opens the OS search/run dialog, types the app name, and presses Enter</td>
+              <td>Windows → <code>Calculator</code>, macOS → <code>Spotify</code></td>
+              <td>Launch applications hands-free from your deck</td>
+            </tr>
+            <tr>
+              <td><strong>Delay</strong></td>
+              <td>Waits a specified time (1-10000ms) before the next action — primarily used inside macros</td>
+              <td><code>500ms</code></td>
+              <td>Waiting for apps to open, page transitions</td>
+            </tr>
+          </table>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Key Name Reference</h4>
+          <p style="color:var(--dim);font-size:0.88rem">Use these exact key names in the config tool:</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;font-size:0.82rem">
+            <div style="background:var(--surface2);border-radius:6px;padding:8px">
+              <strong style="color:var(--acc)">Letters &amp; Numbers</strong><br>
+              <code>a</code> through <code>z</code>, <code>0</code> through <code>9</code>
+            </div>
+            <div style="background:var(--surface2);border-radius:6px;padding:8px">
+              <strong style="color:var(--acc)">Function Keys</strong><br>
+              <code>F1</code> through <code>F24</code>
+            </div>
+            <div style="background:var(--surface2);border-radius:6px;padding:8px">
+              <strong style="color:var(--acc)">Navigation</strong><br>
+              <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>PAGE_UP</code>, <code>PAGE_DOWN</code>, <code>HOME</code>, <code>END</code>
+            </div>
+            <div style="background:var(--surface2);border-radius:6px;padding:8px">
+              <strong style="color:var(--acc)">System</strong><br>
+              <code>ENTER</code>, <code>TAB</code>, <code>ESC</code>, <code>BACKSPACE</code>, <code>DELETE</code>, <code>INSERT</code>, <code>SPACE</code>, <code>CAPS_LOCK</code>, <code>PRINT_SCREEN</code>
+            </div>
+            <div style="background:var(--surface2);border-radius:6px;padding:8px">
+              <strong style="color:var(--acc)">Media Keys</strong><br>
+              <code>MEDIA_PLAY_PAUSE</code>, <code>MEDIA_NEXT_TRACK</code>, <code>MEDIA_PREV_TRACK</code>, <code>MEDIA_MUTE</code>, <code>MEDIA_VOLUME_UP</code>, <code>MEDIA_VOLUME_DOWN</code>, <code>MEDIA_STOP</code>
+            </div>
+            <div style="background:var(--surface2);border-radius:6px;padding:8px">
+              <strong style="color:var(--acc)">Brightness &amp; Lock</strong><br>
+              <code>BRIGHTNESS_UP</code>, <code>BRIGHTNESS_DOWN</code>, <code>LOCK_SCREEN</code>
+            </div>
+          </div>
+
+          <h4 style="margin:18px 0 6px;font-size:0.95rem">Modifier Keys (for Combos)</h4>
+          <p style="color:var(--dim);font-size:0.88rem">Available modifiers: <code>CTRL</code>, <code>ALT</code>, <code>SHIFT</code>, <code>GUI</code> (Windows key / Cmd), and combinations like <code>CTRL_SHIFT</code>, <code>CTRL_ALT</code>, <code>CTRL_ALT_SHIFT</code>, etc.</p>
+
+          <h4 style="margin:18px 0 6px;font-size:0.95rem">Macro Tips</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Macros execute each step sequentially. There is no hard step limit, but very long macros (>50 steps) may take several seconds to run</li>
+            <li>Use <strong>Delay</strong> steps to wait for UI elements to appear before typing or pressing keys</li>
+            <li>Example: open Task Manager: <code>CTRL+SHIFT+ESC</code> → delay 1000ms → <code>ALT+T</code> (focus details)</li>
+            <li>Macro steps are edited in the config tool's action panel — add, remove, and reorder steps freely</li>
+          </ul>
+
+          <h4 style="margin:18px 0 6px;font-size:0.95rem">App Launcher Notes</h4>
+          <p style="color:var(--dim);font-size:0.88rem">The App Launcher uses the OS search function:<br>
+          Windows → <strong>Win key</strong> → type app name → <strong>Enter</strong><br>
+          macOS → <strong>Cmd+Space</strong> (Spotlight) → type app name → <strong>Enter</strong><br>
+          Linux → <strong>Super key</strong> (GNOME/KDE) → type app name → <strong>Enter</strong></p>
+          <p style="color:var(--dim);font-size:0.88rem;margin-top:4px">Use the exact display name of the app (e.g. "Visual Studio Code" not "code"). The paired device must be at its desktop or home screen — the launcher types into the OS search, not an already-open dialog.</p>
+
+          <div class="guide-note">The App Launcher types into the native OS search — NOT the Windows "Run" dialog (Win+R). This means you launch apps the same way as typing in the Start Menu / Spotlight. Faster and more reliable.</div>
         </div>
       </div>
 
-      <div class="guide-step">
+      <div class="guide-step" id="section-layout">
         <div class="guide-num">7</div>
         <div class="guide-body">
-          <h3>Screensaver &amp; Live Widgets</h3>
-          <p>Three screensaver modes are built in: <strong>Matrix Rain</strong>, <strong>F1 Standings</strong> (live driver + constructor standings), and <strong>Custom Widgets</strong> — user-defined API endpoints displayed as live data cards.</p>
-          <p>To use live data modes (F1, Custom), first set up <strong>WiFi</strong> in the config tool layout controls. For custom widgets, add one or more widget sources below the Screensaver section:</p>
-          <ul style="margin:6px 0 0 18px;font-size:0.8rem;color:var(--dim);line-height:1.6">
-            <li><strong>Label</strong> — name shown above the value on the CYD display</li>
-            <li><strong>URL</strong> — any JSON API endpoint (must return valid JSON, no auth headers needed)</li>
-            <li><strong>Path</strong> — dot-notation JSON path, e.g. <code>btc.usd</code> or <code>current_weather.temperature</code>. Array access with <code>[index]</code> is supported</li>
-            <li><strong>Format</strong> — display template with <code>{value}</code> placeholder, e.g. <code>${value}</code> or <code>{value}°C</code></li>
-            <li><strong>Interval</strong> — seconds between data refreshes (minimum 30s recommended)</li>
+          <h3>Layouts: Pages, Grid &amp; Backup</h3>
+          <p>Your button layout is organised as a grid of pages. Each page has a configurable number of columns and rows, and each cell holds one button with a label, color, and action.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Layout Controls</h4>
+          <p style="color:var(--dim);font-size:0.88rem">Found at the bottom of the config tool:</p>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Columns:</strong> 1 to 6 (default 4)</li>
+            <li><strong>Rows:</strong> 1 to 5 (default 3)</li>
+            <li><strong>Pages:</strong> 1 to 18 (default 3)</li>
           </ul>
-          <p style="margin-top:8px">Use the <strong>Test</strong> button on each widget to verify your URL and path before writing to the device. Widgets cycle every 10s on the CYD display with page-dot navigation.</p>
-          <div class="guide-note">No API keys required for the built-in F1 data (Jolpica API) or Open-Meteo weather. For custom APIs, choose free tiers with no auth.</div>
+          <p style="margin-top:8px">Click <strong>Apply Layout</strong> to resize. Existing button data is <strong>preserved</strong> — when you shrink the grid (e.g. 4×3 → 3×2), extra buttons remain in memory and reappear if you expand again. No content is lost.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Page Tabs</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Page tabs run across the top of the grid area in the config tool</li>
+            <li>Click a tab to switch to that page for editing</li>
+            <li><strong>Double-click</strong> a tab to rename the page</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Editing a Button</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Click any button in the grid to select it — it highlights with a border</li>
+            <li>The Edit Button panel opens below the grid</li>
+            <li>Set the <strong>label</strong> (displayed on the CYD), <strong>color</strong> (hex value, or use the color picker), and <strong>action type</strong> with its parameters</li>
+            <li>Click <strong>Apply</strong> to save changes to the current button, or <strong>Cancel</strong> to discard</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Export, Import &amp; Share</h4>
+          <p style="color:var(--dim);font-size:0.88rem">The config tool supports exporting and importing your entire layout as a JSON file. The buttons are at the top of the config section:</p>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Export</strong> — downloads a <code>.json</code> file with your full layout (all pages, buttons, colors, actions, WiFi, and screensaver settings)</li>
+            <li><strong>Import</strong> — loads a previously exported <code>.json</code> file back into the config tool. After importing, you must still click <strong>Write</strong> to send it to the device</li>
+            <li><strong>Share</strong> — exported JSON files can be sent to other SudoDeck users. They import the file and write it to their device. Build a library of layouts for different workflows</li>
+          </ul>
+          <div class="guide-note">The JSON file contains your WiFi SSID and password in plain text if configured. Be careful when sharing exported configs — clear the WiFi fields first, or share them only with people you trust.</div>
+        </div>
+      </div>
+
+      <div class="guide-step" id="section-screensaver">
+        <div class="guide-num">8</div>
+        <div class="guide-body">
+          <h3>Screensaver &amp; Live Widgets</h3>
+          <p>When idle, the CYD displays a screensaver. Three modes are built in:</p>
+          <ul style="margin:8px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Matrix Rain</strong> — falling green characters across the display. No WiFi needed. Classic look, runs entirely on-device</li>
+            <li><strong>F1 Standings</strong> — live Formula 1 race calendar, driver standings, and constructor standings — cycles through three views. Requires WiFi</li>
+            <li><strong>Custom Widgets</strong> — user-defined API endpoints displayed as live data cards that cycle every 10 seconds. Requires WiFi</li>
+          </ul>
+          <p style="margin-top:8px">Configure screensaver timeout, sleep timeout, and mode in the Screensaver section at the bottom of the config tool. Click <strong>Set</strong> to apply changes (then Write to save to the device).</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Custom Widgets</h4>
+          <p>Add one or more widget sources below the Screensaver section. Each widget has these fields:</p>
+          <table class="cmp-table" style="margin-top:8px;width:100%">
+            <tr>
+              <th>Field</th>
+              <th>What it does</th>
+            </tr>
+            <tr><td><strong>Label</strong></td><td>Name shown above the value on the CYD display</td></tr>
+            <tr><td><strong>URL</strong></td><td>Any JSON API endpoint (must return valid JSON, no custom auth headers supported)</td></tr>
+            <tr><td><strong>Path</strong></td><td>Dot-notation JSON path to extract the value, e.g. <code>btc.usd</code> or <code>current_weather.temperature</code>. Array access with <code>[index]</code> is supported</td></tr>
+            <tr><td><strong>Format</strong></td><td>Display template with <code>{value}</code> placeholder, e.g. <code>${value}</code> or <code>{value}°C</code></td></tr>
+            <tr><td><strong>Interval</strong></td><td>Seconds between data refreshes (30s minimum recommended, max 600s)</td></tr>
+          </table>
+          <p style="margin-top:8px">Use the <strong>Test</strong> button on each widget to verify your URL and path before writing to the device. Widgets cycle every 10 seconds on the CYD display.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Widget Examples</h4>
+          <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-top:6px;font-size:0.85rem;color:var(--dim);line-height:1.7">
+            <strong style="color:var(--acc)">Bitcoin price</strong><br>
+            URL: <code>https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd</code><br>
+            Path: <code>bitcoin.usd</code> &nbsp; Format: <code>${value}</code>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-top:8px;font-size:0.85rem;color:var(--dim);line-height:1.7">
+            <strong style="color:var(--acc)">Temperature (Newcastle, SA)</strong><br>
+            URL: <code>https://api.open-meteo.com/v1/forecast?latitude=-28.73&longitude=24.77&current_weather=true</code><br>
+            Path: <code>current_weather.temperature</code> &nbsp; Format: <code>{value}°C</code>
+          </div>
+
+          <div class="guide-note" style="margin-top:10px">Widgets only fetch when WiFi is configured and connected. No API keys are required for the built-in F1 data (Jolpica API) or Open-Meteo weather. You can have up to 8 custom widgets configured at once.</div>
+        </div>
+      </div>
+
+      <div class="guide-step" id="section-wifi">
+        <div class="guide-num">9</div>
+        <div class="guide-body">
+          <h3>WiFi Setup</h3>
+          <p>WiFi is optional but required for live data features (F1 standings, custom widgets). The CYD uses the ESP32's built-in 2.4GHz WiFi.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Configuration</h4>
+          <ol style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>In the config tool, enter your <strong>SSID</strong> and <strong>password</strong> in the fields below the layout controls</li>
+            <li>Click <strong>Write</strong> to save the layout to the device — WiFi credentials are saved as part of the config</li>
+            <li>On the next boot, the CYD attempts to connect to the WiFi network automatically</li>
+            <li>Connection status appears in the top-right of the CYD's display header</li>
+          </ol>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Status Indicators</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Connected — WiFi icon (arcs) shown in the header</li>
+            <li>Connecting — shows "W:connecting"</li>
+            <li>Failed — shows "W:OFF" with an error reason code (seen in the header after a failed attempt)</li>
+            <li>No WiFi configured — header shows nothing related to WiFi</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Important Notes</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>2.4GHz only</strong> — the ESP32 does not support 5GHz WiFi networks. Make sure your router isn't hiding the 2.4GHz band</li>
+            <li>Auto-reconnect — the CYD retries connection every 30 seconds if the connection drops</li>
+            <li>Special characters in SSID or password — most work, but very unusual characters (non-ASCII, emoji) may cause issues over the serial connection</li>
+            <li>WiFi credentials are stored in the config JSON on the device's SPIFFS — they persist across reboots</li>
+            <li>Flashing new firmware erases everything — save a copy of your config with Export</li>
+          </ul>
+          <div class="guide-note">WiFi on the CYD is not required for normal BLE keyboard operation. It's only needed for F1 standings and custom widgets. If you never use those features, leave WiFi blank.</div>
+        </div>
+      </div>
+
+      <!-- ─── Section: Maintenance ─── -->
+      <div id="maintenance" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Maintenance</h3></div>
+
+      <div class="guide-step" id="section-update">
+        <div class="guide-num">10</div>
+        <div class="guide-body">
+          <h3>Firmware Updates</h3>
+          <p>Updating the firmware is the same process as the initial flash. The firmware tool on the Configure page handles everything.</p>
+          <ol style="margin:8px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>First, <strong>Export</strong> your current layout from the config tool (Config section) — flashing erases it</li>
+            <li>Put the CYD in <strong>flash mode</strong> (hold BOOT, tap RESET, release BOOT)</li>
+            <li>On the <a href="../app/#firmware" style="color:var(--acc)">Configure page</a>, click <strong>Connect for Flashing</strong></li>
+            <li>Select the new version from the dropdown and click <strong>Flash</strong></li>
+            <li>Wait for the progress bar to complete — the CYD reboots automatically</li>
+            <li>Reconnect via WebSerial (Connect → Read should show a default layout)</li>
+            <li><strong>Import</strong> your exported .json backup, then <strong>Write</strong> it to the device</li>
+          </ol>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Full Flash Backup</h4>
+          <p style="color:var(--dim);font-size:0.88rem">The <strong>Backup Firmware</strong> button reads the entire 4MB flash and saves it as a <code>.bin</code> file. This captures both the firmware and your config. To restore it, use the <strong>Custom .bin</strong> option in the flash tool and select your backup file. This is useful if you want to revert to a previous firmware without re-configuring everything.</p>
+          <div class="guide-note">Firmware updates overwrite the entire app partition. Your config (stored in the SPIFFS partition) is also erased. Always export your .json config before flashing. The bootloader partition is protected — you can't brick the CYD with a bad flash, just flash again.</div>
+        </div>
+      </div>
+
+      <div class="guide-step" id="section-reset">
+        <div class="guide-num">11</div>
+        <div class="guide-body">
+          <h3>Factory Reset</h3>
+          <p>Two ways to reset the device to its default 3-page layout (Main, Media, Studio):</p>
+          <p style="margin-top:8px"><strong>Method 1 — Config tool Reset button:</strong> Click the red <strong>Reset</strong> button in the config tool. If connected via WebSerial, it sends a factory reset command to the device (clears the config, resets screensaver settings). Then it reads the fresh default config back into the browser. If not connected, it resets the browser's config to defaults only.</p>
+          <p style="margin-top:8px"><strong>Method 2 — Re-flash firmware:</strong> Flashing the firmware .bin at address 0 overwrites the entire flash including the SPIFFS config partition. This gives you a completely clean slate — fresh firmware, default config.</p>
+          <div class="guide-note">The default layout: 3 pages (Main, Media, Studio), 4×3 grid (12 buttons), each pre-filled with common shortcuts like Copy, Paste, Undo, Play/Pause, Next Track, and volume controls.</div>
+        </div>
+      </div>
+
+      <!-- ─── Section: Troubleshooting ─── -->
+      <div id="troubleshooting" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Troubleshooting</h3></div>
+
+      <div class="guide-step" id="section-tshoot">
+        <div class="guide-num">12</div>
+        <div class="guide-body">
+          <h3>Common Issues</h3>
+
+          <div style="margin-top:8px">
+            <p><strong>"Could not load firmware list" in the firmware tool</strong></p>
+            <p style="color:var(--dim);font-size:0.88rem">The firmware manifest file couldn't be loaded. Hard-refresh the page (Ctrl+F5 or Cmd+Shift+R) to clear the browser cache. If it persists, open the browser console (F12 > Console tab) and look for the specific error — usually a network or JSON parsing issue.</p>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>CYD not detected / serial port not showing up</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>You must use <strong>Chrome or Edge</strong> (Web Serial API is not supported in Firefox, Safari, or older browsers)</li>
+              <li>The page must be served over <strong>HTTPS</strong> (or localhost) — HTTP pages can't access Web Serial. GitHub Pages works</li>
+              <li>Check your USB cable — some cables are charge-only and don't carry data. Try the cable that came with the CYD or a known-good data cable</li>
+              <li>Try a different USB port, preferably directly on the computer motherboard (not a hub)</li>
+              <li>If the CYD lights up but isn't detected, the USB-serial driver (CH340/CP2102) may be missing. Windows usually auto-installs it; on Linux it's built-in; on macOS you may need a driver</li>
+              <li>Restart the browser after plugging in the CYD — sometimes the port list doesn't refresh</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>BLE won't pair / "SudoDeck" not found in Bluetooth list</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>Make sure the CYD is powered (USB plugged in) — no power = no Bluetooth</li>
+              <li>Check the top-left of the display — you should see a Bluetooth icon (Apple-style for macOS/iOS) or "BT" text (Windows/Android/Linux)</li>
+              <li>If the header shows no Bluetooth indicator, the BLE stack may not have started. Reboot the CYD by tapping the RESET button on the back</li>
+              <li>If the CYD was previously paired to another device, it may not be discoverable. Unpair from the old device or forget the CYD in the old device's Bluetooth settings first</li>
+              <li>On Windows: go to Settings > Bluetooth & other devices > Remove the CYD if listed, then click "Add Bluetooth or other device" and look for SudoDeck again</li>
+              <li>BLE range is ~10 metres. Make sure the CYD is close to the device you're pairing with</li>
+              <li>Some devices (especially older ones) may need Bluetooth off/on toggled between pairing attempts</li>
+              <li>The CYD supports BLE (Bluetooth Low Energy) only. Your computer/phone/tablet must support BLE — virtually all devices from 2016+ do</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>Config write fails: "IncompleteInput", "HTTP 404", or "oom"</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li><strong>"IncompleteInput"</strong> usually means the JSON config was too large for the serial buffer. Update to firmware v2.1.5+ which has a 128KB buffer — enough for all 18 pages</li>
+              <li><strong>"HTTP 404"</strong> in the firmware tool means the firmware manifest URL is incorrect. Hard-refresh the page</li>
+              <li><strong>"oom"</strong> (out of memory) means the JSON payload exceeded the ESP32's available heap. Reduce the number of pages or buttons, or remove long labels/widget URLs</li>
+              <li>If the firmware dropdown doesn't show v2.1.5+, hard-refresh the page to clear cache</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>Buttons don't do anything when pressed</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>Check if the CYD is paired to your device — look for the Bluetooth icon/BT text in the display header. No icon = not connected</li>
+              <li>Verify the button has an actual action assigned in the config tool (not just a label with no action type)</li>
+              <li>Make sure the action type matches what you want — e.g. "Text String" won't trigger a keyboard shortcut</li>
+              <li>Reboot the CYD and re-pair if needed</li>
+              <li>Test with a simple action: set a button to <code>Single Key → ENTER</code> and see if it fires</li>
+              <li>If the button flashes on press but nothing happens, the BLE connection may be active but the HID report isn't reaching the OS. Unpair and re-pair</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>Screen is blank / won't turn on</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>If the USB is plugged in but the screen is off, tap the display — it may be in sleep mode</li>
+              <li>If still blank, the firmware may be corrupted or missing. Re-flash the firmware (the bootloader can't be bricked — you can always flash again)</li>
+              <li>Make sure the CYD is getting power — the backlight should glow even without firmware</li>
+              <li>If the CYD doesn't respond to BOOT+RESET for flash mode, try a different USB cable or port</li>
+              <li>As a last resort, momentarily short the EN pin to GND with a wire to force a hardware reset</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>WiFi won't connect / "W:connecting" stays forever</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>The ESP32 only supports <strong>2.4GHz</strong> networks — check that your router isn't hiding the 2.4GHz band (many modern routers combine 2.4GHz and 5GHz under one SSID)</li>
+              <li>Double-check the SSID and password — the config tool doesn't validate them, and typos are common</li>
+              <li>Avoid unusual special characters in the password. ASCII characters are most reliable over the serial connection</li>
+              <li>The CYD retries connection every 30 seconds. Wait at least 2 minutes before assuming it won't connect</li>
+              <li>The WiFi module is disabled when BT is connected to save power — they share the same radio</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>Touchscreen is inaccurate or unresponsive</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>The CYD uses a resistive touchscreen — it requires firm press, not a light tap like a phone</li>
+              <li>Use your fingernail or a stylus for more precision. Resistive screens detect pressure, not capacitance</li>
+              <li>If touch stops working, reboot the CYD</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>Display shows garbled / corrupted graphics</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>This can happen if the TFT SPI frequency is too high for your specific CYD unit. Try a different firmware version or re-flash</li>
+              <li>Poor USB power (long cable, hub without external power) can cause display glitches — plug directly into the computer</li>
+              <li>Reboot the CYD — a temporary glitch is usually fixed by a reset</li>
+            </ul>
+          </div>
+
+          <div class="guide-note">Still stuck? Open an issue on <a href="https://github.com/sudobreakstuff/sudodeck/issues" target="_blank" style="color:var(--acc)">GitHub</a> or email <a href="mailto:shahidsingh1zn@gmail.com" style="color:var(--acc)">shahidsingh1zn@gmail.com</a>. Include details: CYD model, firmware version, what you were doing, and what error you saw.</div>
+        </div>
+      </div>
+
+      <!-- ─── Section: Reference ─── -->
+      <div id="reference" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Reference</h3></div>
+
+      <div class="guide-step" id="section-limits">
+        <div class="guide-num">13</div>
+        <div class="guide-body">
+          <h3>Limits &amp; Specifications</h3>
+
+          <h4 style="margin:12px 0 6px;font-size:0.95rem">Layout Limits</h4>
+          <table class="cmp-table" style="margin-top:8px;width:100%">
+            <tr><th>Limit</th><th>Value</th></tr>
+            <tr><td>Pages</td><td>18</td></tr>
+            <tr><td>Columns per page</td><td>1–6</td></tr>
+            <tr><td>Rows per page</td><td>1–5</td></tr>
+            <tr><td>Buttons per page</td><td>30 (6×5 max)</td></tr>
+            <tr><td>Total buttons (all pages)</td><td>540 (18 × 30)</td></tr>
+            <tr><td>Custom widgets</td><td>8 max</td></tr>
+          </table>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Hardware Specifications</h4>
+          <table class="cmp-table" style="margin-top:8px;width:100%">
+            <tr><th>Component</th><th>Specification</th></tr>
+            <tr><td>SoC</td><td>ESP32-D0WD-V3, dual-core Xtensa LX6 @ 240MHz</td></tr>
+            <tr><td>SRAM</td><td>520KB total (~320KB usable after system reserve)</td></tr>
+            <tr><td>Flash</td><td>4MB SPI flash (2MB app + 2MB SPIFFS data)</td></tr>
+            <tr><td>Display</td><td>2.8" TFT LCD, 320×240 pixels, ILI9341 driver, SPI</td></tr>
+            <tr><td>Touch</td><td>Resistive touchscreen, XPT2046 controller, SPI</td></tr>
+            <tr><td>Bluetooth</td><td>BLE 4.2 (Bluetooth Low Energy), HID keyboard profile</td></tr>
+            <tr><td>WiFi</td><td>802.11 b/g/n, 2.4GHz only</td></tr>
+            <tr><td>USB</td><td>USB-C (USB 2.0 data + power, no alt-mode/PD)</td></tr>
+            <tr><td>USB-serial</td><td>CH340C or CP2102 (depending on CYD batch)</td></tr>
+            <tr><td>Power</td><td>5V USB, ~200-300mA draw</td></tr>
+            <tr><td>Battery</td><td>None — USB power only. No charging circuit, no battery connector</td></tr>
+            <tr><td>MAC address</td><td>Unique per device (printed in firmware info response)</td></tr>
+          </table>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Software Limits</h4>
+          <table class="cmp-table" style="margin-top:8px;width:100%">
+            <tr><th>Limit</th><th>Value</th></tr>
+            <tr><td>Button label length</td><td>Truncated with "..." at display width (~12 chars on 4-col grid)</td></tr>
+            <tr><td>Macro steps</td><td>No hard limit — practical max ~50 before execution time becomes noticeable</td></tr>
+            <tr><td>Text string length</td><td>No hard limit — practical max ~200 chars per button</td></tr>
+            <tr><td>Delay range</td><td>1–10000 milliseconds</td></tr>
+            <tr><td>Screensaver timeout</td><td>5–600 seconds (configurable)</td></tr>
+            <tr><td>Sleep timeout</td><td>0–600 seconds (0 = never sleep)</td></tr>
+            <tr><td>Serial buffer (v2.1.5+)</td><td>131072 bytes (128KB) — enough for full config of all 18 pages</td></tr>
+            <tr><td>BLE range</td><td>~10m open air</td></tr>
+          </table>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Compatibility</h4>
+          <table class="cmp-table" style="margin-top:8px;width:100%">
+            <tr><th>OS / Platform</th><th>BLE HID Support</th><th>Web Serial Support</th></tr>
+            <tr><td>Windows 10+</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
+            <tr><td>macOS 11+</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
+            <tr><td>Linux (BlueZ)</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
+            <tr><td>Android 8+</td><td>Yes</td><td>Yes (Chrome)</td></tr>
+            <tr><td>iOS / iPadOS 13+</td><td>Yes</td><td>No (Safari only, no Web Serial)</td></tr>
+            <tr><td>ChromeOS</td><td>Yes</td><td>Yes</td></tr>
+          </table>
+
+          <div class="guide-note" style="margin-top:10px">Limits are enforced by the firmware at <code>firmware.ino:298</code>. The web config tool also caps inputs — entering a value above the max is silently clamped. All limits are open-source and changeable in the source code if you need something different.</div>
         </div>
       </div>
 
