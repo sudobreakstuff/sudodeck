@@ -1437,7 +1437,8 @@ void handle_touch(int tx, int ty) {
     }
       // Redraw label after flash
       if (label[0]) {
-        tft.setTextColor(c_txt, bg);
+        uint16_t txt_bg = (button_style == 1) ? c_bg : bg;
+        tft.setTextColor(c_txt, txt_bg);
         String dlabel = label;
         int max_lw = bw - 4;
         int lw = tft.textWidth(label);
