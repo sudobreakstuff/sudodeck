@@ -442,6 +442,9 @@ var themePresets = {
   cyberpunk:  { bg:"#000000", hdr:"#200820", acc:"#FF0088", txt:"#FFFFFF", dim:"#637282", btn:"#180820" },
   monochrome: { bg:"#101210", hdr:"#212424", acc:"#BDBFBF", txt:"#FFFFFF", dim:"#637282", btn:"#212424" },
   ocean:      { bg:"#000000", hdr:"#022010", acc:"#00EFEF", txt:"#FFFFFF", dim:"#637282", btn:"#082000" },
+  blood:      { bg:"#000000", hdr:"#300000", acc:"#FF0000", txt:"#FFFFFF", dim:"#637282", btn:"#180000" },
+  nord:       { bg:"#000000", hdr:"#182838", acc:"#5A7B8B", txt:"#FFFFFF", dim:"#637282", btn:"#212428" },
+  dracula:    { bg:"#000000", hdr:"#200828", acc:"#FF00FF", txt:"#FFFFFF", dim:"#637282", btn:"#200828" },
 };
 
 function syncThemeUI() {
@@ -459,7 +462,7 @@ function syncThemeUI() {
     '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.dim+'"></span>'+
     '<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:'+p.btn+'"></span>'+
     '<span style="color:'+p.txt+';font-size:0.7rem;margin-left:4px;">'+cd.theme.name+'</span>';
-  var styles = ['flat','outlined','neon'];
+  var styles = ['flat','outlined','neon','soft','shadow'];
   document.getElementById('themeStylePreview').innerHTML = styles.map(function(s) {
     var sel = s === (cd.theme.button_style||'flat') ? ' style="border:2px solid var(--acc);"' : '';
     return '<span class="ts-pill" data-style="'+s+'"'+sel+'>'+s+'</span>';

@@ -302,9 +302,14 @@ void apply_theme() {
   else if (!strcmp(t,"cyberpunk")) { c_bg=0x0000; c_hdr=0x2008; c_acc=0xF811; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1808; }
   else if (!strcmp(t,"monochrome")) { c_bg=0x10A2; c_hdr=0x2124; c_acc=0xBDF7; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x2124; }
   else if (!strcmp(t,"ocean")) { c_bg=0x0000; c_hdr=0x0210; c_acc=0x07EF; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x0880; }
+  else if (!strcmp(t,"blood")) { c_bg=0x0000; c_hdr=0x3000; c_acc=0xF800; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1800; }
+  else if (!strcmp(t,"nord")) { c_bg=0x0000; c_hdr=0x18E3; c_acc=0x5AEB; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x2124; }
+  else if (!strcmp(t,"dracula")) { c_bg=0x0000; c_hdr=0x2008; c_acc=0xF81F; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x2008; }
   else { c_bg=0x0000; c_hdr=0x0862; c_acc=0x07F1; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1107; }
   if (!strcmp(s,"outlined")) button_style=1;
   else if (!strcmp(s,"neon")) button_style=2;
+  else if (!strcmp(s,"soft")) button_style=3;
+  else if (!strcmp(s,"shadow")) button_style=4;
   else button_style=0;
 }
 void apply_cfg() {
@@ -1047,6 +1052,14 @@ void draw_grid() {
     } else if (button_style == 2) { // neon
       tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    } else if (button_style == 3) { // soft
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+      uint16_t sbg = tft.alphaBlend(200, bg, 0xFFFF);
+      tft.drawRoundRect(x, y, bw, bh, 6, sbg);
+    } else if (button_style == 4) { // shadow
+      uint16_t sh = tft.alphaBlend(80, bg, 0x0000);
+      tft.fillRoundRect(x + 2, y + 2, bw, bh, 6, sh);
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
     } else { // flat
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     }
@@ -1410,6 +1423,14 @@ void handle_touch(int tx, int ty) {
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
     } else if (button_style == 2) { // neon
       tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+    } else if (button_style == 3) { // soft
+      tft.fillRoundRect(x, y, bw, bh, 6, bg);
+      uint16_t sbg = tft.alphaBlend(200, bg, 0xFFFF);
+      tft.drawRoundRect(x, y, bw, bh, 6, sbg);
+    } else if (button_style == 4) { // shadow
+      uint16_t sh = tft.alphaBlend(80, bg, 0x0000);
+      tft.fillRoundRect(x + 2, y + 2, bw, bh, 6, sh);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     } else { // flat
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
