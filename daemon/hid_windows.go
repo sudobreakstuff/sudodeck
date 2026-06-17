@@ -175,10 +175,6 @@ func injectMediaTap(key uint16) {
 	winMu.Lock()
 	defer winMu.Unlock()
 
-	mediaMap := map[uint16]uint16{
-		0xE8: 0xAE, // VOLUME UP
-		0xE9: 0xAE, // Actually VK_VOLUME_DOWN = 0xAD... let me fix
-	}
 	var vk uint16
 	switch key {
 	case 0xE8:
