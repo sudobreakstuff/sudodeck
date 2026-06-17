@@ -36,25 +36,26 @@
         <a href="#setup" class="guide-toc-sect">Setup</a>
         <a href="#section-flash" class="guide-toc-item">2. Flash Firmware</a>
         <a href="#section-connect" class="guide-toc-item">3. Connect &amp; Configure</a>
-        <a href="#section-pair" class="guide-toc-item">4. Pair via Bluetooth</a>
-        <a href="#section-use" class="guide-toc-item">5. Use It</a>
+        <a href="#section-wired" class="guide-toc-item">4. Wired Mode Setup (alternative to Bluetooth)</a>
+        <a href="#section-pair" class="guide-toc-item">5. Pair via Bluetooth</a>
+        <a href="#section-use" class="guide-toc-item">6. Use It</a>
 
         <a href="#features" class="guide-toc-sect">Features</a>
-        <a href="#section-actions" class="guide-toc-item">6. Action Types</a>
-        <a href="#section-layout" class="guide-toc-item">7. Layouts, Export &amp; Import</a>
-        <a href="#section-screensaver" class="guide-toc-item">8. Screensaver &amp; Widgets</a>
-        <a href="#section-automations" class="guide-toc-item">9. Automations</a>
-        <a href="#section-wifi" class="guide-toc-item">10. WiFi Setup</a>
+        <a href="#section-actions" class="guide-toc-item">7. Action Types</a>
+        <a href="#section-layout" class="guide-toc-item">8. Layouts, Export &amp; Import</a>
+        <a href="#section-screensaver" class="guide-toc-item">9. Screensaver &amp; Widgets</a>
+        <a href="#section-automations" class="guide-toc-item">10. Automations</a>
+        <a href="#section-wifi" class="guide-toc-item">11. WiFi Setup</a>
 
         <a href="#maintenance" class="guide-toc-sect">Maintenance</a>
-        <a href="#section-update" class="guide-toc-item">11. Firmware Updates</a>
-        <a href="#section-reset" class="guide-toc-item">12. Factory Reset</a>
+        <a href="#section-update" class="guide-toc-item">12. Firmware Updates</a>
+        <a href="#section-reset" class="guide-toc-item">13. Factory Reset</a>
 
         <a href="#troubleshooting" class="guide-toc-sect">Troubleshooting</a>
-        <a href="#section-tshoot" class="guide-toc-item">13. Common Issues</a>
+        <a href="#section-tshoot" class="guide-toc-item">14. Common Issues</a>
 
         <a href="#reference" class="guide-toc-sect">Reference</a>
-        <a href="#section-limits" class="guide-toc-item">14. Limits &amp; Specs</a>
+        <a href="#section-limits" class="guide-toc-item">15. Limits &amp; Specs</a>
       </div>
     </div>
 
@@ -92,7 +93,7 @@
             <li>While holding BOOT, tap <strong>RESET</strong> (EN, top-right edge) — the screen goes blank</li>
             <li>Release BOOT — the CYD is now in download mode, waiting for firmware</li>
             <li>On the <a href="../app/#firmware" style="color:var(--acc)">Configure page</a>, click <strong>Connect for Flashing</strong> and select the CYD's serial port in the browser dialog</li>
-            <li>Pick a firmware version from the dropdown (or choose a .bin file with "Custom .bin") and click <strong>Flash</strong></li>
+            <li>Choose your firmware variant — <strong>Standard (BLE)</strong> for Bluetooth or <strong>Wired (Serial)</strong> for USB keystroke injection — then pick a version and click <strong>Flash</strong></li>
             <li>Wait for the progress bar to reach 100% — the CYD reboots automatically and boots into SudoDeck</li>
           </ol>
           <a class="guide-cta" href="../app/#firmware">Go to Firmware Tool</a>
@@ -120,10 +121,83 @@
         </div>
       </div>
 
-      <div class="guide-step" id="section-pair">
+      <div class="guide-step" id="section-wired">
         <div class="guide-num">4</div>
         <div class="guide-body">
+          <h3>Wired Mode Setup</h3>
+          <p>Instead of Bluetooth, you can use the CYD as a <strong>wired keyboard</strong> over USB. The CYD sends keystrokes over the serial connection, and a companion daemon (installed on your computer) injects them as if they came from a physical USB keyboard.</p>
+          <p>Choose this if your computer doesn't have Bluetooth, you want lower latency, or you prefer a single-cable setup.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">1. Flash the Wired Firmware</h4>
+          <p>You need the wired firmware variant on the CYD:</p>
+          <ol style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Put the CYD in <strong>flash mode</strong> (hold BOOT, tap RESET, release BOOT)</li>
+            <li>Open the <a href="../app/#firmware" style="color:var(--acc)">Firmware Tool</a></li>
+            <li>Click <strong>Connect for Flashing</strong> and select the CYD's serial port</li>
+            <li>Select the <strong>Wired (Serial)</strong> variant using the radio buttons</li>
+            <li>Pick the latest wired firmware version from the dropdown and click <strong>Flash</strong></li>
+            <li>Wait for the progress bar to reach 100% — the CYD reboots automatically</li>
+          </ol>
+          <div class="guide-note">The wired and BLE firmware are separate builds. You can switch between them at any time by re-flashing the other variant. Your config is preserved in SPIFFS and works with both firmware types.</div>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">2. Install the Daemon</h4>
+          <p>The daemon is a small background program that reads keystrokes from the CYD over USB and injects them into your OS.</p>
+
+          <p style="margin-top:8px"><strong>Linux</strong></p>
+          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6"># Download the latest release
+curl -L -o sudodeckd https://github.com/sudobreakstuff/sudodeck/releases/latest/download/sudodeckd-linux-amd64
+chmod +x sudodeckd
+
+# Run it (stays open, Ctrl+C to stop)
+./sudodeckd
+
+# Or install as a systemd service for auto-start
+sudo ./sudodeckd --install</pre>
+
+          <p style="margin-top:10px"><strong>Windows</strong></p>
+          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6"># Download sudodeckd-windows-amd64.exe from the releases page
+# Run as Administrator (required for SendInput API)
+sudodeckd-windows-amd64.exe
+
+# Or install as a Windows service (auto-starts on boot)
+sudodeckd-windows-amd64.exe --install</pre>
+
+          <p style="margin-top:10px"><strong>macOS</strong></p>
+          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6"># Download sudodeckd-darwin-amd64 (Intel) or sudodeckd-darwin-arm64 (Apple Silicon)
+chmod +x sudodeckd-darwin-*
+
+# Run it
+./sudodeckd-darwin-*
+
+# Or install as a LaunchAgent for auto-start
+./sudodeckd-darwin-* --install</pre>
+          <p style="color:var(--dim);font-size:0.85rem;margin-top:6px">macOS will ask for Accessibility permission on first run — grant it in <strong>System Settings → Privacy & Security → Accessibility</strong>.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">3. Plug and Play</h4>
+          <ol style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Plug the CYD into USB — the daemon auto-discovers it within 5 seconds</li>
+            <li>The daemon logs show <code>Device found: /dev/ttyUSB0 (SudoDeck)</code> or similar</li>
+            <li>Tap any button on the CYD — the keystroke is injected into your OS immediately</li>
+            <li>The CYD's header shows <strong>USB</strong> instead of a Bluetooth icon, confirming wired mode is active</li>
+          </ol>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Configuring the CYD</h4>
+          <p>You can still use the config tool to edit buttons while the daemon is running. The tool automatically coordinates with the daemon:</p>
+          <ol style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li>Open the <a href="../app/#config" style="color:var(--acc)">Configure page</a> as normal</li>
+            <li>Click <strong>Connect</strong> — the config tool tells the daemon to release the serial port first</li>
+            <li>Read, edit, and write your layout as usual</li>
+            <li>When you disconnect from the config tool, the daemon picks up the port again automatically</li>
+          </ol>
+          <div class="guide-note">The daemon serves an HTTP API on <code>127.0.0.1:8092</code>. The config tool calls <code>POST /release</code> before connecting via Web Serial, and the daemon reconnects after the port is released. No manual intervention needed.</div>
+        </div>
+      </div>
+
+      <div class="guide-step" id="section-pair">
+        <div class="guide-num">5</div>
+        <div class="guide-body">
           <h3>Pair via Bluetooth</h3>
+          <p><strong>Skip this step if you're using Wired Mode</strong> — wired and BLE are mutually exclusive. The CYD runs one firmware at a time.</p>
           <p>The CYD announces itself as a Bluetooth keyboard. Pair it with your computer, phone, or tablet just like any other Bluetooth device.</p>
           <ol style="margin:8px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
             <li>Keep the CYD powered (USB plugged in) — there is no battery, it needs USB power to run</li>
@@ -147,7 +221,7 @@
       </div>
 
       <div class="guide-step" id="section-use">
-        <div class="guide-num">5</div>
+        <div class="guide-num">6</div>
         <div class="guide-body">
           <h3>Use It</h3>
           <p>Once paired, every button press on the CYD sends the assigned action to the connected device — just like pressing keys on a keyboard.</p>
@@ -190,7 +264,7 @@
       <div id="features" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Features</h3></div>
 
       <div class="guide-step" id="section-actions">
-        <div class="guide-num">6</div>
+        <div class="guide-num">7</div>
         <div class="guide-body">
           <h3>Action Types</h3>
           <p>Each button can be assigned one of six action types. Here's what they do and when to use them:</p>
@@ -291,7 +365,7 @@
       </div>
 
       <div class="guide-step" id="section-layout">
-        <div class="guide-num">7</div>
+        <div class="guide-num">8</div>
         <div class="guide-body">
           <h3>Layouts: Pages, Grid &amp; Backup</h3>
           <p>Your button layout is organised as a grid of pages. Each page has a configurable number of columns and rows, and each cell holds one button with a label, color, and action.</p>
@@ -332,7 +406,7 @@
       </div>
 
       <div class="guide-step" id="section-screensaver">
-        <div class="guide-num">8</div>
+        <div class="guide-num">9</div>
         <div class="guide-body">
           <h3>Screensaver &amp; Live Widgets</h3>
           <p>When idle, the CYD displays a screensaver. Three modes are built in:</p>
@@ -375,7 +449,7 @@
       </div>
 
       <div class="guide-step" id="section-automations">
-        <div class="guide-num">9</div>
+        <div class="guide-num">10</div>
         <div class="guide-body">
           <h3>Automations</h3>
           <p>Automations let you send keystrokes or sequences on a <strong>timer</strong> or <strong>schedule</strong> — no button press needed. Configure them in the app under the Automations panel.</p>
@@ -400,7 +474,7 @@
       </div>
 
       <div class="guide-step" id="section-wifi">
-        <div class="guide-num">10</div>
+        <div class="guide-num">11</div>
         <div class="guide-body">
           <h3>WiFi Setup</h3>
           <p>WiFi is optional but required for live data features (F1 standings, custom widgets). The CYD uses the ESP32's built-in 2.4GHz WiFi.</p>
@@ -437,7 +511,7 @@
       <div id="maintenance" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Maintenance</h3></div>
 
       <div class="guide-step" id="section-update">
-        <div class="guide-num">11</div>
+        <div class="guide-num">12</div>
         <div class="guide-body">
           <h3>Firmware Updates</h3>
           <p>Updating the firmware is the same process as the initial flash. The firmware tool on the Configure page handles everything.</p>
@@ -458,7 +532,7 @@
       </div>
 
       <div class="guide-step" id="section-reset">
-        <div class="guide-num">12</div>
+        <div class="guide-num">13</div>
         <div class="guide-body">
           <h3>Factory Reset</h3>
           <p>Two ways to reset the device to its default 3-page layout (Main, Media, Studio):</p>
@@ -472,7 +546,7 @@
       <div id="troubleshooting" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Troubleshooting</h3></div>
 
       <div class="guide-step" id="section-tshoot">
-        <div class="guide-num">13</div>
+        <div class="guide-num">14</div>
         <div class="guide-body">
           <h3>Common Issues</h3>
 
@@ -561,6 +635,28 @@
           </div>
 
           <div style="margin-top:14px">
+            <p><strong>Daemon not detecting the CYD</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>Make sure you flashed the <strong>Wired (Serial)</strong> firmware variant — the BLE firmware doesn't send HID packets over serial</li>
+              <li>On Linux, add your user to the <code>dialout</code> group: <code>sudo usermod -a -G dialout $USER</code> — log out and back in</li>
+              <li>On Linux, <code>/dev/uinput</code> requires write permission: <code>sudo usermod -a -G input $USER</code></li>
+              <li>On Windows, run the daemon <strong>as Administrator</strong> — SendInput requires elevated privileges</li>
+              <li>On macOS, approve <strong>Accessibility</strong> permission in System Settings &gt; Privacy &amp; Security</li>
+              <li>Check that no other program (Arduino IDE, serial monitor) has the CYD's port open</li>
+              <li>The daemon auto-detects the CYD within 5 seconds of plugging it in. If it doesn't, restart the daemon</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
+            <p><strong>Keystrokes arrive doubled or not at all</strong></p>
+            <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+              <li>The daemon and firmware communicate over the same serial port as the config tool. If you have both open, close the config tool (Web Serial) — the daemon will reconnect</li>
+              <li>If keystrokes are doubled, the daemon may be running twice. Check for another instance and kill it</li>
+              <li>Restart the daemon: stop it (Ctrl+C) and start it again. The daemon re-scans all serial ports on startup</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:14px">
             <p><strong>Display shows garbled / corrupted graphics</strong></p>
             <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
               <li>This can happen if the TFT SPI frequency is too high for your specific CYD unit. Try a different firmware version or re-flash</li>
@@ -577,7 +673,7 @@
       <div id="reference" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Reference</h3></div>
 
       <div class="guide-step" id="section-limits">
-        <div class="guide-num">14</div>
+        <div class="guide-num">15</div>
         <div class="guide-body">
           <h3>Limits &amp; Specifications</h3>
 
@@ -626,13 +722,13 @@
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Compatibility</h4>
           <table class="cmp-table" style="margin-top:8px;width:100%">
-            <tr><th>OS / Platform</th><th>BLE HID Support</th><th>Web Serial Support</th></tr>
-            <tr><td>Windows 10+</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
-            <tr><td>macOS 11+</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
-            <tr><td>Linux (BlueZ)</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
-            <tr><td>Android 8+</td><td>Yes</td><td>Yes (Chrome)</td></tr>
-            <tr><td>iOS / iPadOS 13+</td><td>Yes</td><td>No (Safari only, no Web Serial)</td></tr>
-            <tr><td>ChromeOS</td><td>Yes</td><td>Yes</td></tr>
+            <tr><th>OS / Platform</th><th>BLE HID Support</th><th>Daemon (Wired) Support</th><th>Web Serial Support</th></tr>
+            <tr><td>Windows 10+</td><td>Yes</td><td>Yes (SendInput)</td><td>Yes (Chrome/Edge)</td></tr>
+            <tr><td>macOS 11+</td><td>Yes</td><td>Yes (CGEvent, needs Accessibility)</td><td>Yes (Chrome/Edge)</td></tr>
+            <tr><td>Linux (BlueZ)</td><td>Yes</td><td>Yes (/dev/uinput)</td><td>Yes (Chrome/Edge)</td></tr>
+            <tr><td>Android 8+</td><td>Yes</td><td>No</td><td>Yes (Chrome)</td></tr>
+            <tr><td>iOS / iPadOS 13+</td><td>Yes</td><td>No</td><td>No (Safari only, no Web Serial)</td></tr>
+            <tr><td>ChromeOS</td><td>Yes</td><td>No (Linux VM may work)</td><td>Yes</td></tr>
           </table>
 
           <div class="guide-note" style="margin-top:10px">Limits are enforced by the firmware at <code>firmware.ino:298</code>. The web config tool also caps inputs — entering a value above the max is silently clamped. All limits are open-source and changeable in the source code if you need something different.</div>
