@@ -124,6 +124,7 @@ struct Automation {
 };
 Automation automations[MAX_AUTOMATIONS];
 int automation_count = 0;
+bool automations_enabled = true;
 bool time_synced = false;
 
 JsonDocument config;
@@ -241,6 +242,9 @@ void do_action(JsonObject a) {
   } else if (!strcmp(t,"macro")) {
     JsonArray steps = a["steps"];
     for (JsonObject s : steps) { do_action(s); int d = s["delay"]|0; if (d>0 && d<10000) delay(d); }
+  } else if (!strcmp(t,"automation_toggle")) {
+    automations_enabled = !automations_enabled;
+    draw_header();
   }
 }
 
@@ -340,6 +344,7 @@ void load_automations() {
 }
 
 void check_automations() {
+  if (!automations_enabled) return;
   unsigned long now = millis();
   for (int i = 0; i < automation_count; i++) {
     Automation& a = automations[i];
@@ -1218,6 +1223,10 @@ void draw_header() {
     tft.print("SudoDeck | BLE: ...");
   else
     tft.print("SudoDeck | booting");
+  tft.setTextColor(automations_enabled ? c_acc : TFT_RED, c_hdr);
+  tft.print(" | A:");
+  tft.print(automations_enabled ? "ON" : "OFF");
+  tft.setTextColor(c_acc, c_hdr);
   if (wifi_ssid.length() > 0) {
     if (WiFi.isConnected())
       tft.print(" | W:ON");

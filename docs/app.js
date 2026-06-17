@@ -440,6 +440,7 @@ function gaf() {
   if (t === 'delay') return { type: 'delay', value: parseInt(document.getElementById('edv')?.value) || 100 };
   if (t === 'app') return { type: 'app', os: document.getElementById('aos')?.value || 'windows', name: document.getElementById('anv')?.value || '' };
   if (t === 'macro') { var btn = curBtn(); return { type: 'macro', steps: btn?.action?.steps || [] }; }
+  if (t === 'automation_toggle') return { type: 'automation_toggle' };
   return { type: 'key', value: '' };
 }
 document.getElementById('eat').addEventListener('change', function() {
