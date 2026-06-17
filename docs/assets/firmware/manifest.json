@@ -1,11 +1,18 @@
 {
   "versions": [
     {
+      "version": "2.2.0",
+      "label": "SudoDeck v2.2.0",
+      "file": "firmware-v2.2.0.bin",
+      "address": "0",
+      "notes": "Multi-slot BLE! 3 slots with pair/switch/clear. Bottom bar shows tappable slot name. Config restructured to slots[].pages[]. Auto-migration from v1. Timer + scheduled automations (NTP). Pair via config tool."
+    },
+    {
       "version": "2.1.6",
       "label": "SudoDeck v2.1.6",
       "file": "firmware-v2.1.6.bin",
       "address": "0",
-      "notes": "Themes! 7 presets (default, midnight, forest, amber, cyberpunk, monochrome, ocean) + 4 button styles (flat, glassy, outlined, neon). Set via config tool or set_theme command."
+      "notes": "Themes! 10 presets (default, midnight, forest, amber, cyberpunk, monochrome, ocean, blood, nord, dracula) + 5 button styles (flat, outlined, neon, soft, shadow). Set via config tool or set_theme command."
     },
     {
       "version": "2.1.5",

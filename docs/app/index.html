@@ -82,6 +82,12 @@
           <button class="btn dan" id="btnReset">Reset</button>
         </div>
       </div>
+
+      <div class="cfg-sidebar">
+        <div class="p-bar" id="slotBar"></div>
+        <div class="p-bar" id="pageBar"></div>
+      </div>
+
       <div class="p-bar" id="pBar"></div>
       <div id="gp" style="grid-template-columns:repeat(4,1fr)"></div>
       <div class="ep" id="ep">
@@ -133,12 +139,29 @@
         </div>
         <button class="btn" id="btnWifiSet" style="display:none">Set WiFi</button>
       </div>
+
+      <div class="saver-fold">
+        <div class="saver-hdr" id="slotToggle">
+          <span>BLE Slots</span>
+          <span class="saver-hint" id="slotHint">1 slot</span>
+        </div>
+        <div class="saver-body" id="slotBody">
+          <div id="slotList"></div>
+          <div class="er" style="margin-top:8px">
+            <button class="btn pri" id="btnSlotPair">Pair Current Slot</button>
+            <button class="btn dan" id="btnSlotClear">Clear Slot</button>
+            <button class="btn" id="btnSlotSwitch">Switch to Slot</button>
+            <input type="number" id="slotSwitchIdx" min="0" max="2" value="0" style="width:50px">
+          </div>
+        </div>
+      </div>
+
       <div class="saver-fold">
         <div class="saver-hdr" id="saverToggle">
           <span>Screensaver</span>
           <span class="saver-hint" id="saverHint">off</span>
         </div>
-          <div class="saver-body" id="saverBody">
+        <div class="saver-body" id="saverBody">
           <div class="er">
             <label>Timeout</label>
             <input type="number" id="saverTimeout" min="5" max="600" value="30">
@@ -203,6 +226,16 @@
         <div class="saver-body" id="widgetBody">
           <div id="widgetList"></div>
           <button class="btn pri" id="btnWidgetAdd" style="margin-top:8px">+ Add Widget</button>
+        </div>
+      </div>
+      <div class="saver-fold" style="margin-top:6px">
+        <div class="saver-hdr" id="autoToggle">
+          <span>Automations</span>
+          <span class="saver-hint" id="autoHint">0</span>
+        </div>
+        <div class="saver-body" id="autoBody">
+          <div id="autoList"></div>
+          <button class="btn pri" id="btnAutoAdd" style="margin-top:8px">+ Add Automation</button>
         </div>
       </div>
     </div>

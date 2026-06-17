@@ -6,6 +6,9 @@
 #include <HijelHID_BLEKeyboard.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <nvs_flash.h>
+#include <nvs.h>
+#include <time.h>
 #include "logo_img.h"
 
 #define XP_IRQ 36
@@ -22,10 +25,14 @@
 #define GRID_Y HEAD_H
 #define GRID_H (SCR_H - HEAD_H - BOT_H)
 
+#define MAX_SLOTS 3
+#define MAX_AUTOMATIONS 20
+#define NVS_NS "sdb_ble"
+
 // theme state
 uint16_t c_bg=0x0000, c_hdr=0x0862, c_acc=0x07F1;
 uint16_t c_txt=0xFFFF, c_dim=0x632C, c_btn_bg=0x1107;
-int button_style = 0; // 0=flat 1=glassy 2=outlined 3=neon
+int button_style = 0;
 
 TFT_eSPI tft = TFT_eSPI();
 SPIClass tspi(VSPI);
@@ -35,9 +42,12 @@ HijelHID_BLEKeyboard ble("SudoDeck", "shahid singh");
 bool ble_ready = false;
 bool ble_was_connected = false;
 
-
-int page = 0;
-int num_pages = 0;
+// Slot state
+int current_slot = 0;
+int num_slots = 0;
+String slot_names[MAX_SLOTS];
+int slot_pages[MAX_SLOTS];
+int slot_cur_page[MAX_SLOTS];
 int cols = 4, rows = 3;
 int total_btns = 0;
 
@@ -64,9 +74,7 @@ int sleep_timeout = DEFAULT_SLEEP;
 unsigned long saver_start_ms = 0;
 unsigned long last_touch_ms = 0;
 uint16_t* saver_img = nullptr;
-// Image bounce state
 float saver_x, saver_y, saver_vx, saver_vy;
-// Matrix rain state
 struct { int8_t x, y, len, spd; char ch[16]; } saver_drops[20];
 struct { float x, y, vx, vy; uint8_t life; } saver_parts[25];
 struct { uint8_t x, y, br; } saver_stars[40];
@@ -79,8 +87,8 @@ bool wifi_connecting = false;
 unsigned long wifi_retry_ms = 0;
 unsigned long wifi_connect_start_ms = 0;
 int wifi_last_status = -1;
-unsigned long wifi_conn_timeout = 30000; // 30s instead of 20s
-uint8_t wifi_last_reason = 0; // detailed WiFi disconnect reason
+unsigned long wifi_conn_timeout = 30000;
+uint8_t wifi_last_reason = 0;
 
 // Widget data
 String widget_cache = "";
@@ -103,6 +111,20 @@ struct CustomWidget {
 CustomWidget cwidgets[MAX_WIDGETS];
 int cwidget_count = 0;
 int cwidget_idx = 0;
+
+// Automations
+struct Automation {
+  String type;
+  String name;
+  int interval_sec;
+  String sched_time;
+  String sched_days;
+  JsonDocument action;
+  unsigned long last_fired;
+};
+Automation automations[MAX_AUTOMATIONS];
+int automation_count = 0;
+bool time_synced = false;
 
 JsonDocument config;
 String serial_buf;
@@ -222,14 +244,137 @@ void do_action(JsonObject a) {
   }
 }
 
+// ─── NVS Helpers ────────────────────────────────────────────────────────────
+
+void save_slot_addr(int slot, NimBLEAddress addr) {
+  nvs_handle h;
+  if (nvs_open(NVS_NS, NVS_READWRITE, &h) == ESP_OK) {
+    nvs_set_blob(h, ("addr" + String(slot)).c_str(), (uint8_t*)&addr, sizeof(NimBLEAddress));
+    nvs_commit(h);
+    nvs_close(h);
+  }
+}
+
+NimBLEAddress load_slot_addr(int slot) {
+  nvs_handle h;
+  NimBLEAddress addr;
+  size_t sz = sizeof(NimBLEAddress);
+  if (nvs_open(NVS_NS, NVS_READONLY, &h) == ESP_OK) {
+    if (nvs_get_blob(h, ("addr" + String(slot)).c_str(), (uint8_t*)&addr, &sz) != ESP_OK) {
+      addr = NimBLEAddress();
+    }
+    nvs_close(h);
+  }
+  return addr;
+}
+
+void clear_slot_addr(int slot) {
+  nvs_handle h;
+  if (nvs_open(NVS_NS, NVS_READWRITE, &h) == ESP_OK) {
+    nvs_erase_key(h, ("addr" + String(slot)).c_str());
+    nvs_commit(h);
+    nvs_close(h);
+  }
+}
+
+// ─── BLE Slot Switching ────────────────────────────────────────────────────
+
+void switch_ble_slot(int slot) {
+  if (slot == current_slot || slot < 0 || slot >= num_slots) return;
+  current_slot = slot;
+  if (current_slot >= num_slots) current_slot = 0;
+  int p = slot_cur_page[current_slot];
+  if (p >= slot_pages[current_slot]) p = 0;
+  slot_cur_page[current_slot] = p;
+
+  NimBLEAddress target = load_slot_addr(current_slot);
+  if (!target.isNull() && ble.isConnected()) {
+    NimBLEAddress cur = ble.getPeerAddress();
+    if (cur != target) {
+      ble.disconnect();
+      delay(200);
+    }
+  }
+  NimBLEDevice::startAdvertising();
+  draw_all();
+}
+
+// ─── Automation Helpers ────────────────────────────────────────────────────
+
+bool is_sched_day(const char* days, int wday) {
+  if (!days || !days[0]) return true;
+  char buf[32];
+  strncpy(buf, days, sizeof(buf));
+  buf[sizeof(buf)-1] = 0;
+  char* tok = strtok(buf, ",");
+  while (tok) {
+    if (atoi(tok) == wday) return true;
+    tok = strtok(nullptr, ",");
+  }
+  return false;
+}
+
+void fire_automation(int idx) {
+  if (idx < 0 || idx >= automation_count) return;
+  automations[idx].last_fired = millis();
+  do_action(automations[idx].action.as<JsonObject>());
+}
+
+void load_automations() {
+  automation_count = 0;
+  JsonArray arr = config["automations"].as<JsonArray>();
+  if (!arr) return;
+  for (JsonVariant v : arr) {
+    if (!v.is<JsonObject>() || automation_count >= MAX_AUTOMATIONS) break;
+    JsonObject a = v;
+    Automation& at = automations[automation_count++];
+    at.type = a["type"]|"timer";
+    at.name = a["name"]|"";
+    at.interval_sec = a["interval"]|60;
+    at.sched_time = a["time"]|"";
+    at.sched_days = a["days"]|"";
+    at.action.clear();
+    if (a["action"].is<JsonObject>()) at.action.set(a["action"].as<JsonObject>());
+    at.last_fired = 0;
+  }
+}
+
+void check_automations() {
+  unsigned long now = millis();
+  for (int i = 0; i < automation_count; i++) {
+    Automation& a = automations[i];
+    if (a.type == "timer") {
+      if (now - a.last_fired >= (unsigned long)a.interval_sec * 1000) fire_automation(i);
+    } else if (a.type == "schedule" && time_synced) {
+      struct tm tm;
+      if (!getLocalTime(&tm)) continue;
+      int tm_min = tm.tm_hour * 60 + tm.tm_min;
+      int sched_h = 0, sched_m = 0;
+      if (sscanf(a.sched_time.c_str(), "%d:%d", &sched_h, &sched_m) != 2) continue;
+      int sched_min = sched_h * 60 + sched_m;
+      if (abs(tm_min - sched_min) <= 1 && is_sched_day(a.sched_days.c_str(), tm.tm_wday)) {
+        unsigned long fire_window = 60000;
+        if (now - a.last_fired > fire_window) fire_automation(i);
+      }
+    }
+  }
+}
+
+// ─── Config ─────────────────────────────────────────────────────────────────
+
 void gen_default() {
   config.clear();
+  config["version"] = 2;
   config["name"]="SudoDeck"; config["grid"]["cols"]=4; config["grid"]["rows"]=3;
   config["wifi"]["ssid"]=""; config["wifi"]["password"]="";
   config["saver"]["timeout"]=DEFAULT_TIMEOUT; config["saver"]["sleep"]=DEFAULT_SLEEP; config["saver"]["mode"]=SAVER_MATRIX;
   config["widgets"]=JsonArray();
   config["theme"]["name"]="default"; config["theme"]["button_style"]="flat";
-  JsonArray pg = config["pages"].to<JsonArray>();
+  config["automations"]=JsonArray();
+
+  JsonArray slots = config["slots"].to<JsonArray>();
+  JsonObject s0 = slots.add<JsonObject>(); s0["name"]="Default";
+  JsonArray pg = s0["pages"].to<JsonArray>();
 
   JsonObject p1 = pg.add<JsonObject>(); p1["name"]="Main";
   JsonArray b1 = p1["buttons"].to<JsonArray>();
@@ -283,12 +428,35 @@ bool load_cfg() {
   if (!f) { gen_default(); return false; }
   DeserializationError e = deserializeJson(config, f); f.close();
   if (e) { gen_default(); return false; }
+
+  // Migration from v1 (flat pages[]) to v2 (slots[])
+  if (!config["version"].is<int>() || config["version"].as<int>() < 2) {
+    if (config["pages"].is<JsonArray>()) {
+      JsonDocument nc;
+      nc["version"] = 2;
+      nc["name"] = config["name"]|"SudoDeck";
+      nc["grid"] = config["grid"];
+      nc["wifi"] = config["wifi"];
+      nc["saver"] = config["saver"];
+      nc["theme"] = config["theme"];
+      nc["widgets"] = config["widgets"];
+      JsonArray slots = nc["slots"].to<JsonArray>();
+      JsonObject s0 = slots.add<JsonObject>();
+      s0["name"] = "Default";
+      s0["pages"] = config["pages"];
+      nc["automations"] = config["automations"]|JsonArray();
+      config = nc;
+      save_cfg();
+    }
+  }
   return true;
 }
+
 void save_cfg() {
   fs::File f = SPIFFS.open("/config.json","w");
   if (f) { serializeJson(config, f); f.close(); }
 }
+
 void apply_theme() {
   if (!config["theme"].is<JsonObject>()) { 
     c_bg=0x0000; c_hdr=0x0862; c_acc=0x07F1; c_txt=0xFFFF; c_dim=0x632C; c_btn_bg=0x1107;
@@ -312,15 +480,40 @@ void apply_theme() {
   else if (!strcmp(s,"shadow")) button_style=4;
   else button_style=0;
 }
+
 void apply_cfg() {
   apply_theme();
   cols = constrain(config["grid"]["cols"]|4, 1, 6);
   rows = constrain(config["grid"]["rows"]|3, 1, 5);
-  num_pages = config["pages"].size();
-  if (num_pages < 1) num_pages = 1;
-  if (num_pages > 18) num_pages = 18;
+
+  num_slots = 0;
+  JsonArray slots = config["slots"].as<JsonArray>();
+  if (slots) {
+    for (JsonVariant v : slots) {
+      if (!v.is<JsonObject>() || num_slots >= MAX_SLOTS) break;
+      JsonObject s = v;
+      slot_names[num_slots] = s["name"].as<String>();
+      if (slot_names[num_slots].length() == 0) {
+        slot_names[num_slots] = "Slot " + String(num_slots + 1);
+      }
+      JsonArray pages = s["pages"];
+      int np = pages.size();
+      if (np < 1) np = 1;
+      if (np > 18) np = 18;
+      slot_pages[num_slots] = np;
+      if (slot_cur_page[num_slots] >= np) slot_cur_page[num_slots] = 0;
+      num_slots++;
+    }
+  }
+  if (num_slots < 1) {
+    num_slots = 1;
+    slot_names[0] = "Default";
+    slot_pages[0] = 1;
+    slot_cur_page[0] = 0;
+  }
+  if (current_slot >= num_slots) current_slot = 0;
   total_btns = cols * rows;
-  if (page >= num_pages) page = 0;
+
   if (config["saver"].is<JsonObject>()) {
     int t = config["saver"]["timeout"]|DEFAULT_TIMEOUT;
     if (t >= 5 && t <= 600) saver_timeout = t;
@@ -352,6 +545,7 @@ void apply_cfg() {
       cw.last_fetch = 0;
     }
   }
+  load_automations();
 }
 
 const char* wifi_status_str(int s) {
@@ -372,6 +566,7 @@ void init_wifi() {
   if (WiFi.isConnected()) WiFi.disconnect(false);
   wifi_retry_ms = 0;
   wifi_connecting = false;
+  time_synced = false;
 }
 
 void fetch_widget_data() {
@@ -394,7 +589,7 @@ void fetch_widget_data() {
     if (c > 0) f1_constructor_cache = http.getString();
     http.end();
   } else if (saver_mode == SAVER_FOOTBALL) {
-    http.begin("https://api.sportscore.io/v1/football/matches"); // placeholder
+    http.begin("https://api.sportscore.io/v1/football/matches");
     int c = http.GET();
     if (c > 0) widget_cache = http.getString();
     http.end();
@@ -806,20 +1001,23 @@ void proc_serial(const String& l) {
     if (!req["config"].is<JsonObject>()) { s_err("missing config"); return; }
     config.clear();
     if (!config.set(req["config"].as<JsonObject>())) { s_err("oom"); return; }
-    save_cfg(); apply_cfg(); page=0;
+    save_cfg(); apply_cfg();
+    slot_cur_page[current_slot] = 0;
     JsonDocument r; s_ok(r); Serial.flush();
     init_wifi();
     draw_all();
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
-    r["name"]="SudoDeck"; r["version"]="2.1.5";
+    r["name"]="SudoDeck"; r["version"]="2.2.0";
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
+    r["slot"]=current_slot;
+    r["num_slots"]=num_slots;
     s_ok(r);
   }
-  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); page=0; saver_timeout = DEFAULT_TIMEOUT; sleep_timeout = DEFAULT_SLEEP; saver_active = false; display_asleep = false; CYD_TFT_BL_ON(); if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
+  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); slot_cur_page[current_slot]=0; saver_timeout = DEFAULT_TIMEOUT; sleep_timeout = DEFAULT_SLEEP; saver_active = false; display_asleep = false; CYD_TFT_BL_ON(); if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
   else if (!strcmp(cmd,"set_saver_mode")) {
@@ -912,8 +1110,10 @@ void proc_serial(const String& l) {
     r["display_asleep"] = display_asleep;
     r["sleep_timeout"] = sleep_timeout;
     r["saver_timeout"] = saver_timeout;
-    r["page"] = page;
-    r["num_pages"] = num_pages;
+    r["slot"] = current_slot;
+    r["num_slots"] = num_slots;
+    r["page"] = slot_cur_page[current_slot];
+    r["num_pages"] = slot_pages[current_slot];
     s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
@@ -939,6 +1139,40 @@ void proc_serial(const String& l) {
     if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img");
     JsonDocument r; s_ok(r);
   }
+  else if (!strcmp(cmd,"pair_slot")) {
+    int slot = req["slot"]|0;
+    if (slot < 0 || slot >= num_slots) { s_err("bad slot"); return; }
+    NimBLEAddress addr = ble.getPeerAddress();
+    if (addr.isNull()) { s_err("not connected"); return; }
+    save_slot_addr(slot, addr);
+    JsonDocument r; r["slot"]=slot; r["addr"]=addr.toString().c_str(); s_ok(r);
+  }
+  else if (!strcmp(cmd,"clear_slot")) {
+    int slot = req["slot"]|0;
+    if (slot < 0 || slot >= MAX_SLOTS) { s_err("bad slot"); return; }
+    clear_slot_addr(slot);
+    JsonDocument r; r["slot"]=slot; s_ok(r);
+  }
+  else if (!strcmp(cmd,"switch_slot")) {
+    int slot = req["slot"]|0;
+    if (slot < 0 || slot >= num_slots) { s_err("bad slot"); return; }
+    switch_ble_slot(slot);
+    JsonDocument r; r["slot"]=current_slot; s_ok(r);
+  }
+  else if (!strcmp(cmd,"get_slots")) {
+    JsonDocument r;
+    JsonArray arr = r["slots"].to<JsonArray>();
+    for (int i = 0; i < num_slots; i++) {
+      JsonObject s = arr.add<JsonObject>();
+      s["index"] = i;
+      s["name"] = slot_names[i];
+      s["pages"] = slot_pages[i];
+      NimBLEAddress addr = load_slot_addr(i);
+      if (!addr.isNull()) s["addr"] = addr.toString().c_str();
+    }
+    r["current"] = current_slot;
+    s_ok(r);
+  }
   else { s_err("unknown command"); }
 }
 
@@ -953,38 +1187,24 @@ uint16_t hex_col(const char* s) {
 
 void draw_splash() {
   tft.fillScreen(c_bg);
-
-  // Top / bottom accent stripes
   tft.fillRect(0, 0, SCR_W, 4, c_acc);
   tft.fillRect(0, SCR_H - 4, SCR_W, 4, c_acc);
-
-  // Logo — from transparent PNG
   tft.pushImage((SCR_W - LOGO_W) / 2, 15, LOGO_W, LOGO_H, logo_img);
-
-  // SUDODECK title
   tft.setTextColor(c_txt, c_bg);
   tft.setTextSize(2);
   int tw = tft.textWidth("SUDODECK");
   tft.setCursor((SCR_W - tw) / 2, 130);
   tft.print("SUDODECK");
-
-  // Divider
   tft.drawLine(60, 158, 260, 158, c_acc);
-
-  // Tagline
   tft.setTextSize(1);
   tft.setTextColor(c_dim, c_bg);
   int tw2 = tft.textWidth("cheap. open. yours.");
   tft.setCursor((SCR_W - tw2) / 2, 170);
   tft.print("cheap. open. yours.");
-
-  // Author
   tft.setTextColor(0x6B6D, c_bg);
   int tw3 = tft.textWidth("built by shahid singh");
   tft.setCursor((SCR_W - tw3) / 2, 186);
   tft.print("built by shahid singh");
-
-  // Progress bar outline
   tft.drawRoundRect(60, 208, 200, 10, 5, c_dim);
 }
 
@@ -998,14 +1218,12 @@ void draw_header() {
     tft.print("SudoDeck | BLE: ...");
   else
     tft.print("SudoDeck | booting");
-  // WiFi status
   if (wifi_ssid.length() > 0) {
     if (WiFi.isConnected())
       tft.print(" | W:ON");
     else if (wifi_connecting) {
       tft.setTextColor(c_dim, c_hdr);
       tft.print(" | W: ");
-      // show SSID if short enough
       int flen = tft.textWidth(wifi_ssid.c_str());
       if (flen < 100) tft.print(wifi_ssid);
       else { tft.print(wifi_ssid.substring(0, 12)); tft.print(".."); }
@@ -1033,7 +1251,10 @@ void draw_grid() {
   tft.fillRect(0, GRID_Y, SCR_W, GRID_H, c_bg);
 
   JsonArray btns;
-  if (num_pages > 0 && page < num_pages) btns = config["pages"][page]["buttons"];
+  if (num_slots > 0 && current_slot < num_slots && slot_pages[current_slot] > 0) {
+    int p = slot_cur_page[current_slot];
+    btns = config["slots"][current_slot]["pages"][p]["buttons"];
+  }
 
   for (int i = 0; i < total_btns; i++) {
     int col = i % cols;
@@ -1047,20 +1268,20 @@ void draw_grid() {
       bg = hex_col(btns[i]["color"] | "#16213E");
       label = btns[i]["label"] | "";
     }
-    if (button_style == 1) { // outlined
+    if (button_style == 1) {
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
-    } else if (button_style == 2) { // neon
+    } else if (button_style == 2) {
       tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-    } else if (button_style == 3) { // soft
+    } else if (button_style == 3) {
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
       uint16_t sbg = tft.alphaBlend(200, bg, 0xFFFF);
       tft.drawRoundRect(x, y, bw, bh, 6, sbg);
-    } else if (button_style == 4) { // shadow
+    } else if (button_style == 4) {
       uint16_t sh = tft.alphaBlend(80, bg, 0x0000);
       tft.fillRoundRect(x + 2, y + 2, bw, bh, 6, sh);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-    } else { // flat
+    } else {
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     }
     if (label[0]) {
@@ -1085,17 +1306,17 @@ void draw_grid() {
 void draw_bottom() {
   tft.fillRect(0, SCR_H - BOT_H, SCR_W, BOT_H, c_hdr);
   int cy = SCR_H - BOT_H + 4;
-
   int nav_l = 4, nav_w = 32;
+  int np = num_slots > 0 && current_slot < num_slots ? slot_pages[current_slot] : 1;
 
-  if (num_pages > 1) {
+  if (np > 1) {
     tft.fillRoundRect(nav_l, cy - 2, nav_w, 18, 4, c_btn_bg);
     tft.setTextColor(c_txt, c_btn_bg);
     tft.setCursor(nav_l + 11, cy);
     tft.print("<");
   }
 
-  if (num_pages > 1) {
+  if (np > 1) {
     int bx = SCR_W - nav_w - nav_l;
     tft.fillRoundRect(bx, cy - 2, nav_w, 18, 4, c_btn_bg);
     tft.setTextColor(c_txt, c_btn_bg);
@@ -1103,15 +1324,28 @@ void draw_bottom() {
     tft.print(">");
   }
 
-  // Page name centered between < and >
-  int lx = num_pages > 1 ? nav_l + nav_w + 4 : 4;
-  int rx = num_pages > 1 ? SCR_W - nav_w - 2 - 4 : SCR_W - 4;
+  // Slot name on left side (tappable)
+  int slot_w = 48;
+  if (num_slots > 1) {
+    tft.fillRoundRect(2, cy - 2, slot_w, 18, 4, c_btn_bg);
+    tft.setTextColor(c_acc, c_btn_bg);
+    tft.setTextSize(1);
+    tft.setCursor(4, cy);
+    tft.print(slot_names[current_slot].substring(0, 5));
+  }
+
+  // Page name and counter
+  int lx = num_slots > 1 ? 2 + slot_w + 4 : (np > 1 ? nav_l + nav_w + 4 : 4);
+  int rx = np > 1 ? SCR_W - nav_w - 2 - 4 : SCR_W - 4;
+
   const char* pname = "";
-  if (num_pages > 0 && page < num_pages) pname = config["pages"][page]["name"] | "";
+  if (num_slots > 0 && current_slot < num_slots) {
+    int p = slot_cur_page[current_slot];
+    pname = config["slots"][current_slot]["pages"][p]["name"] | "";
+  }
   int pw = tft.textWidth(pname);
 
-  // page name centered between < > and page counter
-  String pageStr = String(page + 1) + "/" + String(num_pages);
+  String pageStr = String(slot_cur_page[current_slot] + 1) + "/" + String(np);
   int psw = tft.textWidth(pageStr.c_str());
   int avail = rx - lx;
   int name_max = avail - psw - 12;
@@ -1122,7 +1356,6 @@ void draw_bottom() {
   tft.setCursor(name_x, cy);
   tft.print(pname);
 
-  // page counter after page name
   tft.setTextColor(c_acc, c_hdr);
   tft.setCursor(name_x + pw + 8, cy);
   tft.print(pageStr.c_str());
@@ -1203,7 +1436,6 @@ void gen_saver_preset(const char* name) {
     spr.setCursor(6, 14);
     spr.print("SUDO");
   } else {
-    // snake (default)
     int cx = SAVER_W / 2, cy = SAVER_H / 2;
     for (int i = 0; i < 7; i++) {
       float t = (float)i / 6.0 * 2.0 * PI;
@@ -1262,7 +1494,7 @@ void exit_saver() {
   if (display_asleep) {
     display_asleep = false;
     CYD_TFT_BL_ON();
-    tft.writecommand(0x29); // display on
+    tft.writecommand(0x29);
     delay(10);
   }
   last_touch_ms = millis();
@@ -1320,10 +1552,7 @@ void draw_saver() {
   } else if (saver_mode == SAVER_MATRIX) {
     if (now - saver_last_frame < 60) return;
     saver_last_frame = now;
-
-    // Draw semi-transparent black to fade old chars
     tft.fillRect(0, 0, SCR_W, SCR_H, 0x0001);
-
     for (int i = 0; i < 20; i++) {
       int px = saver_drops[i].x * 8;
       for (int j = 0; j < saver_drops[i].len && j < 16; j++) {
@@ -1383,12 +1612,31 @@ void handle_touch(int tx, int ty) {
 
   if (ty >= SCR_H - BOT_H) {
     int nav_l = 4, nav_w = 32;
-    if (num_pages > 1 && tx >= nav_l - 4 && tx <= nav_l + nav_w + 4) {
-      if (page > 0) { page--; draw_grid(); draw_bottom(); }
+    int np = num_slots > 0 && current_slot < num_slots ? slot_pages[current_slot] : 1;
+
+    // Slot tap (left side of bottom bar, only when multi-slot)
+    if (num_slots > 1 && tx >= 2 && tx <= 50) {
+      int next = (current_slot + 1) % num_slots;
+      switch_ble_slot(next);
       return;
     }
-    if (num_pages > 1 && tx >= SCR_W - nav_l - nav_w - 4 && tx <= SCR_W - nav_l + 4) {
-      if (page < num_pages - 1) { page++; draw_grid(); draw_bottom(); }
+
+    // Page prev
+    if (np > 1 && tx >= nav_l - 4 && tx <= nav_l + nav_w + 4) {
+      if (slot_cur_page[current_slot] > 0) {
+        slot_cur_page[current_slot]--;
+        draw_grid();
+        draw_bottom();
+      }
+      return;
+    }
+    // Page next
+    if (np > 1 && tx >= SCR_W - nav_l - nav_w - 4 && tx <= SCR_W - nav_l + 4) {
+      if (slot_cur_page[current_slot] < np - 1) {
+        slot_cur_page[current_slot]++;
+        draw_grid();
+        draw_bottom();
+      }
       return;
     }
     return;
@@ -1411,7 +1659,10 @@ void handle_touch(int tx, int ty) {
       uint16_t bg = c_btn_bg;
       const char* label = "";
       JsonArray btns;
-      if (num_pages > 0 && page < num_pages) btns = config["pages"][page]["buttons"];
+      if (num_slots > 0 && current_slot < num_slots) {
+        int p = slot_cur_page[current_slot];
+        btns = config["slots"][current_slot]["pages"][p]["buttons"];
+      }
       if (i < (int)btns.size()) {
         bg = hex_col(btns[i]["color"] | "#16213E");
         label = btns[i]["label"] | "";
@@ -1419,23 +1670,22 @@ void handle_touch(int tx, int ty) {
       uint16_t hl = tft.alphaBlend(255, bg, 0xFFFF);
       tft.fillRoundRect(x, y, bw, bh, 6, hl);
       delay(60);
-    if (button_style == 1) { // outlined
+    if (button_style == 1) {
       tft.drawRoundRect(x, y, bw, bh, 6, bg);
-    } else if (button_style == 2) { // neon
+    } else if (button_style == 2) {
       tft.fillRoundRect(x - 1, y - 1, bw + 2, bh + 2, 7, c_acc);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-    } else if (button_style == 3) { // soft
+    } else if (button_style == 3) {
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
       uint16_t sbg = tft.alphaBlend(200, bg, 0xFFFF);
       tft.drawRoundRect(x, y, bw, bh, 6, sbg);
-    } else if (button_style == 4) { // shadow
+    } else if (button_style == 4) {
       uint16_t sh = tft.alphaBlend(80, bg, 0x0000);
       tft.fillRoundRect(x + 2, y + 2, bw, bh, 6, sh);
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
-    } else { // flat
+    } else {
       tft.fillRoundRect(x, y, bw, bh, 6, bg);
     }
-      // Redraw label after flash
       if (label[0]) {
         uint16_t txt_bg = (button_style == 1) ? c_bg : bg;
         tft.setTextColor(c_txt, txt_bg);
@@ -1459,13 +1709,13 @@ void handle_touch(int tx, int ty) {
   }
 }
 
-
-
 void setup() {
   Serial.setRxBufferSize(8192);
   Serial.begin(115200);
   esp_log_level_set("*", ESP_LOG_NONE);
   delay(500);
+
+  nvs_flash_init();
 
   tft.begin();
   tft.setRotation(1);
@@ -1474,11 +1724,9 @@ void setup() {
 
   draw_splash();
 
-  // Init touch
   tspi.begin(XP_CLK, XP_MISO, XP_MOSI, XP_CS);
   ts.begin(tspi);
 
-  // Boot animation
   tft.setTextColor(c_dim, c_bg);
   int bx = (SCR_W - tft.textWidth("booting...")) / 2;
   for (int p = 0; p <= 100; p += 1) {
@@ -1547,7 +1795,16 @@ void loop() {
     draw_header();
   }
 
-  // Pre-fetch widget data when WiFi is connected and idle
+  // NTP time sync
+  if (WiFi.isConnected() && !time_synced) {
+    configTzTime("SAST-2", "pool.ntp.org", "time.google.com");
+    struct tm tm;
+    if (getLocalTime(&tm)) {
+      time_synced = true;
+    }
+  }
+
+  // Pre-fetch widget data
   if (WiFi.isConnected() && widget_cache.length() == 0 && !widget_fetching && now - widget_fetch_ms > 5000) {
     fetch_widget_data();
   }
@@ -1563,7 +1820,7 @@ void loop() {
     }
   }
 
-  // BLE health check — keep advertising alive when not connected
+  // BLE health check
   if (ble_ready && !ble.isConnected()) {
     static unsigned long last_ble_check = 0;
     if (now - last_ble_check > 10000) {
@@ -1571,6 +1828,9 @@ void loop() {
       NimBLEDevice::startAdvertising();
     }
   }
+
+  // Check automations
+  check_automations();
 
   if (!saver_active) {
     if (ble_ready) {
@@ -1583,7 +1843,6 @@ void loop() {
   }
 
   if (saver_active) {
-    // sleep display after inactivity
     if (!display_asleep && sleep_timeout > 0 && now - saver_start_ms > (unsigned long)sleep_timeout * 1000) {
       display_asleep = true;
       tft.writecommand(0x28);
