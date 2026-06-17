@@ -69,7 +69,7 @@
     font-size: 0.72rem;
     font-weight: 500;
     letter-spacing: 0.3px;
-    color: var(--dim);
+    color: var(--text);
     transition: color 0.15s;
     text-decoration: none;
     position: relative;
