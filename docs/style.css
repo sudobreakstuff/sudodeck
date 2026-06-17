@@ -268,6 +268,65 @@
   }
   .sc a:hover::after { background: var(--acc); }
 
+  /* ─── intro section (What is SudoDeck + Why I built it) ─── */
+  .intro-section {
+    padding: 80px 20px;
+  }
+  .intro-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .intro-wrap h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 28px;
+  }
+  .intro-wrap h2 .g { color: var(--acc); }
+  .intro-text {
+    font-size: 0.95rem;
+    color: var(--dim);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .intro-heart {
+    margin-top: 48px;
+    padding: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    text-align: left;
+    position: relative;
+  }
+  .intro-heart h3 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--acc);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .intro-heart p {
+    font-size: 0.88rem;
+    color: var(--dim);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .intro-heart p:last-of-type { margin-bottom: 0; }
+  .intro-sign {
+    font-family: var(--mono);
+    font-size: 0.85rem !important;
+    color: var(--text) !important;
+    margin-top: 16px !important;
+  }
+  @media (max-width: 540px) {
+    .intro-section { padding: 48px 16px; }
+    .intro-text { font-size: 0.88rem; }
+    .intro-heart { padding: 24px 18px; margin-top: 32px; }
+    .intro-heart p { font-size: 0.82rem; }
+  }
+
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -742,6 +801,11 @@
   }
   @media (max-width: 540px) {
     .guide-step { flex-direction: column; overflow-x: auto; overflow-y: hidden; }
+    .guide-body h3 { font-size: 0.92rem; }
+    .guide-body h4 { font-size: 0.85rem !important; }
+    .guide-body p, .guide-body li, .guide-body .guide-note, .guide-body code { font-size: 0.82rem; }
+    .guide-body pre { font-size: 0.72rem; padding: 8px; }
+    .guide-num { width: 32px; height: 32px; font-size: 0.9rem; }
   }
 
   /* ── Guide TOC ── */
@@ -1303,6 +1367,27 @@
     .pricing-card { padding: 20px 12px; }
     .btn { font-size: 0.6rem; padding: 4px 8px; }
     .shop-thumbs img { height: 70px; }
+  }
+
+  /* ─── dimensions (buy page) ─── */
+  .dims {
+    max-width: 500px;
+    margin: 40px auto 0;
+    text-align: center;
+  }
+  .dims img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .dims-caption {
+    margin-top: 12px;
+    font-size: 0.82rem;
+    color: var(--dim);
+    line-height: 1.5;
   }
 
   .ts-pill {
