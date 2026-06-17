@@ -51,6 +51,7 @@ Newcastle, KZN — arrange via email.
 | **Connection** | **BLE Wireless** | USB Wired | USB Wired |
 | **Bluetooth Range** | **~10m** | Cable length | Cable length |
 | **Display** | **2.8" colour touch** | 6 LCD buttons | 15 LCD buttons |
+| **Resolution** | **320 x 240** | 96 x 96 each | 96 x 96 each |
 | **Touch Screen** | **Yes** | No | No |
 | **Buttons** | **20+ (multi-page)** | 6 fixed | 15 fixed |
 | **Pages** | **Up to 18** | 1 | 1 |
