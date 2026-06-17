@@ -1168,8 +1168,8 @@
   }
 
   @media (max-width: 540px) {
-    .shop-thumbs { grid-template-columns: repeat(2, 1fr); }
-    .shop-thumbs img { height: 100px; }
+    .shop-thumbs { grid-template-columns: repeat(3, 1fr); }
+    .shop-thumbs img { height: 80px; }
   }
 
   /* ─── pricing / buy section ─── */
@@ -1367,27 +1367,6 @@
     .pricing-card { padding: 20px 12px; }
     .btn { font-size: 0.6rem; padding: 4px 8px; }
     .shop-thumbs img { height: 70px; }
-  }
-
-  /* ─── dimensions (buy page) ─── */
-  .dims {
-    max-width: 500px;
-    margin: 40px auto 0;
-    text-align: center;
-  }
-  .dims img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .dims-caption {
-    margin-top: 12px;
-    font-size: 0.82rem;
-    color: var(--dim);
-    line-height: 1.5;
   }
 
   .ts-pill {
