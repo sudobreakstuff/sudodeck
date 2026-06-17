@@ -42,30 +42,37 @@ Newcastle, KZN — arrange via email.
 
 ## Why SudoDeck vs the Competition
 
+#### Hardware & Value
+
 | | SudoDeck | Stream Deck Mini | Stream Deck MK.2 |
-|---|---|---|---|---|
+|---|---|---|---|
 | **Price (SA)** | **R1,099** | R1,799 | ~R2,800 |
 | **Price per button** | **~R55** | R300 | ~R187 |
 | **Connection** | **BLE Wireless** | USB Wired | USB Wired |
 | **Bluetooth Range** | **~10m** | Cable length | Cable length |
-| **Display** | **2.8" colour touch** | 6× LCD buttons | 15× LCD buttons |
-| **Touch Screen** | **Yes** — tap any position | No | No |
-| **Buttons** | **20+ touch (multi-page)** | 6 fixed | 15 fixed |
+| **Display** | **2.8" colour touch** | 6 LCD buttons | 15 LCD buttons |
+| **Touch Screen** | **Yes** | No | No |
+| **Buttons** | **20+ (multi-page)** | 6 fixed | 15 fixed |
 | **Pages** | **Up to 18** | 1 | 1 |
-| **Open Source** | **MIT** ✅ | No ❌ | No ❌ |
-| **Config Software** | **Built-in web page** (no install) | Proprietary app | Proprietary app |
-| **Web Serial Config** | **Yes** — Chrome/Edge, no install | No | No |
-| **Config on Device** | **Yes** — follows anywhere | No | No |
-| **Export / Import JSON** | **Yes** | No | No |
-| **Firmware Updates** | **Via browser** (Web Serial) | Proprietary app | Proprietary app |
-| **Action Types** | **Key, Combo, Text, Macro, App Launch** | Key, Combo, Text | Key, Combo, Text, Macro |
-| **App Launcher** | **Yes** — press a button to launch any app | No | No |
-| **Macro Sequences** | **Yes** — multi-step with delays | No | Yes |
-| **Automations** | **Timers & Schedules** (20 max) | No | No |
-| **Custom Live Widgets** | **Yes** — API data on display | No | No |
-| **WiFi** | **Built-in** — live data widgets | No | No |
-| **Screensaver** | **3 modes** (Matrix, F1, Widgets) | None | None |
+| **Screensaver** | **3 modes** | None | None |
 | **Built In** | **South Africa** | Imported | Imported |
+
+#### Software & Features
+
+| | SudoDeck | Stream Deck Mini | Stream Deck MK.2 |
+|---|---|---|---|
+| **Open Source** | **MIT** | No | No |
+| **Config Software** | **Built-in web page** | Proprietary app | Proprietary app |
+| **Web Serial Config** | **Yes** — no install | No | No |
+| **Config on Device** | **Yes** — follows you | No | No |
+| **Export / Import JSON** | **Yes** | No | No |
+| **Firmware Updates** | **Via browser** | Proprietary app | Proprietary app |
+| **Action Types** | **Key, Combo, Text, Macro, App** | Key, Combo, Text | Key, Combo, Text, Macro |
+| **App Launcher** | **Yes** | No | No |
+| **Macro Sequences** | **Yes** — multi-step | No | Yes |
+| **Automations** | **Timers & Schedules** | No | No |
+| **Custom Live Widgets** | **Yes** | No | No |
+| **WiFi** | **Built-in** | No | No |
 
 **The bottom line:** SudoDeck is the only wireless, open source macro deck on the market — at half the price of the nearest competitor.
 
