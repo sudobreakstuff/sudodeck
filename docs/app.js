@@ -85,6 +85,7 @@ async function sc(c, t) { if (!dw) throw new Error('nc'); if(!dr) throw new Erro
 document.getElementById('btnConnect').addEventListener('click', async function() {
   try {
     if (!('serial' in navigator)) { tm('Web Serial needs Chrome/Edge', 'ng'); return; }
+    tryReleaseDaemon();
     var p = await navigator.serial.requestPort(); await p.open({baudRate:115200});
     dp = p; dr = p.readable.getReader(); dw = p.writable.getWriter(); ss(true); tm('Connected');
     try { var r = await sc({cmd:'get_info'}); tm(r.name+' v'+(r.version||'?')); } catch(e) {}
@@ -761,6 +762,10 @@ document.getElementById('autoList').addEventListener('change', function(e) {
 
 ic(); ra();
 
+/* ── Daemon coordination ── */
+function tryReleaseDaemon() {
+  fetch('http://127.0.0.1:8092/release', { method: 'POST' }).catch(function(){});
+}
 /* ── Firmware (esptool-js via dynamic import) ── */
 var fwLoader = null, fwFileData = null, fwTransport = null, fwFlashAddr = 0, fwManifest = null;
 
@@ -830,6 +835,7 @@ var fwPort = null;
 async function fwConnect() {
   if (fwLoader) { fwLog('Already connected.'); return; }
   if (!('serial' in navigator)) { fwLog('Web Serial not available (Chrome/Edge required)'); return; }
+  tryReleaseDaemon();
   if (fwPort) { try { fwPort.close(); } catch (e) {} fwPort = null; }
   fwTransport = null; fwLoader = null;
   try {

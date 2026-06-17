@@ -1,0 +1,208 @@
+//go:build windows
+// +build windows
+
+package main
+
+import (
+	"sync"
+	"syscall"
+	"unsafe"
+)
+
+var (
+	user32                       = syscall.NewLazyDLL("user32.dll")
+	procSendInput                = user32.NewProc("SendInput")
+	procMapVirtualKey            = user32.NewProc("MapVirtualKeyW")
+)
+
+const (
+	INPUT_KEYBOARD = 1
+	KEYEVENTF_KEYUP = 2
+)
+
+type input struct {
+	Type uint32
+	Ki   keybdinput
+}
+
+type keybdinput struct {
+	WVk      uint16
+	WScan    uint16
+	DwFlags  uint32
+	Time     uint32
+	DwExtra  uint64
+}
+
+// HID usage ID to Windows virtual key code
+var hidToVK = map[uint16]uint16{
+	0x04: 'A', 0x05: 'B', 0x06: 'C', 0x07: 'D', 0x08: 'E',
+	0x09: 'F', 0x0A: 'G', 0x0B: 'H', 0x0C: 'I', 0x0D: 'J',
+	0x0E: 'K', 0x0F: 'L', 0x10: 'M', 0x11: 'N', 0x12: 'O',
+	0x13: 'P', 0x14: 'Q', 0x15: 'R', 0x16: 'S', 0x17: 'T',
+	0x18: 'U', 0x19: 'V', 0x1A: 'W', 0x1B: 'X', 0x1C: 'Y',
+	0x1D: 'Z',
+	0x1E: '1', 0x1F: '2', 0x20: '3', 0x21: '4', 0x22: '5',
+	0x23: '6', 0x24: '7', 0x25: '8', 0x26: '9', 0x27: '0',
+	0x28: 0x0D, // VK_RETURN
+	0x29: 0x1B, // VK_ESCAPE
+	0x2A: 0x08, // VK_BACK
+	0x2B: 0x09, // VK_TAB
+	0x2C: 0x20, // VK_SPACE
+	0x2D: 0xBD, // VK_OEM_MINUS
+	0x2E: 0xBB, // VK_OEM_PLUS
+	0x2F: 0xDB, // VK_OEM_4 [
+	0x30: 0xDD, // VK_OEM_6 ]
+	0x31: 0xDC, // VK_OEM_5 \
+	0x33: 0xBA, // VK_OEM_1 ;
+	0x34: 0xDE, // VK_OEM_7 '
+	0x35: 0xC0, // VK_OEM_3 `
+	0x36: 0xBC, // VK_OEM_COMMA
+	0x37: 0xBE, // VK_OEM_PERIOD
+	0x38: 0xBF, // VK_OEM_2 /
+	0x39: 0x15, // VK_CAPS
+	0x3A: 0x70, // F1
+	0x3B: 0x71, // F2
+	0x3C: 0x72, // F3
+	0x3D: 0x73, // F4
+	0x3E: 0x74, // F5
+	0x3F: 0x75, // F6
+	0x40: 0x76, // F7
+	0x41: 0x77, // F8
+	0x42: 0x78, // F9
+	0x43: 0x79, // F10
+	0x44: 0x7A, // F11
+	0x45: 0x7B, // F12
+	0x46: 0x7C, // F13
+	0x47: 0x7D, // F14
+	0x48: 0x7E, // F15
+	0x49: 0x7F, // F16
+	0x4A: 0x80, // F17
+	0x4B: 0x81, // F18
+	0x4C: 0x82, // F19
+	0x4D: 0x83, // F20
+	0x4E: 0x84, // F21
+	0x4F: 0x85, // F22
+	0x50: 0x86, // F23
+	0x51: 0x87, // F24
+	0x52: 0x2C, // PRINT SCREEN
+	0x53: 0x14, // SCROLL LOCK
+	0x54: 0x90, // PAUSE
+	0x55: 0x24, // HOME
+	0x56: 0x23, // END
+	0x57: 0x21, // PAGE UP
+	0x58: 0x22, // PAGE DOWN
+	0x59: 0x2D, // INSERT
+	0x5A: 0x2E, // DELETE
+	0x5B: 0x24, // HOME
+	0x5C: 0x23, // END
+	0x5D: 0x21, // PAGE UP
+	0x5E: 0x22, // PAGE DOWN
+	0x5F: 0x13, // VK_PAUSE
+	0x60: 0x26, // LEFT
+	0x61: 0x28, // DOWN
+	0x62: 0x27, // RIGHT
+	0x63: 0x25, // UP
+	0x64: 0x6A, // NUMPAD *
+	0x65: 0x6B, // NUMPAD +
+	0x66: 0x6D, // NUMPAD -
+	0x67: 0x6E, // NUMPAD .
+	0x68: 0x6F, // NUMPAD /
+	0x69: 0x61, // NUMPAD 1
+	0x6A: 0x62, // NUMPAD 2
+	0x6B: 0x63, // NUMPAD 3
+	0x6C: 0x64, // NUMPAD 4
+	0x6D: 0x65, // NUMPAD 5
+	0x6E: 0x66, // NUMPAD 6
+	0x6F: 0x67, // NUMPAD 7
+	0x70: 0x68, // NUMPAD 8
+	0x71: 0x69, // NUMPAD 9
+	0x72: 0x60, // NUMPAD 0
+	0xE0: 0x11, // LCTRL
+	0xE1: 0x10, // LSHIFT
+	0xE2: 0x12, // LALT
+	0xE3: 0x5B, // LGUI (Win)
+	0xE4: 0x11, // RCTRL
+	0xE5: 0x10, // RSHIFT
+	0xE6: 0x12, // RALT
+	0xE7: 0x5C, // RGUI
+}
+
+var winMu sync.Mutex
+
+func sendKey(vk uint16, down bool) {
+	flags := uint32(0)
+	if !down {
+		flags = KEYEVENTF_KEYUP
+	}
+	inp := input{
+		Type: INPUT_KEYBOARD,
+		Ki: keybdinput{
+			WVk:     vk,
+			WScan:   0,
+			DwFlags: flags,
+		},
+	}
+	procSendInput.Call(1, uintptr(unsafe.Pointer(&inp)), unsafe.Sizeof(inp))
+}
+
+func pressKey(key uint16) {
+	if vk, ok := hidToVK[key]; ok {
+		winMu.Lock()
+		defer winMu.Unlock()
+		sendKey(vk, true)
+	}
+}
+
+func pressMods(mods uint8) {
+	winMu.Lock()
+	defer winMu.Unlock()
+	for _, k := range modToHIDKeys(mods) {
+		if vk, ok := hidToVK[k]; ok {
+			sendKey(vk, true)
+		}
+	}
+}
+
+func releaseAll() {
+	winMu.Lock()
+	defer winMu.Unlock()
+	for _, vk := range hidToVK {
+		sendKey(vk, false)
+	}
+}
+
+func injectMediaTap(key uint16) {
+	winMu.Lock()
+	defer winMu.Unlock()
+
+	mediaMap := map[uint16]uint16{
+		0xE8: 0xAE, // VOLUME UP
+		0xE9: 0xAE, // Actually VK_VOLUME_DOWN = 0xAD... let me fix
+	}
+	var vk uint16
+	switch key {
+	case 0xE8:
+		vk = 0xAF // VK_VOLUME_UP
+	case 0xE9:
+		vk = 0xAE // VK_VOLUME_DOWN
+	case 0xEA:
+		vk = 0xAD // VK_VOLUME_MUTE
+	case 0xEB:
+		vk = 0xB3 // VK_MEDIA_PLAY_PAUSE
+	case 0xEC:
+		vk = 0xB0 // VK_MEDIA_NEXT_TRACK
+	case 0xED:
+		vk = 0xB1 // VK_MEDIA_PREV_TRACK
+	case 0xEE:
+		vk = 0xB2 // VK_MEDIA_STOP
+	default:
+		return
+	}
+	sendKey(vk, true)
+	sendKey(vk, false)
+}
+
+func init() {
+	// Pre-warm DLL loading
+	user32.Load()
+}
