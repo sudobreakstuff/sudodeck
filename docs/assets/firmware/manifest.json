@@ -1,11 +1,19 @@
 {
+  "version": 1,
   "versions": [
     {
       "version": "2.2.0",
-      "label": "SudoDeck v2.2.0",
-      "file": "firmware-v2.2.0.bin",
-      "address": "0",
-      "notes": "Multi-slot BLE! 3 slots with pair/switch/clear. Bottom bar shows tappable slot name. Config restructured to slots[].pages[]. Auto-migration from v1. Timer + scheduled automations (NTP). Pair via config tool."
+      "label": "v2.2.0 (BLE)",
+      "file": "firmware-ble-v2.2.0.bin",
+      "address": 0,
+      "variant": "ble"
+    },
+    {
+      "version": "2.2.0",
+      "label": "v2.2.0 (Wired Serial)",
+      "file": "firmware-wired-v2.2.0.bin",
+      "address": 0,
+      "variant": "wired"
     },
     {
       "version": "2.1.6",
@@ -47,21 +55,21 @@
       "label": "SudoDeck v2.1.1",
       "file": "sudodeck-2.1.1.bin",
       "address": "0",
-      "notes": "Fixed icon/screensaver color rendering (byte-swap data for SPI display). Icons now persist after button press — redrawn after flash effect."
+      "notes": "Fixed icon/screensaver color rendering (byte-swap data for SPI display). Icons now persist after button press \u2014 redrawn after flash effect."
     },
     {
       "version": "2.1.0",
       "label": "SudoDeck v2.1.0",
       "file": "sudodeck-2.1.0.bin",
       "address": "0",
-      "notes": "App Launcher uses OS search (Win key / Cmd+Space / Super) instead of run dialog — type 'Calculator' not 'calc.exe'. App icons: upload 32x32 images to buttons via web tool, displayed on CYD grid. Faster app launch: ~250ms total."
+      "notes": "App Launcher uses OS search (Win key / Cmd+Space / Super) instead of run dialog \u2014 type 'Calculator' not 'calc.exe'. App icons: upload 32x32 images to buttons via web tool, displayed on CYD grid. Faster app launch: ~250ms total."
     },
     {
       "version": "2.0.3",
       "label": "SudoDeck v2.0.3",
       "file": "sudodeck-2.0.3.bin",
       "address": "0",
-      "notes": "App Launcher action: select OS (Windows/macOS/Linux), type app name, press button — device opens run dialog, types name, hits Enter. Macro step editor: combo steps show mod+key, delay shows ms."
+      "notes": "App Launcher action: select OS (Windows/macOS/Linux), type app name, press button \u2014 device opens run dialog, types name, hits Enter. Macro step editor: combo steps show mod+key, delay shows ms."
     },
     {
       "version": "2.0.2",
@@ -89,7 +97,7 @@
       "label": "SudoDeck v1.0.0",
       "file": "sudodeck-1.0.0.bin",
       "address": "0",
-      "notes": "Initial release — BLE macro deck with config UI, 4 screensaver modes, web serial config tool"
+      "notes": "Initial release \u2014 BLE macro deck with config UI, 4 screensaver modes, web serial config tool"
     }
   ]
 }

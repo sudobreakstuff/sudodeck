@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build both firmware variants and update assets/firmware/
+# Build both firmware variants and update docs/assets/firmware/
 # Usage: ./build.sh [version]
 #   version defaults to "2.2.0"
 
 VERSION="${1:-2.2.0}"
 DIR="$(cd "$(dirname "$0")" && pwd)"
-ASSETS="$DIR/assets/firmware"
+ASSETS="$DIR/docs/assets/firmware"
 FWM="$DIR/firmware"
 
 BOARD="esp32:esp32:jczn_2432s028r"
@@ -46,25 +46,53 @@ echo "Wired firmware: $ASSETS/firmware-wired-v$VERSION.bin ($(du -h "$ASSETS/fir
 
 # ── Generate manifest ──
 echo "--- Generating manifest ---"
-cat > "$ASSETS/manifest.json" <<ENDMANIFEST
 {
-  "version": 1,
-  "versions": [
-    {
-      "label": "v$VERSION (BLE)",
-      "file": "firmware-ble-v$VERSION.bin",
-      "address": 0,
-      "variant": "ble"
-    },
-    {
-      "label": "v$VERSION (Wired Serial)",
-      "file": "firmware-wired-v$VERSION.bin",
-      "address": 0,
-      "variant": "wired"
-    }
-  ]
-}
-ENDMANIFEST
+  echo '{'
+  echo '  "version": 1,'
+  echo '  "versions": ['
+  echo '    {'
+  echo '      "version": "'"$VERSION"'",'
+  echo '      "label": "v'"$VERSION"' (BLE)",'
+  echo '      "file": "firmware-ble-v'"$VERSION"'.bin",'
+  echo '      "address": 0,'
+  echo '      "variant": "ble"'
+  echo '    },'
+  echo '    {'
+  echo '      "version": "'"$VERSION"'",'
+  echo '      "label": "v'"$VERSION"' (Wired Serial)",'
+  echo '      "file": "firmware-wired-v'"$VERSION"'.bin",'
+  echo '      "address": 0,'
+  echo '      "variant": "wired"'
+  echo '    }'
+  # Append legacy entries if they exist
+  if [ -f "$ASSETS/manifest.json" ]; then
+    # Extract legacy entries (those without "variant") and prepend comma
+    python3 -c "
+import json, sys
+with open('$ASSETS/manifest.json') as f:
+    old = json.load(f)
+legacy = [e for e in old.get('versions', []) if 'variant' not in e]
+if legacy:
+    for e in legacy:
+        # remove old v$VERSION if present (it was BLE-only, superseded)
+        if e.get('version') == '$VERSION':
+            continue
+        print(',')
+        print(json.dumps(e, indent=2))
+" 2>/dev/null || true
+  fi
+  echo '  ]'
+  echo '}'
+} > "$ASSETS/manifest.json.tmp"
+python3 -c "
+import json
+with open('$ASSETS/manifest.json.tmp') as f:
+    data = json.load(f)
+with open('$ASSETS/manifest.json', 'w') as f:
+    json.dump(data, f, indent=2)
+    f.write('\n')
+" 2>/dev/null
+rm -f "$ASSETS/manifest.json.tmp"
 echo "Manifest: $ASSETS/manifest.json"
 
 echo ""
