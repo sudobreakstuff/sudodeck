@@ -1003,6 +1003,7 @@
   }
   .cmp-table {
     width: 100%;
+    min-width: 520px;
     border-collapse: separate;
     border-spacing: 0;
     border-radius: var(--radius);
