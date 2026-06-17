@@ -1,6 +1,9 @@
 #ifndef HID_PROTO_H
 #define HID_PROTO_H
 
+#include <BLEHIDKeys.h>     // KEY_* HID usage IDs
+#include <BLEHIDMediaKeys.h> // MEDIA_* consumer page IDs
+
 #define HID_TAP       0x01
 #define HID_TEXT      0x03
 #define HID_RELEASE   0x04
