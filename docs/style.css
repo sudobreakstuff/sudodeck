@@ -742,7 +742,6 @@
   }
   @media (max-width: 540px) {
     .guide-step { flex-direction: column; }
-    .guide-body { overflow-x: auto; }
   }
 
   /* ── Guide TOC ── */

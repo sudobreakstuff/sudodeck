@@ -194,7 +194,7 @@
         <div class="guide-body">
           <h3>Action Types</h3>
           <p>Each button can be assigned one of six action types. Here's what they do and when to use them:</p>
-          <!--tb--><table class="cmp-table" style="margin-top:12px;width:100%">
+          <div style="overflow-x:auto;overflow-y:hidden"><table class="cmp-table" style="margin-top:12px;width:100%">
             <tr>
               <th>Action</th>
               <th>What it does</th>
@@ -237,7 +237,7 @@
               <td><code>500ms</code></td>
               <td>Waiting for apps to open, page transitions</td>
             </tr>
-          </table>
+          </table></div>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Key Name Reference</h4>
           <p style="color:var(--dim);font-size:0.88rem">Use these exact key names in the config tool:</p>
@@ -345,7 +345,7 @@
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Custom Widgets</h4>
           <p>Add one or more widget sources below the Screensaver section. Each widget has these fields:</p>
-          <!--tb--><table class="cmp-table" style="margin-top:8px;width:100%">
+          <div style="overflow-x:auto;overflow-y:hidden"><table class="cmp-table" style="margin-top:8px;width:100%">
             <tr>
               <th>Field</th>
               <th>What it does</th>
@@ -355,7 +355,7 @@
             <tr><td><strong>Path</strong></td><td>Dot-notation JSON path to extract the value, e.g. <code>btc.usd</code> or <code>current_weather.temperature</code>. Array access with <code>[index]</code> is supported</td></tr>
             <tr><td><strong>Format</strong></td><td>Display template with <code>{value}</code> placeholder, e.g. <code>${value}</code> or <code>{value}°C</code></td></tr>
             <tr><td><strong>Interval</strong></td><td>Seconds between data refreshes (30s minimum recommended, max 600s)</td></tr>
-          </table>
+          </table></div>
           <p style="margin-top:8px">Use the <strong>Test</strong> button on each widget to verify your URL and path before writing to the device. Widgets cycle every 10 seconds on the CYD display.</p>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Widget Examples</h4>
@@ -582,7 +582,7 @@
           <h3>Limits &amp; Specifications</h3>
 
           <h4 style="margin:12px 0 6px;font-size:0.95rem">Layout Limits</h4>
-          <!--tb--><table class="cmp-table" style="margin-top:8px;width:100%">
+          <div style="overflow-x:auto;overflow-y:hidden"><table class="cmp-table" style="margin-top:8px;width:100%">
             <tr><th>Limit</th><th>Value</th></tr>
             <tr><td>Pages</td><td>18</td></tr>
             <tr><td>Columns per page</td><td>1–6</td></tr>
@@ -591,10 +591,10 @@
             <tr><td>Total buttons (all pages)</td><td>540 (18 × 30)</td></tr>
             <tr><td>Custom widgets</td><td>8 max</td></tr>
             <tr><td>Automations</td><td>20 max</td></tr>
-          </table>
+          </table></div>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Hardware Specifications</h4>
-          <!--tb--><table class="cmp-table" style="margin-top:8px;width:100%">
+          <div style="overflow-x:auto;overflow-y:hidden"><table class="cmp-table" style="margin-top:8px;width:100%">
             <tr><th>Component</th><th>Specification</th></tr>
             <tr><td>SoC</td><td>ESP32-D0WD-V3, dual-core Xtensa LX6 @ 240MHz</td></tr>
             <tr><td>SRAM</td><td>520KB total (~320KB usable after system reserve)</td></tr>
@@ -608,10 +608,10 @@
             <tr><td>Power</td><td>5V USB, ~200-300mA draw</td></tr>
             <tr><td>Battery</td><td>None — USB power only. No charging circuit, no battery connector</td></tr>
             <tr><td>MAC address</td><td>Unique per device (printed in firmware info response)</td></tr>
-          </table>
+          </table></div>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Software Limits</h4>
-          <!--tb--><table class="cmp-table" style="margin-top:8px;width:100%">
+          <div style="overflow-x:auto;overflow-y:hidden"><table class="cmp-table" style="margin-top:8px;width:100%">
             <tr><th>Limit</th><th>Value</th></tr>
             <tr><td>Button label length</td><td>Truncated with "..." at display width (~12 chars on 4-col grid)</td></tr>
             <tr><td>Macro steps</td><td>No hard limit — practical max ~50 before execution time becomes noticeable</td></tr>
@@ -621,10 +621,10 @@
             <tr><td>Sleep timeout</td><td>0–600 seconds (0 = never sleep)</td></tr>
             <tr><td>Serial buffer (v2.1.5+)</td><td>131072 bytes (128KB) — enough for full config of all 18 pages</td></tr>
             <tr><td>BLE range</td><td>~10m open air</td></tr>
-          </table>
+          </table></div>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Compatibility</h4>
-          <!--tb--><table class="cmp-table" style="margin-top:8px;width:100%">
+          <div style="overflow-x:auto;overflow-y:hidden"><table class="cmp-table" style="margin-top:8px;width:100%">
             <tr><th>OS / Platform</th><th>BLE HID Support</th><th>Web Serial Support</th></tr>
             <tr><td>Windows 10+</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
             <tr><td>macOS 11+</td><td>Yes</td><td>Yes (Chrome/Edge)</td></tr>
@@ -632,7 +632,7 @@
             <tr><td>Android 8+</td><td>Yes</td><td>Yes (Chrome)</td></tr>
             <tr><td>iOS / iPadOS 13+</td><td>Yes</td><td>No (Safari only, no Web Serial)</td></tr>
             <tr><td>ChromeOS</td><td>Yes</td><td>Yes</td></tr>
-          </table>
+          </table></div>
 
           <div class="guide-note" style="margin-top:10px">Limits are enforced by the firmware at <code>firmware.ino:298</code>. The web config tool also caps inputs — entering a value above the max is silently clamped. All limits are open-source and changeable in the source code if you need something different.</div>
         </div>
