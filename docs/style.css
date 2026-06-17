@@ -16,34 +16,45 @@
     --nav-h: 52px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); min-height: 100%; }
   html {
-    min-height: 100%;
+    position: relative;
     background: var(--bg);
   }
   html::before {
     content: '';
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
     background:
-      radial-gradient(ellipse 80% 60% at 25% 15%, rgba(0,255,136,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 70% 65%, rgba(8,100,180,0.05) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 70% at 55% 80%, rgba(120,20,200,0.04) 0%, transparent 50%);
+      radial-gradient(ellipse 90% 70% at 20% 10%, rgba(0,255,136,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 60% at 75% 60%, rgba(8,100,220,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 80% at 50% 85%, rgba(150,30,220,0.10) 0%, transparent 55%);
     animation:
-      meshDrift 30s ease-in-out infinite alternate,
-      meshBreathe 10s ease-in-out infinite alternate;
+      meshDrift 18s cubic-bezier(0.45, 0.05, 0.35, 1) infinite alternate,
+      meshBreathe 7s ease-in-out infinite alternate;
+  }
+  html::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(10, 14, 23, 0.75);
   }
   @keyframes meshDrift {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(2.5%, 1.5%) scale(1.04); }
+    50% { transform: translate(-1%, 2%) scale(1.03); }
+    100% { transform: translate(3%, -1%) scale(1.06); }
   }
   @keyframes meshBreathe {
-    0% { opacity: 0.55; }
+    0% { opacity: 0.6; }
     100% { opacity: 1; }
   }
   body {
+    position: relative;
+    z-index: 2;
     background: transparent;
     color: var(--text);
     font-family: var(--font);
@@ -826,16 +837,17 @@
     object-fit: cover;
   }
   @media (max-width: 540px) {
-    .guide-step { flex-direction: column; }
-    .guide-body { overflow-x: auto; }
+    .guide-step { flex-direction: column; padding: 16px; }
     .guide-body h3 { font-size: 0.85rem; }
-    .guide-body h4 { font-size: 0.78rem !important; }
-    .guide-body p, .guide-body ol, .guide-body ul, .guide-body li, .guide-body .guide-note { font-size: 0.78rem !important; }
-    .guide-body code { font-size: 0.72rem; }
-    .guide-body pre { font-size: 0.7rem; padding: 8px; white-space: pre; }
-    .guide-body .guide-cta { font-size: 0.78rem; padding: 5px 12px; }
+    .guide-body h4 { font-size: 0.78rem; }
+    .guide-body p, .guide-body li { font-size: 0.78rem; word-break: break-word; }
+    .guide-body ol, .guide-body ul { font-size: 0.78rem !important; }
+    .guide-body .guide-note, .guide-body code { font-size: 0.75rem; }
+    .guide-body .guide-cta { font-size: 0.75rem; padding: 5px 12px; }
+    .guide-body pre { font-size: 0.68rem; padding: 8px; }
     .guide-num { width: 28px; height: 28px; font-size: 0.8rem; }
     .guide-img { max-width: 100%; }
+    .guide-body table { display: block; max-width: 100%; overflow-x: auto; }
   }
 
   /* ── Guide TOC ── */
