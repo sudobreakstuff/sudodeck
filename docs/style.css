@@ -782,6 +782,10 @@
   .fmw-hdr { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
   .fmw-note { color: var(--dim); font-size: 0.85rem; flex: 1; min-width: 200px; }
   .fmw-st { font-size: 0.8rem; color: var(--dim); font-family: var(--mono); }
+  .fmw-variant { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  .fmw-vl { font-size: 0.85rem; color: var(--text); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .fmw-vl input { accent-color: var(--acc); }
+  .fmw-vn { font-size: 0.78rem; color: var(--dim); margin-left: auto; }
   .fmw-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .fmw-flash { display: flex; gap: 8px; align-items: center; }
   .fmw-flash select {

@@ -30,16 +30,17 @@
     <h2><span class="g">Firmware</span></h2>
     <p class="sd">Back up or update your SudoDeck firmware directly from the browser.</p>
 
-    <div class="fmw-note" style="margin-bottom:10px;color:var(--dim);font-size:0.85rem">
-      <strong>Wired mode?</strong> Use the companion daemon (<a href="../guide/#section-wired" style="color:var(--acc)">guide</a>).<br>
-      Before flashing, the config tool auto-releases the daemon port.
-    </div>
-
     <div class="fmw">
       <div class="fmw-hdr">
         <p class="fmw-note">Put your CYD in <strong>flash mode</strong>: hold the BOOT button, tap RESET, release BOOT — then click Connect.</p>
         <button class="btn pri" id="btnFwConnect" onclick="fwConnect()">Connect for Flashing</button>
         <span class="fmw-st" id="fwStatus">Disconnected</span>
+      </div>
+
+      <div class="fmw-variant">
+        <label class="fmw-vl"><input type="radio" name="fwVariant" value="ble" checked onchange="fwApplyVariant()"> Standard (BLE)</label>
+        <label class="fmw-vl"><input type="radio" name="fwVariant" value="wired" onchange="fwApplyVariant()"> Wired (Serial)</label>
+        <span class="fmw-vn" id="fwVariantNote">No extra software needed — works as a Bluetooth keyboard out of the box.</span>
       </div>
 
       <div class="fmw-actions">

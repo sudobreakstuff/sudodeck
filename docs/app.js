@@ -795,19 +795,52 @@ async function fwLoadManifest() {
     if (!r.ok) { fwLog('HTTP ' + r.status); return; }
     fwManifest = await r.json();
     var sel = document.getElementById('fwVersion');
+    var groups = {};
     fwManifest.versions.forEach(function(v) {
+      var variant = v.variant || 'ble';
+      if (!groups[variant]) groups[variant] = document.createElement('optgroup');
       var opt = document.createElement('option');
       opt.value = v.file;
       opt.textContent = v.label;
       opt.dataset.address = v.address;
-      sel.appendChild(opt);
+      groups[variant].appendChild(opt);
+    });
+    var order = ['ble', 'wired'];
+    var labels = { ble: 'Standard (BLE)', wired: 'Wired (Serial)' };
+    order.forEach(function(k) {
+      if (!groups[k]) return;
+      groups[k].label = labels[k] || k;
+      sel.appendChild(groups[k]);
     });
     fwLog('Firmware versions loaded.');
+    fwApplyVariant();
   } catch (e) {
     fwLog('Could not load firmware list.');
   }
 }
 fwLoadManifest();
+
+function fwApplyVariant() {
+  var v = document.querySelector('input[name="fwVariant"]:checked');
+  if (!v) return;
+  var variant = v.value;
+  var sel = document.getElementById('fwVersion');
+  [].forEach.call(sel.querySelectorAll('optgroup'), function(g) {
+    var show = (variant === 'all' || g.label.indexOf(variant === 'wired' ? 'Wired' : 'Standard') >= 0);
+    g.style.display = show ? '' : 'none';
+  });
+  // if current selection is hidden, reset
+  if (sel.selectedIndex >= 0) {
+    var opt = sel.options[sel.selectedIndex];
+    if (opt.parentElement && opt.parentElement.style.display === 'none') {
+      sel.value = '';
+      fwVersionChanged();
+    }
+  }
+  document.getElementById('fwVariantNote').textContent =
+    variant === 'wired' ? 'Requires the companion daemon for keystroke injection.' :
+    'No extra software needed — works as a Bluetooth keyboard out of the box.';
+}
 
 async function fwVersionChanged() {
   var sel = document.getElementById('fwVersion');
