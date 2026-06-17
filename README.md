@@ -43,16 +43,29 @@ Newcastle, KZN — arrange via email.
 ## Why SudoDeck vs the Competition
 
 | | SudoDeck | Stream Deck Mini | Stream Deck MK.2 |
-|---|---|---|---|
+|---|---|---|---|---|
 | **Price (SA)** | **R1,099** | R1,799 | ~R2,800 |
-| **Connection** | BLE Wireless | USB Wired | USB Wired |
-| **Buttons** | 20+ touch (multi-page) | 6 physical LCD | 15 physical LCD |
-| **Open Source** | MIT ✅ | No ❌ | No ❌ |
-| **Config Software** | Built-in web page | Proprietary app | Proprietary app |
-| **Config on Device** | Yes — follows anywhere | No | No |
-| **Screensaver** | 3 modes | None | None |
-| **Touch Screen** | Yes (2.8", 240×320) | No (LCD keys only) | No (LCD keys only) |
-| **Built In** | South Africa | Imported | Imported |
+| **Price per button** | **~R55** | R300 | ~R187 |
+| **Connection** | **BLE Wireless** | USB Wired | USB Wired |
+| **Bluetooth Range** | **~10m** | Cable length | Cable length |
+| **Display** | **2.8" colour touch** | 6× LCD buttons | 15× LCD buttons |
+| **Touch Screen** | **Yes** — tap any position | No | No |
+| **Buttons** | **20+ touch (multi-page)** | 6 fixed | 15 fixed |
+| **Pages** | **Up to 18** | 1 | 1 |
+| **Open Source** | **MIT** ✅ | No ❌ | No ❌ |
+| **Config Software** | **Built-in web page** (no install) | Proprietary app | Proprietary app |
+| **Web Serial Config** | **Yes** — Chrome/Edge, no install | No | No |
+| **Config on Device** | **Yes** — follows anywhere | No | No |
+| **Export / Import JSON** | **Yes** | No | No |
+| **Firmware Updates** | **Via browser** (Web Serial) | Proprietary app | Proprietary app |
+| **Action Types** | **Key, Combo, Text, Macro, App Launch** | Key, Combo, Text | Key, Combo, Text, Macro |
+| **App Launcher** | **Yes** — press a button to launch any app | No | No |
+| **Macro Sequences** | **Yes** — multi-step with delays | No | Yes |
+| **Automations** | **Timers & Schedules** (20 max) | No | No |
+| **Custom Live Widgets** | **Yes** — API data on display | No | No |
+| **WiFi** | **Built-in** — live data widgets | No | No |
+| **Screensaver** | **3 modes** (Matrix, F1, Widgets) | None | None |
+| **Built In** | **South Africa** | Imported | Imported |
 
 **The bottom line:** SudoDeck is the only wireless, open source macro deck on the market — at half the price of the nearest competitor.
 
