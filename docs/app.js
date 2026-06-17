@@ -14,56 +14,53 @@ function dc() {
     theme: { name: "default", button_style: "flat" },
     widgets: [],
     automations: [],
-    slots: [
-      { name: "Default", pages: [
-        { name: "Main", buttons: [
-          { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
-          { label: "Paste", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "v" } },
-          { label: "Cut", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "x" } },
-          { label: "Undo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "z" } },
-          { label: "Save", color: "#1A3A1A", action: { type: "combo", mod: "CTRL", key: "s" } },
-          { label: "Find", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "f" } },
-          { label: "SelAll", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "a" } },
-          { label: "Tab", color: "#16213E", action: { type: "key", value: "TAB" } },
-          { label: "Enter", color: "#1A2A1A", action: { type: "key", value: "ENTER" } },
-          { label: "Esc", color: "#3A1A1A", action: { type: "key", value: "ESC" } },
-          { label: "Vol+", color: "#1A1A3A", action: { type: "key", value: "MEDIA_VOLUME_UP" } },
-          { label: "Vol-", color: "#1A1A3A", action: { type: "key", value: "MEDIA_VOLUME_DOWN" } }
-        ]},
-        { name: "Media", buttons: [
-          { label: "Play", color: "#1A2A1A", action: { type: "key", value: "MEDIA_PLAY_PAUSE" } },
-          { label: "Next", color: "#16213E", action: { type: "key", value: "MEDIA_NEXT_TRACK" } },
-          { label: "Prev", color: "#16213E", action: { type: "key", value: "MEDIA_PREV_TRACK" } },
-          { label: "Mute", color: "#3A1A1A", action: { type: "key", value: "MEDIA_MUTE" } },
-          { label: "Br+", color: "#1A1A3A", action: { type: "key", value: "BRIGHTNESS_UP" } },
-          { label: "Br-", color: "#1A1A3A", action: { type: "key", value: "BRIGHTNESS_DOWN" } },
-          { label: "Home", color: "#16213E", action: { type: "key", value: "HOME" } },
-          { label: "End", color: "#16213E", action: { type: "key", value: "END" } },
-          { label: "PgUp", color: "#16213E", action: { type: "key", value: "PAGE_UP" } },
-          { label: "PgDn", color: "#16213E", action: { type: "key", value: "PAGE_DOWN" } },
-          { label: "Screensht", color: "#3A2A1A", action: { type: "combo", mod: "CTRL_SHIFT", key: "s" } },
-          { label: "Lock", color: "#3A1A1A", action: { type: "combo", mod: "CTRL_ALT", key: "l" } }
-        ]},
-        { name: "Studio", buttons: [
-          { label: "Split", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "k" } },
-          { label: "Undo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "z" } },
-          { label: "Redo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "y" } },
-          { label: "Snip", color: "#3A2A1A", action: { type: "combo", mod: "CTRL", key: "t" } },
-          { label: "FullScr", color: "#16213E", action: { type: "key", value: "F11" } },
-          { label: "TmLine", color: "#1A2A1A", action: { type: "key", value: "F3" } },
-          { label: "Render", color: "#3A1A1A", action: { type: "key", value: "F8" } },
-          { label: "NewPrj", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "n" } },
-          { label: "Export", color: "#1A2A1A", action: { type: "combo", mod: "CTRL", key: "m" } },
-          { label: "Import", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "i" } },
-          { label: "DelRpl", color: "#3A1A1A", action: { type: "combo", mod: "CTRL_SHIFT", key: "d" } },
-          { label: "AddTX", color: "#1A1A3A", action: { type: "combo", mod: "CTRL", key: "t" } }
-        ]}
+    pages: [
+      { name: "Main", buttons: [
+        { label: "Copy", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "c" } },
+        { label: "Paste", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "v" } },
+        { label: "Cut", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "x" } },
+        { label: "Undo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "z" } },
+        { label: "Save", color: "#1A3A1A", action: { type: "combo", mod: "CTRL", key: "s" } },
+        { label: "Find", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "f" } },
+        { label: "SelAll", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "a" } },
+        { label: "Tab", color: "#16213E", action: { type: "key", value: "TAB" } },
+        { label: "Enter", color: "#1A2A1A", action: { type: "key", value: "ENTER" } },
+        { label: "Esc", color: "#3A1A1A", action: { type: "key", value: "ESC" } },
+        { label: "Vol+", color: "#1A1A3A", action: { type: "key", value: "MEDIA_VOLUME_UP" } },
+        { label: "Vol-", color: "#1A1A3A", action: { type: "key", value: "MEDIA_VOLUME_DOWN" } }
+      ]},
+      { name: "Media", buttons: [
+        { label: "Play", color: "#1A2A1A", action: { type: "key", value: "MEDIA_PLAY_PAUSE" } },
+        { label: "Next", color: "#16213E", action: { type: "key", value: "MEDIA_NEXT_TRACK" } },
+        { label: "Prev", color: "#16213E", action: { type: "key", value: "MEDIA_PREV_TRACK" } },
+        { label: "Mute", color: "#3A1A1A", action: { type: "key", value: "MEDIA_MUTE" } },
+        { label: "Br+", color: "#1A1A3A", action: { type: "key", value: "BRIGHTNESS_UP" } },
+        { label: "Br-", color: "#1A1A3A", action: { type: "key", value: "BRIGHTNESS_DOWN" } },
+        { label: "Home", color: "#16213E", action: { type: "key", value: "HOME" } },
+        { label: "End", color: "#16213E", action: { type: "key", value: "END" } },
+        { label: "PgUp", color: "#16213E", action: { type: "key", value: "PAGE_UP" } },
+        { label: "PgDn", color: "#16213E", action: { type: "key", value: "PAGE_DOWN" } },
+        { label: "Screensht", color: "#3A2A1A", action: { type: "combo", mod: "CTRL_SHIFT", key: "s" } },
+        { label: "Lock", color: "#3A1A1A", action: { type: "combo", mod: "CTRL_ALT", key: "l" } }
+      ]},
+      { name: "Studio", buttons: [
+        { label: "Split", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "k" } },
+        { label: "Undo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "z" } },
+        { label: "Redo", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "y" } },
+        { label: "Snip", color: "#3A2A1A", action: { type: "combo", mod: "CTRL", key: "t" } },
+        { label: "FullScr", color: "#16213E", action: { type: "key", value: "F11" } },
+        { label: "TmLine", color: "#1A2A1A", action: { type: "key", value: "F3" } },
+        { label: "Render", color: "#3A1A1A", action: { type: "key", value: "F8" } },
+        { label: "NewPrj", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "n" } },
+        { label: "Export", color: "#1A2A1A", action: { type: "combo", mod: "CTRL", key: "m" } },
+        { label: "Import", color: "#16213E", action: { type: "combo", mod: "CTRL", key: "i" } },
+        { label: "DelRpl", color: "#3A1A1A", action: { type: "combo", mod: "CTRL_SHIFT", key: "d" } },
+        { label: "AddTX", color: "#1A1A3A", action: { type: "combo", mod: "CTRL", key: "t" } }
       ]}
     ]
   };
 }
-function curSlot() { return cd && cd.slots && cs < cd.slots.length ? cd.slots[cs] : null; }
-function curPage() { var s = curSlot(); return s && sp < s.pages.length ? s.pages[sp] : null; }
+function curPage() { return cd && cd.pages && sp < cd.pages.length ? cd.pages[sp] : null; }
 function curBtn() { var p = curPage(); return p && sb >= 0 && sb < p.buttons.length ? p.buttons[sb] : null; }
 
 function ic() { cd = dc(); }
@@ -104,24 +101,13 @@ document.getElementById('btnRead').addEventListener('click', async function() {
   try { var r = await sc({cmd:'get_config'}, 15000); if(r.config) { cd=r.config; cs=0; sp=0; sb=-1; ensureV2(); ra(); tm('Config loaded'); } } catch(e) { console.error('Read failed:', e); tm('Read failed', 'ng'); }
 });
 
-// Ensure config is v2 format (wrap old pages[] into slots[0].pages)
 function ensureV2() {
   if (!cd) return;
-  if (cd.pages && !cd.slots) {
-    cd.version = 2;
-    cd.slots = [{ name: "Default", pages: cd.pages }];
-    delete cd.pages;
-    if (!cd.automations) cd.automations = [];
-  }
   if (!cd.version) cd.version = 2;
-  if (!cd.slots) cd.slots = [{ name: "Default", pages: [] }];
+  if (!cd.pages) cd.pages = [];
   if (!cd.automations) cd.automations = [];
-  if (cd.slots.length === 0) cd.slots.push({ name: "Default", pages: [] });
-  if (cs >= cd.slots.length) cs = 0;
-  var s = cd.slots[cs];
-  if (!s.pages) s.pages = [];
-  if (sp >= s.pages.length) sp = 0;
-  s.pages.forEach(function(p) { if (!p.buttons) p.buttons = []; });
+  if (sp >= cd.pages.length) sp = 0;
+  cd.pages.forEach(function(p) { if (!p.buttons) p.buttons = []; });
 }
 
 // Write config
@@ -168,8 +154,8 @@ function ul() {
   if(!cd) return;
   document.getElementById('lc').value=cd.grid?cd.grid.cols:4;
   document.getElementById('lr').value=cd.grid?cd.grid.rows:3;
-  var s = curSlot();
-  document.getElementById('lp').value=s?s.pages.length:1;
+  var pgs = cd.pages || [];
+  document.getElementById('lp').value=pgs.length;
   if(!cd.wifi) cd.wifi={ssid:'',password:''};
   document.getElementById('wifiSsid').value=cd.wifi.ssid||'';
   document.getElementById('wifiPass').value=cd.wifi.password||'';
@@ -238,72 +224,24 @@ document.getElementById('bal').addEventListener('click', function() {
   var pc=Math.max(1,Math.min(18,parseInt(document.getElementById('lp').value)||1));
   if(!cd.grid) cd.grid={};
   cd.grid.cols=c; cd.grid.rows=r; var tb=c*r;
-  var s = curSlot();
-  if (!s) return;
-  while(s.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); s.pages.push({name:'Page '+(s.pages.length+1),buttons:bt}); }
-  while(s.pages.length>pc) s.pages.pop();
-  for(var i=0;i<s.pages.length;i++) { while(s.pages[i].buttons.length<tb) s.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); }
+  while(cd.pages.length<pc) { var bt=[]; for(var i=0;i<tb;i++) bt.push({label:'',color:'#16213E',action:{type:'key',value:''}}); cd.pages.push({name:'Page '+(cd.pages.length+1),buttons:bt}); }
+  while(cd.pages.length>pc) cd.pages.pop();
+  for(var i=0;i<cd.pages.length;i++) { while(cd.pages[i].buttons.length<tb) cd.pages[i].buttons.push({label:'',color:'#16213E',action:{type:'key',value:''}}); }
   syncWifi(); syncSaver();
   sp=0; sb=-1; ra(); tm('Layout updated');
 });
 
-function ra() { renderSlotBar(); renderPageBar(); rg(); ul(); syncWidgets(); syncThemeUI(); syncSlotUI(); syncAutoUI(); }
-
-function renderSlotBar() {
-  var b = document.getElementById('slotBar'); b.innerHTML = '';
-  if (!cd || !cd.slots) return;
-  cd.slots.forEach(function(s, i) {
-    var t = document.createElement('span');
-    t.className = 'p-tab' + (i === cs ? ' on' : '');
-    t.textContent = s.name || ('Slot ' + (i + 1));
-    t.style.fontSize = '0.65rem';
-    t.addEventListener('click', function(idx) { return function() { cs = idx; sp = 0; sb = -1; ra(); }; }(i));
-    t.addEventListener('dblclick', function(idx) { return function() { var n = prompt('Slot name:', cd.slots[idx].name); if (n !== null) { cd.slots[idx].name = n; ra(); } }; }(i));
-    b.appendChild(t);
-  });
-  // Add slot button
-  if (cd.slots.length < 3) {
-    var a = document.createElement('span');
-    a.className = 'p-tab add';
-    a.textContent = '+';
-    a.addEventListener('click', function() {
-      if (cd.slots.length >= 3) return;
-      var tb = (cd.grid ? cd.grid.cols : 4) * (cd.grid ? cd.grid.rows : 3);
-      var bt = [];
-      for (var i = 0; i < tb; i++) bt.push({ label: '', color: '#16213E', action: { type: 'key', value: '' } });
-      cd.slots.push({ name: 'Slot ' + (cd.slots.length + 1), pages: [{ name: 'Page 1', buttons: bt }] });
-      cs = cd.slots.length - 1; sp = 0; sb = -1;
-      ra();
-    });
-    b.appendChild(a);
-  }
-  // Remove slot button
-  if (cd.slots.length > 1) {
-    var r = document.createElement('span');
-    r.className = 'p-tab rm';
-    r.textContent = '-';
-    r.style.marginLeft = '2px';
-    r.addEventListener('click', function() {
-      if (cd.slots.length <= 1) return;
-      cd.slots.splice(cs, 1);
-      if (cs >= cd.slots.length) cs = cd.slots.length - 1;
-      sp = 0; sb = -1;
-      ra();
-    });
-    b.appendChild(r);
-  }
-}
+function ra() { renderPageBar(); rg(); ul(); syncWidgets(); syncThemeUI(); syncAutoUI(); }
 
 function renderPageBar() {
   var b = document.getElementById('pageBar'); b.innerHTML = '';
-  var s = curSlot();
-  if (!s || !s.pages) return;
-  s.pages.forEach(function(p, i) {
+  if (!cd || !cd.pages) return;
+  cd.pages.forEach(function(p, i) {
     var t = document.createElement('span');
     t.className = 'p-tab' + (i === sp ? ' on' : '');
     t.textContent = p.name || ('Pg' + (i + 1));
     t.addEventListener('click', function(idx) { return function() { sp = idx; sb = -1; ra(); }; }(i));
-    t.addEventListener('dblclick', function(idx) { return function() { var n = prompt('Page name:', s.pages[idx].name); if (n !== null) { s.pages[idx].name = n; ra(); } }; }(i));
+    t.addEventListener('dblclick', function(idx) { return function() { var n = prompt('Page name:', cd.pages[idx].name); if (n !== null) { cd.pages[idx].name = n; ra(); } }; }(i));
     b.appendChild(t);
   });
 }
@@ -510,87 +448,6 @@ if (hero) {
     }
   });
 }
-
-// ── BLE Slots ──
-
-function syncSlotUI() {
-  var h = document.getElementById('slotHint');
-  if (!cd || !cd.slots) { h.textContent = '0 slots'; return; }
-  h.textContent = cd.slots.length + ' slot' + (cd.slots.length > 1 ? 's' : '');
-  var el = document.getElementById('slotList');
-  el.innerHTML = '';
-  cd.slots.forEach(function(s, i) {
-    var c = document.createElement('div');
-    c.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px;border-radius:4px;background:var(--bg2);margin-bottom:4px;' + (i === cs ? 'border:1px solid var(--acc);' : '');
-    var name = document.createElement('span');
-    name.style.cssText = 'font-weight:600;font-size:0.75rem;min-width:60px;';
-    name.textContent = s.name || ('Slot ' + (i + 1));
-    var pages = document.createElement('span');
-    pages.style.cssText = 'font-size:0.65rem;color:var(--dim);';
-    pages.textContent = (s.pages ? s.pages.length : 0) + ' pages';
-    var status = document.createElement('span');
-    status.id = 'slotStatus' + i;
-    status.style.cssText = 'font-size:0.65rem;color:var(--dim);margin-left:auto;';
-    status.textContent = 'not paired';
-    c.appendChild(name);
-    c.appendChild(pages);
-    c.appendChild(status);
-    if (i !== cs) {
-      var sw = document.createElement('button');
-      sw.className = 'btn';
-      sw.textContent = 'Switch';
-      sw.style.cssText = 'padding:3px 8px;font-size:0.65rem;';
-      sw.addEventListener('click', function(idx) { return function() { if (dw) { sc({ cmd: 'switch_slot', slot: idx }).catch(function(e) { tm('Switch failed', 'ng'); }); cs = idx; sp = 0; sb = -1; ra(); } else { cs = idx; sp = 0; sb = -1; ra(); } }; }(i));
-      c.appendChild(sw);
-    }
-    el.appendChild(c);
-  });
-}
-
-document.getElementById('slotToggle').addEventListener('click', function() {
-  document.getElementById('slotBody').classList.toggle('open');
-  if (dw) {
-    sc({ cmd: 'get_slots' }).then(function(r) {
-      if (r.slots) {
-        r.slots.forEach(function(s, i) {
-          var el = document.getElementById('slotStatus' + i);
-          if (el) el.textContent = s.addr ? ('paired: ' + s.addr) : 'not paired';
-        });
-      }
-    }).catch(function() {});
-  }
-});
-
-document.getElementById('btnSlotPair').addEventListener('click', async function() {
-  if (!dw) { tm('Connect first', 'ng'); return; }
-  try {
-    var r = await sc({ cmd: 'pair_slot', slot: cs });
-    if (r.error) { tm(r.error, 'ng'); return; }
-    tm('Slot ' + cs + ' paired: ' + r.addr);
-    syncSlotUI();
-  } catch (e) { tm('Pair failed: ' + (e.message || e), 'ng'); }
-});
-
-document.getElementById('btnSlotClear').addEventListener('click', async function() {
-  if (!dw) { tm('Connect first', 'ng'); return; }
-  try {
-    var r = await sc({ cmd: 'clear_slot', slot: cs });
-    if (r.error) { tm(r.error, 'ng'); return; }
-    tm('Slot ' + cs + ' cleared');
-    syncSlotUI();
-  } catch (e) { tm('Clear failed: ' + (e.message || e), 'ng'); }
-});
-
-document.getElementById('btnSlotSwitch').addEventListener('click', async function() {
-  var idx = parseInt(document.getElementById('slotSwitchIdx').value) || 0;
-  if (dw) {
-    try {
-      var r = await sc({ cmd: 'switch_slot', slot: idx });
-      if (r.error) { tm(r.error, 'ng'); return; }
-    } catch (e) { tm('Switch failed: ' + (e.message || e), 'ng'); return; }
-  }
-  cs = idx; sp = 0; sb = -1; ra();
-});
 
 // ── Screensaver ──
 

@@ -43,17 +43,18 @@
         <a href="#section-actions" class="guide-toc-item">6. Action Types</a>
         <a href="#section-layout" class="guide-toc-item">7. Layouts, Export &amp; Import</a>
         <a href="#section-screensaver" class="guide-toc-item">8. Screensaver &amp; Widgets</a>
-        <a href="#section-wifi" class="guide-toc-item">9. WiFi Setup</a>
+        <a href="#section-automations" class="guide-toc-item">9. Automations</a>
+        <a href="#section-wifi" class="guide-toc-item">10. WiFi Setup</a>
 
         <a href="#maintenance" class="guide-toc-sect">Maintenance</a>
-        <a href="#section-update" class="guide-toc-item">10. Firmware Updates</a>
-        <a href="#section-reset" class="guide-toc-item">11. Factory Reset</a>
+        <a href="#section-update" class="guide-toc-item">11. Firmware Updates</a>
+        <a href="#section-reset" class="guide-toc-item">12. Factory Reset</a>
 
         <a href="#troubleshooting" class="guide-toc-sect">Troubleshooting</a>
-        <a href="#section-tshoot" class="guide-toc-item">12. Common Issues</a>
+        <a href="#section-tshoot" class="guide-toc-item">13. Common Issues</a>
 
         <a href="#reference" class="guide-toc-sect">Reference</a>
-        <a href="#section-limits" class="guide-toc-item">13. Limits &amp; Specs</a>
+        <a href="#section-limits" class="guide-toc-item">14. Limits &amp; Specs</a>
       </div>
     </div>
 
@@ -373,8 +374,33 @@
         </div>
       </div>
 
-      <div class="guide-step" id="section-wifi">
+      <div class="guide-step" id="section-automations">
         <div class="guide-num">9</div>
+        <div class="guide-body">
+          <h3>Automations</h3>
+          <p>Automations let you send keystrokes or sequences on a <strong>timer</strong> or <strong>schedule</strong> — no button press needed. Configure them in the app under the Automations panel.</p>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Types</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Timer</strong> — runs an action every N seconds (e.g. press F5 every 10s to refresh a dashboard)</li>
+            <li><strong>Schedule</strong> — runs an action at a specific time (HH:MM) on selected days of the week (1=Sunday, 7=Saturday)</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Enable / Disable</h4>
+          <ul style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">
+            <li><strong>Per-automation</strong> — each automation has an ON/OFF toggle button in its card in the Automations panel. Disabled automations are skipped.</li>
+            <li><strong>From the CYD</strong> — assign any button the <strong>Auto Toggle</strong> action type (in the button editor), then pick which automation it controls. The button shows <span style="color:#4CAF50;font-weight:600">green</span> when the automation is ON and <span style="color:#f44336;font-weight:600">red</span> when OFF. Tap it to toggle.</li>
+          </ul>
+
+          <h4 style="margin:16px 0 6px;font-size:0.95rem">Actions</h4>
+          <p style="color:var(--dim);font-size:0.88rem">Each automation runs one action (key, combo, text, delay, or app launch) — the same set of action types available for buttons.</p>
+
+          <div class="guide-note" style="margin-top:10px">Automations only fire when enabled. Deleting an automation from the list does not affect button configurations that reference it — those buttons will have no effect until you reassign them.</div>
+        </div>
+      </div>
+
+      <div class="guide-step" id="section-wifi">
+        <div class="guide-num">10</div>
         <div class="guide-body">
           <h3>WiFi Setup</h3>
           <p>WiFi is optional but required for live data features (F1 standings, custom widgets). The CYD uses the ESP32's built-in 2.4GHz WiFi.</p>
@@ -411,7 +437,7 @@
       <div id="maintenance" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Maintenance</h3></div>
 
       <div class="guide-step" id="section-update">
-        <div class="guide-num">10</div>
+        <div class="guide-num">11</div>
         <div class="guide-body">
           <h3>Firmware Updates</h3>
           <p>Updating the firmware is the same process as the initial flash. The firmware tool on the Configure page handles everything.</p>
@@ -432,7 +458,7 @@
       </div>
 
       <div class="guide-step" id="section-reset">
-        <div class="guide-num">11</div>
+        <div class="guide-num">12</div>
         <div class="guide-body">
           <h3>Factory Reset</h3>
           <p>Two ways to reset the device to its default 3-page layout (Main, Media, Studio):</p>
@@ -446,7 +472,7 @@
       <div id="troubleshooting" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Troubleshooting</h3></div>
 
       <div class="guide-step" id="section-tshoot">
-        <div class="guide-num">12</div>
+        <div class="guide-num">13</div>
         <div class="guide-body">
           <h3>Common Issues</h3>
 
@@ -551,7 +577,7 @@
       <div id="reference" style="margin:32px 0 8px"><h3 style="color:var(--acc);font-size:1.3rem;margin:0">Reference</h3></div>
 
       <div class="guide-step" id="section-limits">
-        <div class="guide-num">13</div>
+        <div class="guide-num">14</div>
         <div class="guide-body">
           <h3>Limits &amp; Specifications</h3>
 
@@ -564,6 +590,7 @@
             <tr><td>Buttons per page</td><td>30 (6×5 max)</td></tr>
             <tr><td>Total buttons (all pages)</td><td>540 (18 × 30)</td></tr>
             <tr><td>Custom widgets</td><td>8 max</td></tr>
+            <tr><td>Automations</td><td>20 max</td></tr>
           </table>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">Hardware Specifications</h4>

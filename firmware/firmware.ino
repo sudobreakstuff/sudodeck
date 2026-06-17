@@ -6,8 +6,6 @@
 #include <HijelHID_BLEKeyboard.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <nvs_flash.h>
-#include <nvs.h>
 #include <time.h>
 #include "logo_img.h"
 
@@ -25,9 +23,7 @@
 #define GRID_Y HEAD_H
 #define GRID_H (SCR_H - HEAD_H - BOT_H)
 
-#define MAX_SLOTS 3
 #define MAX_AUTOMATIONS 20
-#define NVS_NS "sdb_ble"
 
 // theme state
 uint16_t c_bg=0x0000, c_hdr=0x0862, c_acc=0x07F1;
@@ -42,12 +38,8 @@ HijelHID_BLEKeyboard ble("SudoDeck", "shahid singh");
 bool ble_ready = false;
 bool ble_was_connected = false;
 
-// Slot state
-int current_slot = 0;
-int num_slots = 0;
-String slot_names[MAX_SLOTS];
-int slot_pages[MAX_SLOTS];
-int slot_cur_page[MAX_SLOTS];
+int current_page = 0;
+int num_pages = 0;
 int cols = 4, rows = 3;
 int total_btns = 0;
 
@@ -251,60 +243,7 @@ void do_action(JsonObject a) {
   }
 }
 
-// ─── NVS Helpers ────────────────────────────────────────────────────────────
 
-void save_slot_addr(int slot, NimBLEAddress addr) {
-  nvs_handle h;
-  if (nvs_open(NVS_NS, NVS_READWRITE, &h) == ESP_OK) {
-    nvs_set_blob(h, ("addr" + String(slot)).c_str(), (uint8_t*)&addr, sizeof(NimBLEAddress));
-    nvs_commit(h);
-    nvs_close(h);
-  }
-}
-
-NimBLEAddress load_slot_addr(int slot) {
-  nvs_handle h;
-  NimBLEAddress addr;
-  size_t sz = sizeof(NimBLEAddress);
-  if (nvs_open(NVS_NS, NVS_READONLY, &h) == ESP_OK) {
-    if (nvs_get_blob(h, ("addr" + String(slot)).c_str(), (uint8_t*)&addr, &sz) != ESP_OK) {
-      addr = NimBLEAddress();
-    }
-    nvs_close(h);
-  }
-  return addr;
-}
-
-void clear_slot_addr(int slot) {
-  nvs_handle h;
-  if (nvs_open(NVS_NS, NVS_READWRITE, &h) == ESP_OK) {
-    nvs_erase_key(h, ("addr" + String(slot)).c_str());
-    nvs_commit(h);
-    nvs_close(h);
-  }
-}
-
-// ─── BLE Slot Switching ────────────────────────────────────────────────────
-
-void switch_ble_slot(int slot) {
-  if (slot == current_slot || slot < 0 || slot >= num_slots) return;
-  current_slot = slot;
-  if (current_slot >= num_slots) current_slot = 0;
-  int p = slot_cur_page[current_slot];
-  if (p >= slot_pages[current_slot]) p = 0;
-  slot_cur_page[current_slot] = p;
-
-  NimBLEAddress target = load_slot_addr(current_slot);
-  if (!target.isNull() && ble.isConnected()) {
-    NimBLEAddress cur = ble.getPeerAddress();
-    if (cur != target) {
-      ble.disconnect();
-      delay(200);
-    }
-  }
-  NimBLEDevice::startAdvertising();
-  draw_all();
-}
 
 // ─── Automation Helpers ────────────────────────────────────────────────────
 
@@ -381,9 +320,7 @@ void gen_default() {
   config["theme"]["name"]="default"; config["theme"]["button_style"]="flat";
   config["automations"]=JsonArray();
 
-  JsonArray slots = config["slots"].to<JsonArray>();
-  JsonObject s0 = slots.add<JsonObject>(); s0["name"]="Default";
-  JsonArray pg = s0["pages"].to<JsonArray>();
+  JsonArray pg = config["pages"].to<JsonArray>();
 
   JsonObject p1 = pg.add<JsonObject>(); p1["name"]="Main";
   JsonArray b1 = p1["buttons"].to<JsonArray>();
@@ -437,27 +374,6 @@ bool load_cfg() {
   if (!f) { gen_default(); return false; }
   DeserializationError e = deserializeJson(config, f); f.close();
   if (e) { gen_default(); return false; }
-
-  // Migration from v1 (flat pages[]) to v2 (slots[])
-  if (!config["version"].is<int>() || config["version"].as<int>() < 2) {
-    if (config["pages"].is<JsonArray>()) {
-      JsonDocument nc;
-      nc["version"] = 2;
-      nc["name"] = config["name"]|"SudoDeck";
-      nc["grid"] = config["grid"];
-      nc["wifi"] = config["wifi"];
-      nc["saver"] = config["saver"];
-      nc["theme"] = config["theme"];
-      nc["widgets"] = config["widgets"];
-      JsonArray slots = nc["slots"].to<JsonArray>();
-      JsonObject s0 = slots.add<JsonObject>();
-      s0["name"] = "Default";
-      s0["pages"] = config["pages"];
-      nc["automations"] = config["automations"]|JsonArray();
-      config = nc;
-      save_cfg();
-    }
-  }
   return true;
 }
 
@@ -495,32 +411,11 @@ void apply_cfg() {
   cols = constrain(config["grid"]["cols"]|4, 1, 6);
   rows = constrain(config["grid"]["rows"]|3, 1, 5);
 
-  num_slots = 0;
-  JsonArray slots = config["slots"].as<JsonArray>();
-  if (slots) {
-    for (JsonVariant v : slots) {
-      if (!v.is<JsonObject>() || num_slots >= MAX_SLOTS) break;
-      JsonObject s = v;
-      slot_names[num_slots] = s["name"].as<String>();
-      if (slot_names[num_slots].length() == 0) {
-        slot_names[num_slots] = "Slot " + String(num_slots + 1);
-      }
-      JsonArray pages = s["pages"];
-      int np = pages.size();
-      if (np < 1) np = 1;
-      if (np > 18) np = 18;
-      slot_pages[num_slots] = np;
-      if (slot_cur_page[num_slots] >= np) slot_cur_page[num_slots] = 0;
-      num_slots++;
-    }
-  }
-  if (num_slots < 1) {
-    num_slots = 1;
-    slot_names[0] = "Default";
-    slot_pages[0] = 1;
-    slot_cur_page[0] = 0;
-  }
-  if (current_slot >= num_slots) current_slot = 0;
+  num_pages = 0;
+  JsonArray pages = config["pages"].as<JsonArray>();
+  if (pages) num_pages = pages.size();
+  if (num_pages < 1) { num_pages = 0; }
+  if (current_page >= num_pages) current_page = 0;
   total_btns = cols * rows;
 
   if (config["saver"].is<JsonObject>()) {
@@ -1011,7 +906,6 @@ void proc_serial(const String& l) {
     config.clear();
     if (!config.set(req["config"].as<JsonObject>())) { s_err("oom"); return; }
     save_cfg(); apply_cfg();
-    slot_cur_page[current_slot] = 0;
     JsonDocument r; s_ok(r); Serial.flush();
     init_wifi();
     draw_all();
@@ -1022,11 +916,9 @@ void proc_serial(const String& l) {
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
-    r["slot"]=current_slot;
-    r["num_slots"]=num_slots;
     s_ok(r);
   }
-  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); slot_cur_page[current_slot]=0; saver_timeout = DEFAULT_TIMEOUT; sleep_timeout = DEFAULT_SLEEP; saver_active = false; display_asleep = false; CYD_TFT_BL_ON(); if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
+  else if (!strcmp(cmd,"factory_reset")) { gen_default(); save_cfg(); apply_cfg(); saver_timeout = DEFAULT_TIMEOUT; sleep_timeout = DEFAULT_SLEEP; saver_active = false; display_asleep = false; CYD_TFT_BL_ON(); if (saver_img) { free(saver_img); saver_img = nullptr; } if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img"); draw_all(); JsonDocument r; s_ok(r); }
   else if (!strcmp(cmd,"reboot")) { JsonDocument r; s_ok(r); delay(100); ESP.restart(); }
   else if (!strcmp(cmd,"ping")) { Serial.println("{\"pong\":true}"); }
   else if (!strcmp(cmd,"set_saver_mode")) {
@@ -1119,10 +1011,6 @@ void proc_serial(const String& l) {
     r["display_asleep"] = display_asleep;
     r["sleep_timeout"] = sleep_timeout;
     r["saver_timeout"] = saver_timeout;
-    r["slot"] = current_slot;
-    r["num_slots"] = num_slots;
-    r["page"] = slot_cur_page[current_slot];
-    r["num_pages"] = slot_pages[current_slot];
     s_ok(r);
   }
   else if (!strcmp(cmd,"upload_saver_img")) {
@@ -1148,40 +1036,7 @@ void proc_serial(const String& l) {
     if (SPIFFS.exists("/saver.img")) SPIFFS.remove("/saver.img");
     JsonDocument r; s_ok(r);
   }
-  else if (!strcmp(cmd,"pair_slot")) {
-    int slot = req["slot"]|0;
-    if (slot < 0 || slot >= num_slots) { s_err("bad slot"); return; }
-    NimBLEAddress addr = ble.getPeerAddress();
-    if (addr.isNull()) { s_err("not connected"); return; }
-    save_slot_addr(slot, addr);
-    JsonDocument r; r["slot"]=slot; r["addr"]=addr.toString().c_str(); s_ok(r);
-  }
-  else if (!strcmp(cmd,"clear_slot")) {
-    int slot = req["slot"]|0;
-    if (slot < 0 || slot >= MAX_SLOTS) { s_err("bad slot"); return; }
-    clear_slot_addr(slot);
-    JsonDocument r; r["slot"]=slot; s_ok(r);
-  }
-  else if (!strcmp(cmd,"switch_slot")) {
-    int slot = req["slot"]|0;
-    if (slot < 0 || slot >= num_slots) { s_err("bad slot"); return; }
-    switch_ble_slot(slot);
-    JsonDocument r; r["slot"]=current_slot; s_ok(r);
-  }
-  else if (!strcmp(cmd,"get_slots")) {
-    JsonDocument r;
-    JsonArray arr = r["slots"].to<JsonArray>();
-    for (int i = 0; i < num_slots; i++) {
-      JsonObject s = arr.add<JsonObject>();
-      s["index"] = i;
-      s["name"] = slot_names[i];
-      s["pages"] = slot_pages[i];
-      NimBLEAddress addr = load_slot_addr(i);
-      if (!addr.isNull()) s["addr"] = addr.toString().c_str();
-    }
-    r["current"] = current_slot;
-    s_ok(r);
-  }
+
   else { s_err("unknown command"); }
 }
 
@@ -1260,10 +1115,8 @@ void draw_grid() {
   tft.fillRect(0, GRID_Y, SCR_W, GRID_H, c_bg);
 
   JsonArray btns;
-  if (num_slots > 0 && current_slot < num_slots && slot_pages[current_slot] > 0) {
-    int p = slot_cur_page[current_slot];
-    btns = config["slots"][current_slot]["pages"][p]["buttons"];
-  }
+  if (num_pages > 0 && current_page < num_pages)
+    btns = config["pages"][current_page]["buttons"];
 
   for (int i = 0; i < total_btns; i++) {
     int col = i % cols;
@@ -1325,16 +1178,15 @@ void draw_bottom() {
   tft.fillRect(0, SCR_H - BOT_H, SCR_W, BOT_H, c_hdr);
   int cy = SCR_H - BOT_H + 4;
   int nav_l = 4, nav_w = 32;
-  int np = num_slots > 0 && current_slot < num_slots ? slot_pages[current_slot] : 1;
 
-  if (np > 1) {
+  if (num_pages > 1) {
     tft.fillRoundRect(nav_l, cy - 2, nav_w, 18, 4, c_btn_bg);
     tft.setTextColor(c_txt, c_btn_bg);
     tft.setCursor(nav_l + 11, cy);
     tft.print("<");
   }
 
-  if (np > 1) {
+  if (num_pages > 1) {
     int bx = SCR_W - nav_w - nav_l;
     tft.fillRoundRect(bx, cy - 2, nav_w, 18, 4, c_btn_bg);
     tft.setTextColor(c_txt, c_btn_bg);
@@ -1342,28 +1194,16 @@ void draw_bottom() {
     tft.print(">");
   }
 
-  // Slot name on left side (tappable)
-  int slot_w = 48;
-  if (num_slots > 1) {
-    tft.fillRoundRect(2, cy - 2, slot_w, 18, 4, c_btn_bg);
-    tft.setTextColor(c_acc, c_btn_bg);
-    tft.setTextSize(1);
-    tft.setCursor(4, cy);
-    tft.print(slot_names[current_slot].substring(0, 5));
-  }
-
   // Page name and counter
-  int lx = num_slots > 1 ? 2 + slot_w + 4 : (np > 1 ? nav_l + nav_w + 4 : 4);
-  int rx = np > 1 ? SCR_W - nav_w - 2 - 4 : SCR_W - 4;
+  int lx = num_pages > 1 ? nav_l + nav_w + 4 : 4;
+  int rx = num_pages > 1 ? SCR_W - nav_w - 2 - 4 : SCR_W - 4;
 
   const char* pname = "";
-  if (num_slots > 0 && current_slot < num_slots) {
-    int p = slot_cur_page[current_slot];
-    pname = config["slots"][current_slot]["pages"][p]["name"] | "";
-  }
+  if (num_pages > 0 && current_page < num_pages)
+    pname = config["pages"][current_page]["name"] | "";
   int pw = tft.textWidth(pname);
 
-  String pageStr = String(slot_cur_page[current_slot] + 1) + "/" + String(np);
+  String pageStr = String(current_page + 1) + "/" + String(num_pages);
   int psw = tft.textWidth(pageStr.c_str());
   int avail = rx - lx;
   int name_max = avail - psw - 12;
@@ -1630,31 +1470,15 @@ void handle_touch(int tx, int ty) {
 
   if (ty >= SCR_H - BOT_H) {
     int nav_l = 4, nav_w = 32;
-    int np = num_slots > 0 && current_slot < num_slots ? slot_pages[current_slot] : 1;
 
-    // Slot tap (left side of bottom bar, only when multi-slot)
-    if (num_slots > 1 && tx >= 2 && tx <= 50) {
-      int next = (current_slot + 1) % num_slots;
-      switch_ble_slot(next);
+    // Page prev "<"
+    if (num_pages > 1 && tx >= nav_l - 4 && tx <= nav_l + nav_w + 4) {
+      if (current_page > 0) { current_page--; draw_grid(); draw_bottom(); }
       return;
     }
-
-    // Page prev
-    if (np > 1 && tx >= nav_l - 4 && tx <= nav_l + nav_w + 4) {
-      if (slot_cur_page[current_slot] > 0) {
-        slot_cur_page[current_slot]--;
-        draw_grid();
-        draw_bottom();
-      }
-      return;
-    }
-    // Page next
-    if (np > 1 && tx >= SCR_W - nav_l - nav_w - 4 && tx <= SCR_W - nav_l + 4) {
-      if (slot_cur_page[current_slot] < np - 1) {
-        slot_cur_page[current_slot]++;
-        draw_grid();
-        draw_bottom();
-      }
+    // Page next ">"
+    if (num_pages > 1 && tx >= SCR_W - nav_l - nav_w - 4 && tx <= SCR_W - nav_l + 4) {
+      if (current_page < num_pages - 1) { current_page++; draw_grid(); draw_bottom(); }
       return;
     }
     return;
@@ -1677,9 +1501,9 @@ void handle_touch(int tx, int ty) {
       uint16_t bg = c_btn_bg;
       const char* label = "";
       JsonArray btns;
-      if (num_slots > 0 && current_slot < num_slots) {
-        int p = slot_cur_page[current_slot];
-        btns = config["slots"][current_slot]["pages"][p]["buttons"];
+      if (num_pages > 0 && current_page < num_pages) {
+        int p = current_page;
+        btns = config["pages"][p]["buttons"];
       }
       if (i < (int)btns.size()) {
         bg = hex_col(btns[i]["color"] | "#16213E");
@@ -1732,8 +1556,6 @@ void setup() {
   Serial.begin(115200);
   esp_log_level_set("*", ESP_LOG_NONE);
   delay(500);
-
-  nvs_flash_init();
 
   tft.begin();
   tft.setRotation(1);
