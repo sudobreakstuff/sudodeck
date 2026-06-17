@@ -22,6 +22,31 @@
     color: var(--text);
     font-family: var(--font);
     overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 25% 15%, rgba(0,255,136,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 70% 65%, rgba(8,100,180,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 70% at 55% 80%, rgba(120,20,200,0.03) 0%, transparent 50%);
+    animation:
+      meshDrift 30s ease-in-out infinite alternate,
+      meshBreathe 10s ease-in-out infinite alternate;
+  }
+  @keyframes meshDrift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(2.5%, 1.5%) scale(1.04); }
+  }
+  @keyframes meshBreathe {
+    0% { opacity: 0.55; }
+    100% { opacity: 1; }
   }
   ::selection { background: var(--acc); color: var(--bg); }
 
