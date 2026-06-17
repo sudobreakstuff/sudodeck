@@ -801,17 +801,19 @@
     object-fit: cover;
   }
   @media (max-width: 540px) {
-    .guide-step { flex-direction: column; padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .guide-step { flex-direction: column; padding: 16px; }
     .guide-body h3 { font-size: 0.85rem; }
     .guide-body h4 { font-size: 0.78rem; }
     .guide-body p, .guide-body li { font-size: 0.78rem; word-break: break-word; }
     .guide-body ol, .guide-body ul { font-size: 0.78rem !important; line-height: 1.5; }
     .guide-body .guide-note, .guide-body code { font-size: 0.75rem; }
     .guide-body .guide-cta { font-size: 0.75rem; padding: 5px 12px; }
-    .guide-body pre { font-size: 0.68rem; padding: 8px; }
+    .guide-body pre { font-size: 0.68rem; padding: 8px; white-space: pre-wrap; word-break: break-word; }
+    .guide-body table { min-width: 0; font-size: 0.6rem; }
+    .guide-body table th, .guide-body table td { padding: 5px 6px; }
+    .guide-body table td:first-child { white-space: normal; }
     .guide-num { width: 28px; height: 28px; font-size: 0.8rem; }
     .guide-img { max-width: 100%; }
-    .guide-body table { display: block; max-width: 100%; overflow-x: auto; }
   }
 
   /* ── Guide TOC ── */
