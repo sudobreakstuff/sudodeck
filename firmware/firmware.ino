@@ -125,7 +125,6 @@ struct Automation {
 };
 Automation automations[MAX_AUTOMATIONS];
 int automation_count = 0;
-bool automations_enabled = true;
 bool time_synced = false;
 
 JsonDocument config;
@@ -244,8 +243,11 @@ void do_action(JsonObject a) {
     JsonArray steps = a["steps"];
     for (JsonObject s : steps) { do_action(s); int d = s["delay"]|0; if (d>0 && d<10000) delay(d); }
   } else if (!strcmp(t,"automation_toggle")) {
-    automations_enabled = !automations_enabled;
-    draw_header();
+    int ai = a["index"]|0;
+    if (ai >= 0 && ai < automation_count) {
+      automations[ai].enabled = !automations[ai].enabled;
+      draw_grid();
+    }
   }
 }
 
@@ -346,7 +348,6 @@ void load_automations() {
 }
 
 void check_automations() {
-  if (!automations_enabled) return;
   unsigned long now = millis();
   for (int i = 0; i < automation_count; i++) {
     Automation& a = automations[i];
@@ -1226,10 +1227,6 @@ void draw_header() {
     tft.print("SudoDeck | BLE: ...");
   else
     tft.print("SudoDeck | booting");
-  tft.setTextColor(automations_enabled ? c_acc : TFT_RED, c_hdr);
-  tft.print(" | A:");
-  tft.print(automations_enabled ? "ON" : "OFF");
-  tft.setTextColor(c_acc, c_hdr);
   if (wifi_ssid.length() > 0) {
     if (WiFi.isConnected())
       tft.print(" | W:ON");
@@ -1277,7 +1274,16 @@ void draw_grid() {
     uint16_t bg = c_btn_bg;
     const char* label = "";
     if (i < (int)btns.size()) {
-      bg = hex_col(btns[i]["color"] | "#16213E");
+      const char* atype = btns[i]["action"]["type"]|"";
+      if (!strcmp(atype, "automation_toggle")) {
+        int ai = btns[i]["action"]["index"]|0;
+        if (ai >= 0 && ai < automation_count && automations[ai].enabled)
+          bg = hex_col("#1A5C1A");
+        else
+          bg = hex_col("#5C1A1A");
+      } else {
+        bg = hex_col(btns[i]["color"] | "#16213E");
+      }
       label = btns[i]["label"] | "";
     }
     if (button_style == 1) {

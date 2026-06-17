@@ -372,6 +372,12 @@ function uaf() {
         uaf();
       });
     }, 50);
+  } else if (t === 'automation_toggle') {
+    syncAutomations();
+    var opts = (cd.automations || []).map(function(au, j) {
+      return '<option value="' + j + '"' + (a.index === j ? ' selected' : '') + '>' + esc(au.name || ('Auto ' + (j + 1))) + '</option>';
+    }).join('');
+    h = '<div class="er"><label>Automation</label><select id="eai">' + opts + '</select></div>';
   }
   c.innerHTML = h;
 }
@@ -440,7 +446,7 @@ function gaf() {
   if (t === 'delay') return { type: 'delay', value: parseInt(document.getElementById('edv')?.value) || 100 };
   if (t === 'app') return { type: 'app', os: document.getElementById('aos')?.value || 'windows', name: document.getElementById('anv')?.value || '' };
   if (t === 'macro') { var btn = curBtn(); return { type: 'macro', steps: btn?.action?.steps || [] }; }
-  if (t === 'automation_toggle') return { type: 'automation_toggle' };
+  if (t === 'automation_toggle') return { type: 'automation_toggle', index: parseInt(document.getElementById('eai')?.value) || 0 };
   return { type: 'key', value: '' };
 }
 document.getElementById('eat').addEventListener('change', function() {
@@ -453,6 +459,7 @@ document.getElementById('eat').addEventListener('change', function() {
     if (nt === 'delay') na.value = 100;
     if (nt === 'app') { na.os = 'windows'; na.name = ''; }
     if (nt === 'macro') na.steps = [];
+    if (nt === 'automation_toggle') na.index = 0;
     b.action = na;
   }
   uaf();
