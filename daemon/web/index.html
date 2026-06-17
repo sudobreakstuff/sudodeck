@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configure — SudoDeck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nl" href="/"><span class="s"><svg viewBox="0 0 100 125" fill="none" stroke="#00FF88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" /><path d="M18 36 L50 16 L82 36" /><path d="M18 36 L50 56 L82 36" /><path d="M50 56 L50 90" /></svg></span>Sudo<span class="g">Deck</span></a>
+  <ul class="nls">
+    <li><a href="/">Configure</a></li>
+  </ul>
+</nav>
+
+<section id="firmware" class="section-reveal" style="padding-top:120px">
+  <div class="sec">
+    <h2><span class="g">Firmware</span></h2>
+    <p class="sd">Back up or update your SudoDeck firmware directly from the browser.</p>
+
+    <div class="fmw">
+      <div class="fmw-hdr">
+        <p class="fmw-note">Put your CYD in <strong>flash mode</strong>: hold the BOOT button, tap RESET, release BOOT — then click Connect.</p>
+        <button class="btn pri" id="btnFwConnect" onclick="fwConnect()">Connect for Flashing</button>
+        <span class="fmw-st" id="fwStatus">Disconnected</span>
+      </div>
+
+      <div class="fmw-variant">
+        <label class="fmw-vl"><input type="radio" name="fwVariant" value="ble" checked onchange="fwApplyVariant()"> Standard (BLE)</label>
+        <label class="fmw-vl"><input type="radio" name="fwVariant" value="wired" onchange="fwApplyVariant()"> Wired (Serial)</label>
+        <span class="fmw-vn" id="fwVariantNote">No extra software needed — works as a Bluetooth keyboard out of the box.</span>
+      </div>
+
+      <div class="fmw-actions">
+        <button class="btn" id="btnFwBackup" onclick="fwBackup()" disabled>Backup Firmware</button>
+        <div class="fmw-flash">
+          <select id="fwVersion" onchange="fwVersionChanged()">
+            <option value="">— Select version —</option>
+          </select>
+          <span class="fw-or">or</span>
+          <label class="btn" id="btnFwFlashLabel">
+            <input type="file" id="btnFwFile" accept=".bin" onchange="fwFileSelected()" hidden>
+            Custom .bin
+          </label>
+          <button class="btn dan" id="btnFwFlash" onclick="fwFlash()" disabled>Flash</button>
+        </div>
+      </div>
+
+      <pre class="fmw-log" id="fwLog">Ready.</pre>
+
+      <div class="fmw-bar-wrap">
+        <div class="fmw-bar" id="fwBar"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="config" class="section-reveal">
+  <div class="inner">
+    <h2>Configure</h2>
+    <div class="cfg-box">
+      <div class="cfg-bar">
+        <div id="sb" class="badge off">
+          <div class="dot r"></div>
+          <span>DISCONNECTED</span>
+        </div>
+        <div class="tb" style="margin:0;">
+          <button class="btn pri" id="btnConnect">Connect</button>
+          <button class="btn" id="btnRead">Read</button>
+          <button class="btn pri" id="btnWrite">Write</button>
+          <button class="btn" id="btnExport">Export</button>
+          <button class="btn" id="btnImport" onclick="document.getElementById('fileInput').click()">Import</button>
+          <input type="file" id="fileInput" accept=".json" style="display:none">
+          <button class="btn dan" id="btnReset">Reset</button>
+        </div>
+      </div>
+
+      <div class="cfg-sidebar">
+        <div class="p-bar" id="pageBar"></div>
+      </div>
+
+      <div class="p-bar" id="pBar"></div>
+      <div id="gp" style="grid-template-columns:repeat(4,1fr)"></div>
+      <div class="ep" id="ep">
+        <h3>Edit Button</h3>
+        <div class="er">
+          <label>Label</label>
+          <input type="text" id="el" placeholder="Button label" maxlength="12">
+          <label>Color</label>
+          <input type="color" id="ec" value="#16213e">
+        </div>
+        <div class="er">
+          <label>Action</label>
+          <select id="ea"><option value="">— None —</option><option value="key">Single Key</option><option value="combo">Key Combo</option><option value="text">Text String</option><option value="macro">Macro</option><option value="app">App Launcher</option><option value="automation_toggle">Auto Toggle</option></select>
+        </div>
+        <div id="eav"></div>
+        <div class="er"></div>
+        <button class="btn pri" id="bae">Apply</button>
+        <button class="btn" id="bce">Cancel</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- layout, wifi, screensaver, theme, widgets, automations -->
+<div class="divider"></div>
+<section id="layout-sect" class="section-reveal">
+  <div class="inner">
+    <h2>Layout</h2>
+    <div class="cfg-box" style="padding:16px">
+      <div class="er">
+        <label>Columns</label><input type="number" id="lc" min="1" max="6" value="4">
+        <label>Rows</label><input type="number" id="lr" min="1" max="5" value="3">
+        <label>Pages</label><input type="number" id="lp" min="1" max="18" value="3">
+        <button class="btn pri" id="bl">Apply Layout</button>
+      </div>
+      <div class="er" style="margin-top:10px">
+        <label>WiFi SSID</label><input type="text" id="ws" placeholder="Network name">
+        <label>Password</label><input type="password" id="wp" placeholder="Password">
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<section id="saver-sect" class="section-reveal">
+  <div class="inner">
+    <h2>Screensaver</h2>
+    <div class="cfg-box" style="padding:16px">
+      <button class="btn" id="saverToggle">Screensaver Settings</button>
+      <div id="saverBody" style="margin-top:10px">
+        <div class="er">
+          <label>Timeout (s)</label><input type="number" id="saverTimeout" min="5" max="600" value="30">
+          <label>Sleep (s)</label><input type="number" id="saverSleep" min="0" max="600" value="60">
+          <label>Mode</label>
+          <select id="saverMode"><option value="matrix">Matrix Rain</option><option value="f1">F1 Standings</option><option value="widget">Custom Widgets</option></select>
+          <button class="btn pri" id="btnSaverSet">Set</button>
+          <button class="btn pri" id="btnSaverModeSet">Set Mode</button>
+        </div>
+        <p id="saverHint" style="color:var(--dim);font-size:0.82rem;margin-top:6px"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<section id="theme-sect" class="section-reveal">
+  <div class="inner">
+    <h2>Theme</h2>
+    <div class="cfg-box" style="padding:16px">
+      <div class="er">
+        <label>Preset</label>
+        <select id="themeName"></select>
+        <label>Button Style</label>
+        <select id="themeStyle"></select>
+        <button class="btn pri" id="btnThemeSet">Set Theme</button>
+      </div>
+      <div id="themePreview" style="display:flex;gap:6px;align-items:center;padding:8px;border-radius:6px;margin-top:8px"></div>
+      <div id="themeStylePreview" style="display:flex;gap:6px;margin-top:6px"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<section id="widget-sect" class="section-reveal">
+  <div class="inner">
+    <h2>Widgets</h2>
+    <div class="cfg-box" style="padding:16px">
+      <div id="widgetList"></div>
+      <button class="btn pri" id="btnWidgetAdd">Add Widget</button>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+<section id="automation-sect" class="section-reveal">
+  <div class="inner">
+    <h2>Automations</h2>
+    <div class="cfg-box" style="padding:16px">
+      <div id="automationList"></div>
+      <button class="btn pri" id="btnAutoAdd">Add Automation</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/sudobreakstuff/sudodeck">SudoDeck</a> &mdash; cheap. open. yours.
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

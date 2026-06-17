@@ -64,6 +64,23 @@
         <div class="fmw-bar" id="fwBar"></div>
       </div>
     </div>
+
+    <div class="fmw" id="daemonSetup" style="margin-top:16px;display:none">
+      <div class="fmw-hdr">
+        <h3 style="margin:0;font-size:1rem">Daemon Setup</h3>
+        <span style="font-size:0.7rem;color:var(--dim);background:var(--surface2);padding:2px 8px;border-radius:4px">ADVANCED</span>
+      </div>
+      <p style="color:var(--dim);font-size:0.85rem;margin-bottom:10px">
+        The companion daemon reads keystrokes from the CYD over USB and injects them into your OS.
+        After installing, the daemon runs silently in the background and your CYD works as a wired
+        keyboard whenever plugged in — no browser, no interaction needed.
+      </p>
+      <div class="fmw-actions" style="margin-bottom:0">
+        <button class="btn pri" id="btnDaemonDownload" onclick="daemonDownload()">Download for <span id="daemonOs">your OS</span></button>
+        <span style="font-size:0.82rem;color:var(--dim)" id="daemonFileName"></span>
+      </div>
+      <pre class="fmw-log" id="daemonLog" style="height:auto;min-height:60px;margin-top:10px;font-size:0.82rem">Select Wired (Serial) above and the daemon setup panel will appear.</pre>
+    </div>
   </div>
 </section>
 

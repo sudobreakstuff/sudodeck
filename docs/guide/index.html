@@ -124,9 +124,10 @@
       <div class="guide-step" id="section-wired">
         <div class="guide-num">4</div>
         <div class="guide-body">
-          <h3>Wired Mode Setup</h3>
+          <h3>Wired Mode Setup <span style="font-size:0.7rem;color:var(--dim);font-weight:400;background:var(--surface2);padding:2px 8px;border-radius:4px;vertical-align:middle">ADVANCED</span></h3>
           <p>Instead of Bluetooth, you can use the CYD as a <strong>wired keyboard</strong> over USB. The CYD sends keystrokes over the serial connection, and a companion daemon (installed on your computer) injects them as if they came from a physical USB keyboard.</p>
           <p>Choose this if your computer doesn't have Bluetooth, you want lower latency, or you prefer a single-cable setup.</p>
+          <div class="guide-note">Wired mode is for <strong>advanced users</strong>. It requires installing and running a background daemon on your computer. If you just want a plug-and-play Bluetooth keyboard, stick with the Standard (BLE) firmware.</div>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">1. Flash the Wired Firmware</h4>
           <p>You need the wired firmware variant on the CYD:</p>
@@ -151,27 +152,25 @@ chmod +x sudodeckd
 # Run it (stays open, Ctrl+C to stop)
 ./sudodeckd
 
-# Or install as a systemd service for auto-start
-sudo ./sudodeckd --install</pre>
+# Install as a systemd user service (auto-start on login)
+./sudodeckd --install</pre>
 
           <p style="margin-top:10px"><strong>Windows</strong></p>
-          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6"># Download sudodeckd-windows-amd64.exe from the releases page
-# Run as Administrator (required for SendInput API)
+          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6"># Run as Administrator (required for SendInput API)
 sudodeckd-windows-amd64.exe
 
-# Or install as a Windows service (auto-starts on boot)
+# Install as a Windows service (auto-start on boot, run as Administrator)
 sudodeckd-windows-amd64.exe --install</pre>
 
           <p style="margin-top:10px"><strong>macOS</strong></p>
-          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6"># Download sudodeckd-darwin-amd64 (Intel) or sudodeckd-darwin-arm64 (Apple Silicon)
-chmod +x sudodeckd-darwin-*
+          <pre style="background:#000;color:var(--acc);padding:12px;border-radius:6px;font-size:0.82rem;overflow-x:auto;margin-top:4px;line-height:1.6">chmod +x sudodeckd-darwin-*
 
-# Run it
+# Run it (foreground)
 ./sudodeckd-darwin-*
 
-# Or install as a LaunchAgent for auto-start
+# Install as a LaunchAgent (auto-start on login)
 ./sudodeckd-darwin-* --install</pre>
-          <p style="color:var(--dim);font-size:0.85rem;margin-top:6px">macOS will ask for Accessibility permission on first run — grant it in <strong>System Settings → Privacy & Security → Accessibility</strong>.</p>
+          <p style="color:var(--dim);font-size:0.85rem;margin-top:6px">macOS will ask for <strong>Accessibility</strong> permission on first run — grant it in <strong>System Settings → Privacy & Security → Accessibility</strong>. Without it, keystroke injection is blocked.</p>
 
           <h4 style="margin:16px 0 6px;font-size:0.95rem">3. Plug and Play</h4>
           <ol style="margin:4px 0 0 18px;color:var(--dim);font-size:0.88rem;line-height:1.7">

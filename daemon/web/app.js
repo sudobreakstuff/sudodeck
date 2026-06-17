@@ -786,6 +786,10 @@ function fwSetStatus(s) {
 }
 
 function fwBaseUrl() {
+  var host = window.location.hostname;
+  if (host === '127.0.0.1' || host === 'localhost') {
+    return 'https://sudobreakstuff.github.io/sudodeck/assets/firmware';
+  }
   var parts = window.location.pathname.split('/').filter(Boolean);
   return '/' + (parts.length > 1 ? parts[0] : '') + '/assets/firmware';
 }

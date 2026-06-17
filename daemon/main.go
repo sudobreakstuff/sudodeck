@@ -2,12 +2,16 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
+	"runtime"
 	"strings"
 	"sync"
 	"syscall"
@@ -16,6 +20,9 @@ import (
 	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
+
+//go:embed web/*
+var webFS embed.FS
 
 const (
 	HID_TAP       = 0x01
@@ -342,9 +349,18 @@ func (d *Daemon) tryConnect(name string) bool {
 }
 
 func (d *Daemon) startHTTPServer() {
+	sub, err := fs.Sub(webFS, "web")
+	if err != nil {
+		log.Fatalf("web fs: %v", err)
+	}
+	fileServer := http.FileServer(http.FS(sub))
+
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/app/", fileServer)
+	mux.Handle("/", fileServer)
+
+	mux.HandleFunc("/api/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"ok":       true,
@@ -354,7 +370,7 @@ func (d *Daemon) startHTTPServer() {
 		})
 	})
 
-	mux.HandleFunc("/release", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/release", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "use POST", 405)
 			return
@@ -368,12 +384,11 @@ func (d *Daemon) startHTTPServer() {
 		json.NewEncoder(w).Encode(map[string]string{"ok": "true"})
 	})
 
-	mux.HandleFunc("/reconnect", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/reconnect", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "use POST", 405)
 			return
 		}
-		// Force rescan by closing and letting scanLoop reconnect
 		d.closePort()
 		d.mu.Lock()
 		d.mode = "hid"
@@ -382,7 +397,7 @@ func (d *Daemon) startHTTPServer() {
 		json.NewEncoder(w).Encode(map[string]string{"ok": "true"})
 	})
 
-	mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
 		d.mu.Lock()
 		port := d.portName
 		mode := d.mode
@@ -400,14 +415,61 @@ func (d *Daemon) startHTTPServer() {
 		Handler: mux,
 	}
 
-	log.Printf("HTTP API on %s", d.httpAddr)
+	log.Printf("HTTP server on http://%s", d.httpAddr)
+
+	// Auto-open browser in foreground mode
+	if os.Getenv("SUDODECK_SERVICE") != "1" {
+		go openBrowser("http://" + d.httpAddr + "/app/")
+	}
+
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("HTTP server: %v", err)
 	}
 }
 
+func openBrowser(url string) {
+	var cmd string
+	var args []string
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "rundll32"
+		args = []string{"url.dll,FileProtocolHandler", url}
+	case "darwin":
+		cmd = "open"
+		args = []string{url}
+	default:
+		cmd = "xdg-open"
+		args = []string{url}
+	}
+	if err := exec.Command(cmd, args...).Start(); err != nil {
+		log.Printf("open browser: %v (continue manually at %s)", err, url)
+	}
+}
+
 func main() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "--install", "-i":
+			if err := installService(); err != nil {
+				log.Fatalf("install: %v", err)
+			}
+			return
+		case "--uninstall", "-u":
+			if err := uninstallService(); err != nil {
+				log.Fatalf("uninstall: %v", err)
+			}
+			return
+		case "--help", "-h":
+			fmt.Printf("SudoDeck daemon — wired keystroke injection\n\nUsage:\n  %s              Run daemon (foreground)\n  %s --install    Install as system service (auto-start)\n  %s --uninstall  Remove system service\n", os.Args[0], os.Args[0], os.Args[0])
+			return
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown flag: %s\nUse --help for usage.\n", os.Args[1])
+			os.Exit(1)
+		}
+	}
+
 	log.Println("SudoDeck daemon starting...")
 
 	d := NewDaemon()
