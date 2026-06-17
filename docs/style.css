@@ -16,13 +16,39 @@
     --nav-h: 52px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
-  body {
+  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); min-height: 100%; }
+  html {
+    position: relative;
     background: var(--bg);
+  }
+  html::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 120% 70% at 50% 20%, rgba(0,255,136,0.12) 0%, transparent 60%);
+  }
+  html::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(10, 14, 23, 0.85);
+    animation: glowPulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes glowPulse {
+    0% { opacity: 0.88; }
+    100% { opacity: 1; }
+  }
+  body {
+    position: relative;
+    z-index: 2;
+    background: transparent;
     color: var(--text);
     font-family: var(--font);
     overflow-x: hidden;
-    position: relative;
   }
   ::selection { background: var(--acc); color: var(--bg); }
 
