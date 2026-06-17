@@ -769,9 +769,9 @@ function syncAutoUI() {
           '<option value="timer"' + (a.type === 'timer' ? ' selected' : '') + '>Timer</option>' +
           '<option value="schedule"' + (a.type === 'schedule' ? ' selected' : '') + '>Schedule</option>' +
         '</select></div>' +
-        '<div class="wc-ef" id="autoTimerFields' + i + '"' + (a.type === 'schedule' ? ' style="display:none"' : '') + '><label>Interval</label><input class="auto-fi" data-i="' + i + '" data-f="interval" value="' + (a.interval || 60) + '" style="flex:0;width:60px"> <span style="font-size:0.65rem;color:var(--dim)">sec</span></div>' +
+        '<div class="wc-ef" id="autoTimerFields' + i + '"' + (a.type === 'schedule' ? ' style="display:none"' : '') + '><label>Interval</label><input class="auto-fi" data-i="' + i + '" data-f="interval" value="' + (a.interval || 60) + '" style="flex:none;width:60px"> <span style="font-size:0.65rem;color:var(--dim)">sec</span></div>' +
         '<div class="wc-ef" id="autoSchedFields' + i + '"' + (a.type !== 'schedule' ? ' style="display:none"' : '') + '>' +
-          '<label>Time</label><input class="auto-fi" data-i="' + i + '" data-f="time" value="' + esc(a.time || '09:00') + '" placeholder="HH:MM" style="flex:0;width:60px">' +
+          '<label>Time</label><input class="auto-fi" data-i="' + i + '" data-f="time" value="' + esc(a.time || '09:00') + '" placeholder="HH:MM" style="flex:none;width:60px">' +
           '<label style="min-width:auto;margin-left:8px">Days</label><input class="auto-fi" data-i="' + i + '" data-f="days" value="' + esc(a.days || '1,2,3,4,5') + '" placeholder="1-7, comma" style="flex:1">' +
         '</div>' +
         '<div class="wc-ef"><label>Action</label><select class="auto-action-type" data-i="' + i + '">' +
@@ -801,7 +801,7 @@ function renderAutoActionFields(idx, action) {
   } else if (t === 'text') {
     h = '<div class="wc-ef"><label>Text</label><input class="auto-af" data-i="' + idx + '" data-f="value" value="' + es(action.value || '') + '" placeholder="Text" style="flex:1"></div>';
   } else if (t === 'delay') {
-    h = '<div class="wc-ef"><label>Delay</label><input class="auto-af" data-i="' + idx + '" data-f="value" value="' + (action.value || 100) + '" style="flex:0;width:60px"> <span style="font-size:0.65rem;color:var(--dim)">ms</span></div>';
+    h = '<div class="wc-ef"><label>Delay</label><input class="auto-af" data-i="' + idx + '" data-f="value" value="' + (action.value || 100) + '" style="flex:none;width:60px"> <span style="font-size:0.65rem;color:var(--dim)">ms</span></div>';
   } else if (t === 'app') {
     h = '<div class="wc-ef"><label>OS</label><select class="auto-af" data-i="' + idx + '" data-f="os">' +
       ['windows', 'macos', 'linux'].map(function(o) { return '<option value="' + o + '"' + (action.os === o ? ' selected' : '') + '>' + o.charAt(0).toUpperCase() + o.slice(1) + '</option>'; }).join('') +

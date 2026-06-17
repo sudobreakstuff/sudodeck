@@ -1762,6 +1762,7 @@ void setup() {
     (void)s;
   });
   ble.begin();
+  NimBLEDevice::startAdvertising();
   ble_ready = true;
   draw_header();
 }
