@@ -767,9 +767,11 @@
     .pricing-email { font-size: 0.7rem; }
     .f-grid { grid-template-columns: 1fr; }
     .s-grid { grid-template-columns: 1fr; }
-    .cmp-table { min-width: 0; font-size: 0.65rem; }
-    .cmp-table th, .cmp-table td { padding: 8px 8px; }
+    .cmp-table { min-width: 0; font-size: 0.6rem; }
+    .cmp-table th, .cmp-table td { padding: 6px 6px; }
     .cmp-table td:first-child { white-space: normal; }
+    .cmp-table .price { font-size: 0.7rem; white-space: normal; }
+    .cmp-table .price-strike { font-size: 0.6rem; white-space: normal; }
     .lc { flex-direction: column; align-items: stretch; }
     .lc .cg { width: 100%; }
     .lc .cg input { width: 100%; }
@@ -1394,9 +1396,7 @@
 
   @media (max-width: 640px) {
     .pricing-grid { grid-template-columns: 1fr; }
-    .cmp-table { font-size: 0.65rem; }
-    .cmp-table th, .cmp-table td { padding: 8px 8px; }
-    .cmp-table td:first-child { white-space: normal; }
+    .cmp-table { overflow: visible; }
   }
 
   @media (max-width: 380px) {
