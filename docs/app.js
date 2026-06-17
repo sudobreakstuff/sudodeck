@@ -760,6 +760,7 @@ function syncAutoUI() {
         '<span class="wc-label" style="flex:1">' + esc(a.name || '') + '</span>' +
         '<span style="font-size:0.65rem;color:var(--dim);margin-right:8px">' + esc(typeLabel) + '</span>' +
         '<div class="wc-actions">' +
+          '<button class="btn auto-on-btn" data-i="' + i + '" style="' + (a.enabled !== false ? 'background:var(--acc);color:#fff' : '') + '">' + (a.enabled !== false ? 'ON' : 'OFF') + '</button>' +
           '<button class="btn auto-edit-btn" data-i="' + i + '">Edit</button>' +
           '<button class="btn dan auto-rm-btn" data-i="' + i + '">Del</button>' +
         '</div>' +
@@ -818,7 +819,7 @@ document.getElementById('autoToggle').addEventListener('click', function() {
 document.getElementById('btnAutoAdd').addEventListener('click', function() {
   if (!cd) return;
   syncAutomations();
-  cd.automations.push({ type: 'timer', name: '', interval: 60, time: '09:00', days: '1,2,3,4,5', action: { type: 'key', value: '' } });
+  cd.automations.push({ type: 'timer', name: '', interval: 60, time: '09:00', days: '1,2,3,4,5', enabled: true, action: { type: 'key', value: '' } });
   syncAutoUI();
   var list = document.getElementById('autoList');
   var last = list.lastElementChild;
@@ -833,7 +834,10 @@ document.getElementById('autoList').addEventListener('click', function(e) {
   if (!btn) return;
   var i = parseInt(btn.getAttribute('data-i'));
   if (isNaN(i) || !cd || !cd.automations || i >= cd.automations.length) return;
-  if (btn.classList.contains('auto-edit-btn')) {
+  if (btn.classList.contains('auto-on-btn')) {
+    cd.automations[i].enabled = cd.automations[i].enabled !== false ? false : true;
+    syncAutoUI();
+  } else if (btn.classList.contains('auto-edit-btn')) {
     var ed = document.getElementById('autoEdit' + i);
     if (ed) ed.classList.toggle('open');
   } else if (btn.classList.contains('auto-rm-btn')) {

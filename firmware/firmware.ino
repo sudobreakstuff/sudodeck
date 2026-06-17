@@ -119,6 +119,7 @@ struct Automation {
   int interval_sec;
   String sched_time;
   String sched_days;
+  bool enabled;
   JsonDocument action;
   unsigned long last_fired;
 };
@@ -337,6 +338,7 @@ void load_automations() {
     at.interval_sec = a["interval"]|60;
     at.sched_time = a["time"]|"";
     at.sched_days = a["days"]|"";
+    at.enabled = a["enabled"]|true;
     at.action.clear();
     if (a["action"].is<JsonObject>()) at.action.set(a["action"].as<JsonObject>());
     at.last_fired = 0;
@@ -348,6 +350,7 @@ void check_automations() {
   unsigned long now = millis();
   for (int i = 0; i < automation_count; i++) {
     Automation& a = automations[i];
+    if (!a.enabled) continue;
     if (a.type == "timer") {
       if (now - a.last_fired >= (unsigned long)a.interval_sec * 1000) fire_automation(i);
     } else if (a.type == "schedule" && time_synced) {
