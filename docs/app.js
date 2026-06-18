@@ -88,7 +88,15 @@ document.getElementById('btnConnect').addEventListener('click', async function()
     tryReleaseDaemon();
     var p = await navigator.serial.requestPort(); await p.open({baudRate:115200});
     dp = p; dr = p.readable.getReader(); dw = p.writable.getWriter(); ss(true); tm('Connected');
-    try { var r = await sc({cmd:'get_info'}); tm(r.name+' v'+(r.version||'?')); } catch(e) {}
+    // Retry get_info with delays — port open can reset ESP32 (DTR/RTS toggle)
+    for (var _i = 0; _i < 5; _i++) {
+      try {
+        __srl_buf = '';
+        var r = await sc({cmd:'get_info'}, 3000);
+        if (r && r.name) { tm(r.name+' v'+(r.version||'?')); break; }
+      } catch(e) {}
+      await new Promise(function(r) { setTimeout(r, 1200); });
+    }
     setTimeout(saverSync, 500);
   } catch(e) { if(e.message!=='The device has been lost.') tm('Connection failed', 'ng'); ss(false); }
 });

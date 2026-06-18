@@ -1448,6 +1448,8 @@ void draw_saver() {
       }
     }
   } else {
+    if (now - saver_last_frame < 40) return;
+    saver_last_frame = now;
     saver_x += saver_vx;
     saver_y += saver_vy;
     if (saver_x < 0) { saver_x = 0; saver_vx = -saver_vx; }
@@ -1605,6 +1607,7 @@ void setup() {
   load_saver_img();
   last_touch_ms = millis();
   draw_all();
+  Serial.println("{\"ready\":true}");
 }
 
 void loop() {
@@ -1612,51 +1615,54 @@ void loop() {
 
   unsigned long now = millis();
 
-  // WiFi connection management
-  if (wifi_ssid.length() > 0 && !WiFi.isConnected() && !wifi_connecting) {
-    if (wifi_retry_ms == 0 || now - wifi_retry_ms > 30000) {
-      wifi_connecting = true;
-      wifi_connect_start_ms = now;
-      wifi_last_status = -1;
-      wifi_last_reason = 0;
-      WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
+  // Skip blocking network ops during screensaver to avoid stuttering animation
+  if (!saver_active) {
+    // WiFi connection management
+    if (wifi_ssid.length() > 0 && !WiFi.isConnected() && !wifi_connecting) {
+      if (wifi_retry_ms == 0 || now - wifi_retry_ms > 30000) {
+        wifi_connecting = true;
+        wifi_connect_start_ms = now;
+        wifi_last_status = -1;
+        wifi_last_reason = 0;
+        WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
+        draw_header();
+      }
+    }
+    if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL || now - wifi_connect_start_ms > wifi_conn_timeout)) {
+      wifi_connecting = false;
+      wifi_retry_ms = now;
+      wifi_last_status = WiFi.status();
       draw_header();
     }
-  }
-  if (wifi_connecting && (WiFi.status() == WL_CONNECT_FAILED || WiFi.status() == WL_NO_SSID_AVAIL || now - wifi_connect_start_ms > wifi_conn_timeout)) {
-    wifi_connecting = false;
-    wifi_retry_ms = now;
-    wifi_last_status = WiFi.status();
-    draw_header();
-  }
-  if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
-    wifi_connecting = false;
-    wifi_retry_ms = 0;
-    wifi_last_status = -1;
-    draw_header();
-  }
-
-  // NTP time sync
-  if (WiFi.isConnected() && !time_synced) {
-    configTzTime("SAST-2", "pool.ntp.org", "time.google.com");
-    struct tm tm;
-    if (getLocalTime(&tm)) {
-      time_synced = true;
+    if (wifi_connecting && WiFi.status() == WL_CONNECTED) {
+      wifi_connecting = false;
+      wifi_retry_ms = 0;
+      wifi_last_status = -1;
+      draw_header();
     }
-  }
 
-  // Pre-fetch widget data
-  if (WiFi.isConnected() && widget_cache.length() == 0 && !widget_fetching && now - widget_fetch_ms > 5000) {
-    fetch_widget_data();
-  }
-  if (WiFi.isConnected() && cwidget_count > 0) {
-    static unsigned long cw_last = 0;
-    for (int i = 0; i < cwidget_count; i++) {
-      CustomWidget& cw = cwidgets[i];
-      if (cw.url.length() > 0 && cw.cache.length() == 0 && now - cw.last_fetch > 5000) {
-        fetch_custom_widget(i);
-        cw_last = now;
-        break;
+    // NTP time sync
+    if (WiFi.isConnected() && !time_synced) {
+      configTzTime("SAST-2", "pool.ntp.org", "time.google.com");
+      struct tm tm;
+      if (getLocalTime(&tm)) {
+        time_synced = true;
+      }
+    }
+
+    // Pre-fetch widget data
+    if (WiFi.isConnected() && widget_cache.length() == 0 && !widget_fetching && now - widget_fetch_ms > 5000) {
+      fetch_widget_data();
+    }
+    if (WiFi.isConnected() && cwidget_count > 0) {
+      static unsigned long cw_last = 0;
+      for (int i = 0; i < cwidget_count; i++) {
+        CustomWidget& cw = cwidgets[i];
+        if (cw.url.length() > 0 && cw.cache.length() == 0 && now - cw.last_fetch > 5000) {
+          fetch_custom_widget(i);
+          cw_last = now;
+          break;
+        }
       }
     }
   }
