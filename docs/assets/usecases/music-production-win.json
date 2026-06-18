@@ -1,0 +1,28 @@
+{
+  "name": "Producer",
+  "grid": {"cols": 4, "rows": 3},
+  "wifi": {"ssid": "", "password": ""},
+  "saver": {"timeout": 30, "mode": 0, "sleep": 60},
+  "theme": {"name": "default", "button_style": "flat"},
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Studio",
+      "buttons": [
+        {"label":"Record","color":"#16213e","action":{"type":"key","value":"F5"}},
+        {"label":"Stop","color":"#111827","action":{"type":"key","value":"F6"}},
+        {"label":"Play","color":"#2a1218","action":{"type":"key","value":"F7"}},
+        {"label":"Loop","color":"#111827","action":{"type":"combo","mod":"CTRL","key":"L"}},
+        {"label":"Quantiz","color":"#111827","action":{"type":"combo","mod":"CTRL_SHIFT","key":"Q"}},
+        {"label":"Metro","color":"#111827","action":{"type":"combo","mod":"CTRL_SHIFT","key":"M"}},
+        {"label":"Tap","color":"#16213e","action":{"type":"key","value":"F8"}},
+        {"label":"Undo","color":"#111827","action":{"type":"combo","mod":"CTRL","key":"Z"}},
+        {"label":"Add Trk","color":"#111827","action":{"type":"combo","mod":"CTRL_SHIFT","key":"T"}},
+        {"label":"Dup","color":"#111827","action":{"type":"combo","mod":"CTRL","key":"D"}},
+        {"label":"Delete","color":"#111827","action":{"type":"key","value":"DEL"}},
+        {"label":"Save","color":"#2a1218","action":{"type":"combo","mod":"CTRL","key":"S"}}
+      ]
+    }
+  ]
+}

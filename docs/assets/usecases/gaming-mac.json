@@ -1,0 +1,186 @@
+{
+  "name": "Gamer",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Gaming",
+      "buttons": [
+        {
+          "label": "Rotatn",
+          "color": "#16213e",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "key",
+                "value": "1"
+              },
+              {
+                "type": "delay",
+                "value": 200
+              },
+              {
+                "type": "key",
+                "value": "2"
+              },
+              {
+                "type": "delay",
+                "value": 200
+              },
+              {
+                "type": "key",
+                "value": "3"
+              },
+              {
+                "type": "delay",
+                "value": 200
+              },
+              {
+                "type": "key",
+                "value": "4"
+              },
+              {
+                "type": "delay",
+                "value": 200
+              },
+              {
+                "type": "key",
+                "value": "5"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Burst",
+          "color": "#16213e",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "key",
+                "value": "6"
+              },
+              {
+                "type": "delay",
+                "value": 100
+              },
+              {
+                "type": "key",
+                "value": "7"
+              },
+              {
+                "type": "delay",
+                "value": 100
+              },
+              {
+                "type": "key",
+                "value": "8"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Buff",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "9"
+          }
+        },
+        {
+          "label": "Mount",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "0"
+          }
+        },
+        {
+          "label": "Potion",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F1"
+          }
+        },
+        {
+          "label": "Interact",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F"
+          }
+        },
+        {
+          "label": "Target",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "TAB"
+          }
+        },
+        {
+          "label": "Focus",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "SHIFT",
+            "key": "TAB"
+          }
+        },
+        {
+          "label": "Mute",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "M"
+          }
+        },
+        {
+          "label": "Deafen",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "D"
+          }
+        },
+        {
+          "label": "Talk",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "CAPS_LOCK"
+          }
+        },
+        {
+          "label": "Vibe",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F14"
+          }
+        }
+      ]
+    }
+  ]
+}

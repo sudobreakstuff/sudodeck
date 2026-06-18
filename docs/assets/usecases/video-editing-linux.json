@@ -1,0 +1,149 @@
+{
+  "name": "Video Editor",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Edit",
+      "buttons": [
+        {
+          "label": "Cut",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "X"
+          }
+        },
+        {
+          "label": "R.Del",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "X"
+          }
+        },
+        {
+          "label": "Play",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "SPACE"
+          }
+        },
+        {
+          "label": "Zoom+",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "="
+          }
+        },
+        {
+          "label": "Zoom-",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "-"
+          }
+        },
+        {
+          "label": "Split",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "B"
+          }
+        },
+        {
+          "label": "Undo",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "Z"
+          }
+        },
+        {
+          "label": "Redo",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "Z"
+          }
+        },
+        {
+          "label": "N.Frame",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "",
+            "key": "RIGHT"
+          }
+        },
+        {
+          "label": "P.Frame",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "",
+            "key": "LEFT"
+          }
+        },
+        {
+          "label": "Marker",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "M"
+          }
+        },
+        {
+          "label": "Export",
+          "color": "#16213e",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "combo",
+                "mod": "CTRL",
+                "key": "I"
+              },
+              {
+                "type": "delay",
+                "value": 500
+              },
+              {
+                "type": "combo",
+                "mod": "CTRL_SHIFT",
+                "key": "DEL"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

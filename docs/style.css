@@ -401,7 +401,7 @@
     margin: -36px 0 56px;
     line-height: 1.5;
   }
-  section#usecases > .sd { margin-bottom: 64px; }
+  section#usecases .sd { margin-bottom: 80px; }
 
   .inner {
     max-width: 1040px;
@@ -610,6 +610,24 @@
     align-self: flex-start;
   }
   .uc-dl:hover { text-decoration: underline; }
+  .uc-dl-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .uc-os {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: var(--font);
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .uc-os:hover { border-color: var(--dim); }
   .uc-cta {
     text-align: center;
     margin-top: 48px;

@@ -1,0 +1,152 @@
+{
+  "name": "Live Streamer",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Stream",
+      "buttons": [
+        {
+          "label": "Scene1",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "1"
+          }
+        },
+        {
+          "label": "Scene2",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "2"
+          }
+        },
+        {
+          "label": "Scene3",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "3"
+          }
+        },
+        {
+          "label": "BRB",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "4"
+          }
+        },
+        {
+          "label": "Cam 1",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "1"
+          }
+        },
+        {
+          "label": "Cam 2",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "2"
+          }
+        },
+        {
+          "label": "Full",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "3"
+          }
+        },
+        {
+          "label": "Stream",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "B"
+          }
+        },
+        {
+          "label": "M.Mic",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "M"
+          }
+        },
+        {
+          "label": "M.Desk",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "D"
+          }
+        },
+        {
+          "label": "Skip",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "MEDIA_NEXT"
+          }
+        },
+        {
+          "label": "Raid",
+          "color": "#2a1218",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "text",
+                "value": "/raid "
+              },
+              {
+                "type": "delay",
+                "value": 200
+              },
+              {
+                "type": "text",
+                "value": "channelname"
+              },
+              {
+                "type": "key",
+                "value": "ENTER"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

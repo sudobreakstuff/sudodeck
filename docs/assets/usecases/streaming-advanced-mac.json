@@ -1,0 +1,147 @@
+{
+  "name": "Streamer Pro",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Advanced",
+      "buttons": [
+        {
+          "label": "Src1",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "1"
+          }
+        },
+        {
+          "label": "Src2",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "2"
+          }
+        },
+        {
+          "label": "Src3",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "3"
+          }
+        },
+        {
+          "label": "Src4",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "4"
+          }
+        },
+        {
+          "label": "Replay",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "R"
+          }
+        },
+        {
+          "label": "Mic+",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F9"
+          }
+        },
+        {
+          "label": "Mic-",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F10"
+          }
+        },
+        {
+          "label": "M.All",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "M"
+          }
+        },
+        {
+          "label": "Trans",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "T"
+          }
+        },
+        {
+          "label": "Rec",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "R"
+          }
+        },
+        {
+          "label": "Alert",
+          "color": "#111827",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "key",
+                "value": "F13"
+              },
+              {
+                "type": "delay",
+                "value": 1000
+              },
+              {
+                "type": "key",
+                "value": "F13"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Stop",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "B"
+          }
+        }
+      ]
+    }
+  ]
+}

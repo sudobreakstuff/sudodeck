@@ -1,0 +1,149 @@
+{
+  "name": "Office",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Office",
+      "buttons": [
+        {
+          "label": "Email",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "N"
+          }
+        },
+        {
+          "label": "Reply",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "R"
+          }
+        },
+        {
+          "label": "Meeting",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "K"
+          }
+        },
+        {
+          "label": "Status",
+          "color": "#2a1218",
+          "action": {
+            "type": "app",
+            "os": "linux",
+            "name": "teams"
+          }
+        },
+        {
+          "label": "Calc",
+          "color": "#111827",
+          "action": {
+            "type": "app",
+            "os": "linux",
+            "name": "gnome-calculator"
+          }
+        },
+        {
+          "label": "Snip",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "S"
+          }
+        },
+        {
+          "label": "Lock",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "",
+            "key": "LOCK"
+          }
+        },
+        {
+          "label": "Sig",
+          "color": "#111827",
+          "action": {
+            "type": "text",
+            "value": "\n\nBest regards,\nShahid Singh\nshahidsingh1zn@gmail.com"
+          }
+        },
+        {
+          "label": "Spotify",
+          "color": "#111827",
+          "action": {
+            "type": "app",
+            "os": "linux",
+            "name": "spotify"
+          }
+        },
+        {
+          "label": "Code",
+          "color": "#111827",
+          "action": {
+            "type": "app",
+            "os": "linux",
+            "name": "code"
+          }
+        },
+        {
+          "label": "Term",
+          "color": "#111827",
+          "action": {
+            "type": "app",
+            "os": "linux",
+            "name": "gnome-terminal"
+          }
+        },
+        {
+          "label": "Standup",
+          "color": "#2a1218",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "combo",
+                "mod": "CTRL_SHIFT",
+                "key": "M"
+              },
+              {
+                "type": "delay",
+                "value": 500
+              },
+              {
+                "type": "text",
+                "value": "Yesterday: Finished the API integration\nToday: Starting on the dashboard\nBlockers: None"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

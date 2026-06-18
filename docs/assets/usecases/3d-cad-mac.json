@@ -1,0 +1,129 @@
+{
+  "name": "3D Artist",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Model",
+      "buttons": [
+        {
+          "label": "Orbit",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "F1"
+          }
+        },
+        {
+          "label": "Pan",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "F2"
+          }
+        },
+        {
+          "label": "Zoom",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "F3"
+          }
+        },
+        {
+          "label": "Loop Cut",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "R"
+          }
+        },
+        {
+          "label": "Extrude",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "E"
+          }
+        },
+        {
+          "label": "Bevel",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "B"
+          }
+        },
+        {
+          "label": "Inset",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "I"
+          }
+        },
+        {
+          "label": "Merge",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "M"
+          }
+        },
+        {
+          "label": "Subdiv",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "1"
+          }
+        },
+        {
+          "label": "Smooth",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "2"
+          }
+        },
+        {
+          "label": "Render",
+          "color": "#2a1218",
+          "action": {
+            "type": "key",
+            "value": "F12"
+          }
+        },
+        {
+          "label": "Shade",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "Z"
+          }
+        }
+      ]
+    }
+  ]
+}

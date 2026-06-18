@@ -1,0 +1,152 @@
+{
+  "name": "Developer",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Dev",
+      "buttons": [
+        {
+          "label": "Save",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "S"
+          }
+        },
+        {
+          "label": "Search",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "F"
+          }
+        },
+        {
+          "label": "Comment",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "/"
+          }
+        },
+        {
+          "label": "Format",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "I"
+          }
+        },
+        {
+          "label": "Commit",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "G"
+          }
+        },
+        {
+          "label": "Push",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "P"
+          }
+        },
+        {
+          "label": "Pull",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "P"
+          }
+        },
+        {
+          "label": "Log",
+          "color": "#111827",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "combo",
+                "mod": "CTRL_SHIFT",
+                "key": "G"
+              },
+              {
+                "type": "delay",
+                "value": 300
+              },
+              {
+                "type": "text",
+                "value": "git log --oneline -10"
+              },
+              {
+                "type": "key",
+                "value": "ENTER"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Run",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F5"
+          }
+        },
+        {
+          "label": "Debug",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F8"
+          }
+        },
+        {
+          "label": "Build",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "B"
+          }
+        },
+        {
+          "label": "Term",
+          "color": "#2a1218",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "`"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "name": "Presenter",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Present",
+      "buttons": [
+        {
+          "label": "Next",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "RIGHT"
+          }
+        },
+        {
+          "label": "Prev",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "LEFT"
+          }
+        },
+        {
+          "label": "Blank",
+          "color": "#2a1218",
+          "action": {
+            "type": "key",
+            "value": "B"
+          }
+        },
+        {
+          "label": "Black",
+          "color": "#2a1218",
+          "action": {
+            "type": "key",
+            "value": "W"
+          }
+        },
+        {
+          "label": "Pen",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "P"
+          }
+        },
+        {
+          "label": "Laser",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "L"
+          }
+        },
+        {
+          "label": "Zoom",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "F5"
+          }
+        },
+        {
+          "label": "Timer",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI_SHIFT",
+            "key": "T"
+          }
+        },
+        {
+          "label": "Q&A",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "M"
+          }
+        },
+        {
+          "label": "Jump",
+          "color": "#111827",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "key",
+                "value": "F5"
+              },
+              {
+                "type": "delay",
+                "value": 500
+              },
+              {
+                "type": "text",
+                "value": "Slide 5"
+              },
+              {
+                "type": "key",
+                "value": "ENTER"
+              }
+            ]
+          }
+        },
+        {
+          "label": "End",
+          "color": "#2a1218",
+          "action": {
+            "type": "key",
+            "value": "ESC"
+          }
+        },
+        {
+          "label": "Record",
+          "color": "#16213e",
+          "action": {
+            "type": "combo",
+            "mod": "GUI",
+            "key": "R"
+          }
+        }
+      ]
+    }
+  ]
+}

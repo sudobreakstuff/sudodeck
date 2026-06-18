@@ -1,0 +1,142 @@
+{
+  "name": "Photo Editor",
+  "grid": {
+    "cols": 4,
+    "rows": 3
+  },
+  "wifi": {
+    "ssid": "",
+    "password": ""
+  },
+  "saver": {
+    "timeout": 30,
+    "mode": 0,
+    "sleep": 60
+  },
+  "theme": {
+    "name": "default",
+    "button_style": "flat"
+  },
+  "widgets": [],
+  "automations": [],
+  "pages": [
+    {
+      "name": "Edit",
+      "buttons": [
+        {
+          "label": "Brush",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "B"
+          }
+        },
+        {
+          "label": "Eraser",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "E"
+          }
+        },
+        {
+          "label": "Mask",
+          "color": "#16213e",
+          "action": {
+            "type": "key",
+            "value": "Q"
+          }
+        },
+        {
+          "label": "Crop",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "C"
+          }
+        },
+        {
+          "label": "Curves",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "M"
+          }
+        },
+        {
+          "label": "Levels",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL",
+            "key": "L"
+          }
+        },
+        {
+          "label": "Spot",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "J"
+          }
+        },
+        {
+          "label": "Clone",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "S"
+          }
+        },
+        {
+          "label": "Lasso",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "L"
+          }
+        },
+        {
+          "label": "Dodge",
+          "color": "#111827",
+          "action": {
+            "type": "key",
+            "value": "O"
+          }
+        },
+        {
+          "label": "Sat",
+          "color": "#111827",
+          "action": {
+            "type": "combo",
+            "mod": "CTRL_SHIFT",
+            "key": "U"
+          }
+        },
+        {
+          "label": "Export",
+          "color": "#2a1218",
+          "action": {
+            "type": "macro",
+            "steps": [
+              {
+                "type": "combo",
+                "mod": "CTRL_SHIFT",
+                "key": "E"
+              },
+              {
+                "type": "delay",
+                "value": 500
+              },
+              {
+                "type": "key",
+                "value": "ENTER"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
