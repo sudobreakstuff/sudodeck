@@ -88,6 +88,17 @@ SudoDeck is a **Bluetooth macro keyboard** built on a CYD (ESP32 + ILI9341 touch
 - **Self-contained** — all config lives on the device's flash
 - **Open source** — MIT licensed. Fork it, build your own
 
+## What can you build with it?
+
+| Use Case | What it does | Best for |
+|----------|-------------|----------|
+| **🎮 Live Streaming** | OBS scene switching, camera cuts, stream/record toggle, mute panel, raid commands — all wireless | Twitch/YouTube streamers |
+| **🎬 Video Editing** | Cut, ripple delete, zoom, split, export — map your entire NLE workflow to dedicated buttons | DaVinci Resolve, Premiere Pro editors |
+| **⌨️ Gaming** | MMO ability rotations, sim racing pit controls, Discord mute/deafen, push-to-talk — one hand does it all | Gamers, sim racers, flight sim pilots |
+| **💼 Productivity** | Email templates, app launcher, Slack status, meeting controls, lock PC — automate your day | Office workers, remote workers |
+| **🎧 Music Production** | Record, quantize, tap tempo, loop, save — control your DAW from anywhere in the room | Ableton, FL Studio producers |
+| **💻 Development** | Git commit/push/pull, run/debug, format, search, build — keep your dev loop one tap away | Developers, DevOps |
+
 ### How It Works
 
 ```
@@ -132,6 +143,19 @@ If you already have a CYD and want to build your own:
 - **Config persists on device** — unplug and go, your layout follows
 - **Web flasher** — update firmware directly from the browser on the [Configure page](https://sudobreakstuff.github.io/sudodeck/app.html), no tools needed
 - **Shareable configs** — export your layout as JSON, share with others, import on any device
+
+### Ready-made configs
+
+Import one of these layouts in the config tool to get started instantly:
+
+| Use Case | Config File |
+|----------|-------------|
+| 🎮 [Live Streaming](https://sudobreakstuff.github.io/sudodeck/assets/usecases/streaming.json) | OBS scene switching, camera cuts, mute panel, raid macro |
+| 🎬 [Video Editing](https://sudobreakstuff.github.io/sudodeck/assets/usecases/video-editing.json) | Cut, ripple delete, zoom, split, export for DaVinci/Premiere |
+| ⌨️ [Gaming](https://sudobreakstuff.github.io/sudodeck/assets/usecases/gaming.json) | MMO rotation macro, Discord mute/deafen, push-to-talk |
+| 💼 [Productivity](https://sudobreakstuff.github.io/sudodeck/assets/usecases/productivity.json) | Email, app launcher, lock PC, signature, standup macro |
+| 🎧 [Music Production](https://sudobreakstuff.github.io/sudodeck/assets/usecases/music-production.json) | Record, quantize, tap tempo, loop — for Ableton/FL Studio |
+| 💻 [Development](https://sudobreakstuff.github.io/sudodeck/assets/usecases/development.json) | Git commit/push/pull, run, debug, build, terminal |
 
 ## Documentation
 
@@ -205,6 +229,7 @@ sudodeck/
 │       └── firmware/
 │           ├── manifest.json
 │           └── sudodeck-*.bin
+│   └── assets/usecases/   # Ready-made config JSONs
 ├── README.md
 └── LICENSE
 ```

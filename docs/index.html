@@ -16,7 +16,7 @@
 <nav>
   <a class="nl" href="/"><span class="s"><svg viewBox="0 0 100 125" fill="none" stroke="#00FF88" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" /><path d="M18 36 L50 16 L82 36" /><path d="M18 36 L50 56 L82 36" /><path d="M50 56 L50 90" /></svg></span>Sudo<span class="g">Deck</span></a>
   <ul class="nls">
-    <li><a href="#features">Features</a></li>
+    <li><a href="#usecases">Uses</a></li>
     <li><a href="#compare">Compare</a></li>
     <li><a href="buy/">Buy</a></li>
     <li><a href="guide/">Guide</a></li>
@@ -66,91 +66,411 @@
   </div>
 </section>
 
-<section id="features">
+<section id="usecases">
   <div class="inner">
-    <h2>Why <span class="g">Sudo</span>Deck</h2>
-    <div class="f-grid">
-      <div class="f-card rv d1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
-        </svg>
-        <h3>Zero Setup</h3>
-        <p>Pair once via Bluetooth. Works on any PC, Mac, or phone. No daemons, no drivers, nothing to install.</p>
+    <h2>What can you do with <span class="g">Sudo</span>Deck?</h2>
+    <p class="sd">Real workflows. One tap each. These are just the start — every button is yours to program.</p>
+
+    <div class="uc-grid">
+
+      <!-- ─── 1. Live Streaming ─── -->
+      <div class="uc-card">
+        <div class="uc-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Studio</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Scene1</div>
+            <div class="cyd-btn hl">Scene2</div>
+            <div class="cyd-btn hl">Scene3</div>
+            <div class="cyd-btn ko">BRB</div>
+            <div class="cyd-btn">Cam 1</div>
+            <div class="cyd-btn">Cam 2</div>
+            <div class="cyd-btn">Full</div>
+            <div class="cyd-btn ko">Stream</div>
+            <div class="cyd-btn">M.Mic</div>
+            <div class="cyd-btn">M.Desk</div>
+            <div class="cyd-btn">Skip</div>
+            <div class="cyd-btn ko">Raid</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>🎮 Live Streaming</h3>
+          <p>Never tab out of your stream again. Switch scenes, cut cameras, and manage audio — all from a wireless deck next to your keyboard. Each button is a hotkey mapped to OBS or Streamlabs.</p>
+          <div class="uc-tags">
+            <span>Wireless</span>
+            <span>Multi-page</span>
+            <span>Macros</span>
+            <span>Key Combos</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ One-tap Raid</strong>
+            <span>Tap once to type <code>/raid channelname</code> in chat and hit Enter — keeps the hype going without missing a beat.</span>
+          </div>
+          <a class="uc-dl" href="assets/usecases/streaming.json" download>Download this layout</a>
+        </div>
       </div>
-      <div class="f-card rv d2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-        <h3>Fully Configurable</h3>
-        <p>Edit every button's label, color, and action from your browser. Export your layout as JSON to share or back up. Import any config in one click.</p>
+
+      <!-- ─── 2. Video Editing ─── -->
+      <div class="uc-card">
+        <div class="cyd-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Resolve</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Cut</div>
+            <div class="cyd-btn hl">R.Del</div>
+            <div class="cyd-btn">Play</div>
+            <div class="cyd-btn">Zoom+</div>
+            <div class="cyd-btn">Zoom-</div>
+            <div class="cyd-btn">Split</div>
+            <div class="cyd-btn">Undo</div>
+            <div class="cyd-btn">Redo</div>
+            <div class="cyd-btn ko">N.Frame</div>
+            <div class="cyd-btn ko">P.Frame</div>
+            <div class="cyd-btn">Marker</div>
+            <div class="cyd-btn hl">Export</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>🎬 Video Editing</h3>
+          <p>Stop hunting keyboard shortcuts. Dedicate a full page of buttons to your NLE — cut, ripple delete, zoom, split, and export without touching the keyboard. Add a second page for colour grading.</p>
+          <div class="uc-tags">
+            <span>20+ Buttons</span>
+            <span>Multi-page</span>
+            <span>Key Combos</span>
+            <span>Macros</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Quick Export</strong>
+            <span>Set in/out points, open the Deliver page, start render — one tap runs a multi-step macro that does it all.</span>
+          </div>
+          <a class="uc-dl" href="assets/usecases/video-editing.json" download>Download this layout</a>
+        </div>
       </div>
-      <div class="f-card rv d3">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-          <line x1="12" y1="22.08" x2="12" y2="12"/>
-        </svg>
-        <h3>Self-Contained</h3>
-        <p>All config lives on the device's flash. Unplug it, move to another machine, your layout follows.</p>
+
+      <!-- ─── 3. Gaming ─── -->
+      <div class="uc-card">
+        <div class="cyd-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:PC</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Rotatn</div>
+            <div class="cyd-btn hl">Burst</div>
+            <div class="cyd-btn">Buff</div>
+            <div class="cyd-btn">Mount</div>
+            <div class="cyd-btn">Potion</div>
+            <div class="cyd-btn">Interact</div>
+            <div class="cyd-btn">Target</div>
+            <div class="cyd-btn">Focus</div>
+            <div class="cyd-btn ko">Mute</div>
+            <div class="cyd-btn ko">Deafen</div>
+            <div class="cyd-btn">Talk</div>
+            <div class="cyd-btn">Vibe</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>⌨️ Gaming</h3>
+          <p>Execute perfect MMO rotations, toggle sim racing pit controls, and manage Discord — all without breaking immersion. Macros chain multiple actions with precise timing.</p>
+          <div class="uc-tags">
+            <span>Wireless</span>
+            <span>Macros</span>
+            <span>Multi-page</span>
+            <span>Key Combos</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ MMO Opener</strong>
+            <span>Tap once to execute a 5-step ability sequence with 200ms delays — perfect damage rotation every pull, hands-free.</span>
+          </div>
+          <a class="uc-dl" href="assets/usecases/gaming.json" download>Download this layout</a>
+        </div>
       </div>
-      <div class="f-card rv d4">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-        </svg>
-        <h3>Open Source</h3>
-        <p>MIT licensed. Fork it, hack it, build your own. The code is yours — modify it however you see fit.</p>
+
+      <!-- ─── 4. Productivity ─── -->
+      <div class="uc-card">
+        <div class="cyd-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Office</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Email</div>
+            <div class="cyd-btn">Reply</div>
+            <div class="cyd-btn">Meeting</div>
+            <div class="cyd-btn ko">Status</div>
+            <div class="cyd-btn">Calc</div>
+            <div class="cyd-btn">Snip</div>
+            <div class="cyd-btn hl">Lock</div>
+            <div class="cyd-btn">Sig</div>
+            <div class="cyd-btn">Spotify</div>
+            <div class="cyd-btn">Code</div>
+            <div class="cyd-btn">Term</div>
+            <div class="cyd-btn ko">Standup</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>💼 Productivity</h3>
+          <p>Stop typing the same things every day. Launch apps, paste canned responses, insert your signature, and automate your morning routine — all with one tap.</p>
+          <div class="uc-tags">
+            <span>Text Strings</span>
+            <span>App Launcher</span>
+            <span>Macros</span>
+            <span>Wireless</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Standup Ready</strong>
+            <span>One button opens Slack, sets your status to "In a meeting", types yesterday's progress, and sets "Available in 30 min".</span>
+          </div>
+          <a class="uc-dl" href="assets/usecases/productivity.json" download>Download this layout</a>
+        </div>
       </div>
-      <div class="f-card rv d5">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-        </svg>
-        <h3>Affordable</h3>
-        <p>R1,099 pre-assembled and delivered. Half the price of the cheapest Stream Deck — with more features. DIY option from ~R300.</p>
+
+      <!-- ─── 5. Music Production ─── -->
+      <div class="uc-card">
+        <div class="cyd-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Ableton</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Record</div>
+            <div class="cyd-btn">Stop</div>
+            <div class="cyd-btn ko">Play</div>
+            <div class="cyd-btn">Loop</div>
+            <div class="cyd-btn">Quantiz</div>
+            <div class="cyd-btn">Metro</div>
+            <div class="cyd-btn hl">Tap</div>
+            <div class="cyd-btn">Undo</div>
+            <div class="cyd-btn">Add Trk</div>
+            <div class="cyd-btn">Dup</div>
+            <div class="cyd-btn">Delete</div>
+            <div class="cyd-btn ko">Save</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>🎧 Music Production</h3>
+          <p>Keep your hands on your instrument, not your keyboard. Control Ableton, FL Studio, or any DAW from anywhere in the room — wireless range covers the whole studio.</p>
+          <div class="uc-tags">
+            <span>Wireless</span>
+            <span>10m Range</span>
+            <span>Key Combos</span>
+            <span>Multi-page</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Tap Tempo</strong>
+            <span>Tap the button in time with your track to set the BPM — no reaching for the DAW, no mouse clicks, just the beat.</span>
+          </div>
+          <a class="uc-dl" href="assets/usecases/music-production.json" download>Download this layout</a>
+        </div>
       </div>
-      <div class="f-card rv d6">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M1 9l4 4-4 4"/><path d="M9 21h4l4-4-4-4"/>
-          <path d="M23 9l-4 4 4 4"/><path d="M15 3h-4l-4 4 4 4"/>
-        </svg>
-        <h3>BLE HID</h3>
-        <p>Standard Bluetooth HID — your computer sees a real keyboard. Instant, reliable, no extra software needed.</p>
+
+      <!-- ─── 6. Development ─── -->
+      <div class="uc-card">
+        <div class="cyd-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:VS Code</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Save</div>
+            <div class="cyd-btn">Search</div>
+            <div class="cyd-btn">Comment</div>
+            <div class="cyd-btn hl">Format</div>
+            <div class="cyd-btn ko">Commit</div>
+            <div class="cyd-btn">Push</div>
+            <div class="cyd-btn">Pull</div>
+            <div class="cyd-btn">Log</div>
+            <div class="cyd-btn">Run</div>
+            <div class="cyd-btn">Debug</div>
+            <div class="cyd-btn">Build</div>
+            <div class="cyd-btn ko">Term</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>💻 Development</h3>
+          <p>Keep your git commands, code snippets, and build actions one tap away. No more context-switching — commit, push, deploy, and run from your deck.</p>
+          <div class="uc-tags">
+            <span>Macros</span>
+            <span>Text Strings</span>
+            <span>Multi-page</span>
+            <span>Open Source</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Ship It</strong>
+            <span>Commit all changes with a message, push to main, open the CI pipeline — one tap deploys your feature from code to build.</span>
+          </div>
+          <a class="uc-dl" href="assets/usecases/development.json" download>Download this layout</a>
+        </div>
       </div>
-      <div class="f-card rv d1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/>
-          <rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>
-        </svg>
-        <h3>App Launcher</h3>
-        <p>Set an action type to "App Launcher", select your OS (Windows/macOS/Linux), type the app display name, and press the button. The device opens the OS search and launches the app (~250ms).</p>
+        </div>
       </div>
-      <div class="f-card rv d3">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-          <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
-          <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-        </svg>
-        <h3>Macro Steps</h3>
-        <p>Edit multi-step macros with combo (modifier+key) and delay steps. Combo steps show a mod dropdown and key input. Delay steps show ms.</p>
+
+      <!-- ─── 2. Video Editing ─── -->
+      <div class="uc-card">
+        <div class="uc-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Resolve</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Cut</div>
+            <div class="cyd-btn hl">R.Del</div>
+            <div class="cyd-btn">Play</div>
+            <div class="cyd-btn">Zoom+</div>
+            <div class="cyd-btn">Zoom-</div>
+            <div class="cyd-btn">Split</div>
+            <div class="cyd-btn">Undo</div>
+            <div class="cyd-btn">Redo</div>
+            <div class="cyd-btn ko">N.Frame</div>
+            <div class="cyd-btn ko">P.Frame</div>
+            <div class="cyd-btn">Marker</div>
+            <div class="cyd-btn hl">Export</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>🎬 Video Editing</h3>
+          <p>Stop hunting keyboard shortcuts. Dedicate a full page of buttons to your NLE — cut, ripple delete, zoom, split, and export without touching the keyboard. Add a second page for colour grading.</p>
+          <div class="uc-tags">
+            <span>20+ Buttons</span>
+            <span>Multi-page</span>
+            <span>Key Combos</span>
+            <span>Macros</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Quick Export</strong>
+            <span>Set in/out points, open the Deliver page, start render — one tap runs a multi-step macro that does it all.</span>
+          </div>
+        </div>
       </div>
+
+      <!-- ─── 3. Gaming ─── -->
+      <div class="uc-card">
+        <div class="uc-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:PC</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Rotatn</div>
+            <div class="cyd-btn hl">Burst</div>
+            <div class="cyd-btn">Buff</div>
+            <div class="cyd-btn">Mount</div>
+            <div class="cyd-btn">Potion</div>
+            <div class="cyd-btn">Interact</div>
+            <div class="cyd-btn">Target</div>
+            <div class="cyd-btn">Focus</div>
+            <div class="cyd-btn ko">Mute</div>
+            <div class="cyd-btn ko">Deafen</div>
+            <div class="cyd-btn">Talk</div>
+            <div class="cyd-btn">Vibe</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>⌨️ Gaming</h3>
+          <p>Execute perfect MMO rotations, toggle sim racing pit controls, and manage Discord — all without breaking immersion. Macros chain multiple actions with precise timing.</p>
+          <div class="uc-tags">
+            <span>Wireless</span>
+            <span>Macros</span>
+            <span>Multi-page</span>
+            <span>Key Combos</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ MMO Opener</strong>
+            <span>Tap once to execute a 5-step ability sequence with 200ms delays — perfect damage rotation every pull, hands-free.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 4. Productivity ─── -->
+      <div class="uc-card">
+        <div class="uc-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Office</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Email</div>
+            <div class="cyd-btn">Reply</div>
+            <div class="cyd-btn">Meeting</div>
+            <div class="cyd-btn ko">Status</div>
+            <div class="cyd-btn">Calc</div>
+            <div class="cyd-btn">Snip</div>
+            <div class="cyd-btn hl">Lock</div>
+            <div class="cyd-btn">Sig</div>
+            <div class="cyd-btn">Spotify</div>
+            <div class="cyd-btn">Code</div>
+            <div class="cyd-btn">Term</div>
+            <div class="cyd-btn ko">Standup</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>💼 Productivity</h3>
+          <p>Stop typing the same things every day. Launch apps, paste canned responses, insert your signature, and automate your morning routine — all with one tap.</p>
+          <div class="uc-tags">
+            <span>Text Strings</span>
+            <span>App Launcher</span>
+            <span>Macros</span>
+            <span>Wireless</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Standup Ready</strong>
+            <span>One button opens Slack, sets your status to "In a meeting", types yesterday's progress, and sets "Available in 30 min".</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 5. Music Production ─── -->
+      <div class="uc-card">
+        <div class="uc-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:Ableton</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Record</div>
+            <div class="cyd-btn">Stop</div>
+            <div class="cyd-btn ko">Play</div>
+            <div class="cyd-btn">Loop</div>
+            <div class="cyd-btn">Quantiz</div>
+            <div class="cyd-btn">Metro</div>
+            <div class="cyd-btn hl">Tap</div>
+            <div class="cyd-btn">Undo</div>
+            <div class="cyd-btn">Add Trk</div>
+            <div class="cyd-btn">Dup</div>
+            <div class="cyd-btn">Delete</div>
+            <div class="cyd-btn ko">Save</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>🎧 Music Production</h3>
+          <p>Keep your hands on your instrument, not your keyboard. Control Ableton, FL Studio, or any DAW from anywhere in the room — wireless range covers the whole studio.</p>
+          <div class="uc-tags">
+            <span>Wireless</span>
+            <span>10m Range</span>
+            <span>Key Combos</span>
+            <span>Multi-page</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Tap Tempo</strong>
+            <span>Tap the button in time with your track to set the BPM — no reaching for the DAW, no mouse clicks, just the beat.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 6. Development ─── -->
+      <div class="uc-card">
+        <div class="uc-mockup">
+          <div class="cyd-bar"><span class="cyd-w">W:VS Code</span><span class="cyd-bat"></span></div>
+          <div class="cyd-grid">
+            <div class="cyd-btn hl">Save</div>
+            <div class="cyd-btn">Search</div>
+            <div class="cyd-btn">Comment</div>
+            <div class="cyd-btn hl">Format</div>
+            <div class="cyd-btn ko">Commit</div>
+            <div class="cyd-btn">Push</div>
+            <div class="cyd-btn">Pull</div>
+            <div class="cyd-btn">Log</div>
+            <div class="cyd-btn">Run</div>
+            <div class="cyd-btn">Debug</div>
+            <div class="cyd-btn">Build</div>
+            <div class="cyd-btn ko">Term</div>
+          </div>
+        </div>
+        <div class="uc-info">
+          <h3>💻 Development</h3>
+          <p>Keep your git commands, code snippets, and build actions one tap away. No more context-switching — commit, push, deploy, and run from your deck.</p>
+          <div class="uc-tags">
+            <span>Macros</span>
+            <span>Text Strings</span>
+            <span>Multi-page</span>
+            <span>Open Source</span>
+          </div>
+          <div class="uc-macro">
+            <strong>⚡ Ship It</strong>
+            <span>Commit all changes with a message, push to main, open the CI pipeline — one tap deploys your feature from code to build.</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="stats">
-      <div class="stat rv d1">
-        <div class="stat-num">R1,099</div>
-        <div class="stat-label">Full Kit Price</div>
-      </div>
-      <div class="stat rv d2">
-        <div class="stat-num">BLE</div>
-        <div class="stat-label">No Drivers Needed</div>
-      </div>
-      <div class="stat rv d3">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Screensaver Modes</div>
-      </div>
-      <div class="stat rv d4">
-        <div class="stat-num">MIT</div>
-        <div class="stat-label">Open Source</div>
-      </div>
+    <div class="uc-cta">
+      <p>This is just the beginning. Every button does whatever <em>you</em> want —<br>key, combo, text, macro, app launcher, or automation.</p>
+      <a class="btn-h primary" href="guide/">Build Your Setup</a>
     </div>
   </div>
 </section>

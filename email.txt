@@ -1,0 +1,17 @@
+Subject: SudoDeck — open-source macro streamdeck
+
+Hi [Name],
+
+I came across your profile and thought I'd reach out. I've been working on a project called SudoDeck — a fully customisable macro streamdeck that I built from the ground up. It's been a passion project of mine for a while now, and I'm at a point where I'd love to get more eyes on it.
+
+The entire project is open source, including the firmware, hardware design files, configuration tool, and companion daemon. Anyone can build their own with off-the-shelf parts and a 3D-printed enclosure. I also offer a pre-assembled version for those who'd rather buy one ready to go.
+
+I'd really appreciate it if you could take a look and let me know what you think. Any feedback would mean a lot.
+
+Website: https://sudobreakstuff.github.io/sudodeck/
+GitHub: https://github.com/sudobreakstuff/sudodeck
+
+Thanks for your time.
+
+Best regards,
+Shahid
