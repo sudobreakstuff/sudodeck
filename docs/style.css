@@ -401,6 +401,7 @@
     margin: -36px 0 56px;
     line-height: 1.5;
   }
+  section#usecases > .sd { margin-bottom: 64px; }
 
   .inner {
     max-width: 1040px;
@@ -477,20 +478,15 @@
     border-color: rgba(0,255,136,0.25);
     background: #141c2a;
   }
-  @media (min-width: 721px) {
-    .uc-card { flex-direction: row; }
-  }
 
   /* CYD mockup */
   .cyd-mockup {
-    flex-shrink: 0;
-    width: 180px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 260px;
     background: #05080e;
     border: 2px solid #1a2332;
     border-radius: 10px;
     padding: 6px;
-    align-self: flex-start;
   }
   .cyd-bar {
     display: flex;
