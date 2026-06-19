@@ -185,9 +185,9 @@
           <div><code>press CTRL+S</code><span>Modifiers: CTRL, ALT, SHIFT, GUI</span></div>
         </div>
         <div class="flow-syntax-title" style="margin-top:10px">Supported Apps (<span id="flowAppCount"></span>)</div>
-        <div class="flow-marquee-wrap">
-          <div class="flow-marquee" id="flowMarquee"><span class="flow-logo" title="loading..."><span class="flow-logo-i">?</span><span class="flow-logo-n">loading...</span></span></div>
-        </div>
+          <div class="flow-marquee-wrap">
+            <div class="flow-marquee" id="flowMarquee"></div>
+          </div>
       </div>
     </div>
 
@@ -199,6 +199,21 @@
 </footer>
 
 <script src="../shortcuts.js"></script>
+<script>
+(function() {
+  var names = Object.keys(SHORTCUTS).sort();
+  var c = document.getElementById('flowAppCount');
+  if (c) c.textContent = names.length;
+  var m = document.getElementById('flowMarquee');
+  if (m) {
+    m.innerHTML = names.map(function(n) {
+      return '<span class="flow-logo">' + n + '</span>';
+    }).join('') + names.map(function(n) {
+      return '<span class="flow-logo">' + n + '</span>';
+    }).join('');
+  }
+})();
+</script>
 <script src="../app.js"></script>
 </body>
 </html>

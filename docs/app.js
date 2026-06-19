@@ -1415,23 +1415,6 @@ async function fwFlash() {
   btn.disabled = false; btn.textContent = 'Flash';
 }
 
-// Populate flow builder supported apps marquee
-(function populateMarquee() {
-  var names = Object.keys(SHORTCUTS).sort();
-  var el = document.getElementById('flowAppCount');
-  if (el) el.textContent = names.length;
-  var marquee = document.getElementById('flowMarquee');
-  if (marquee) {
-    var logos = names.map(function(n) {
-      var a = SHORTCUTS[n];
-      var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
-      var aliases = (a.aliases || []).join(', ');
-      return '<span class="flow-logo" title="' + esc(n) + (aliases ? ' (' + aliases + ')' : '') + '"><span class="flow-logo-i">' + initials + '</span><span class="flow-logo-n">' + esc(n) + '</span></span>';
-    }).join('');
-    marquee.innerHTML = logos + logos;
-  }
-})();
-
 // Sidebar navigation
 (function() {
   var items = document.querySelectorAll('.sidebar-item');
