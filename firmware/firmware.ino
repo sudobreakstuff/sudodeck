@@ -233,7 +233,12 @@ void do_action(JsonObject a) {
     ble.tap(KEY_RETURN);
   } else if (!strcmp(t,"macro")) {
     JsonArray steps = a["steps"];
-    for (JsonObject s : steps) { do_action(s); int d = s["delay"]|0; if (d>0 && d<10000) delay(d); }
+    for (JsonObject s : steps) {
+      do_action(s);
+      int d = s["delay"]|0;
+      if (d == 0 && !strcmp(s["type"]|"", "delay")) d = s["value"]|0;
+      if (d>0 && d<10000) delay(d);
+    }
   } else if (!strcmp(t,"automation_toggle")) {
     int ai = a["index"]|0;
     if (ai >= 0 && ai < automation_count) {
