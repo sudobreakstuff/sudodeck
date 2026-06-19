@@ -1043,11 +1043,12 @@ function expandAppLaunch(step) {
       { type: 'delay', value: 2000 }
     ];
   }
-  // windows / linux: Win+R → type name → Enter
+  // windows / linux: Win key → wait → type name → Enter
   return [
-    { type: 'combo', mod: 'GUI', key: 'r' },
-    { type: 'delay', value: 500 },
+    { type: 'key', value: 'GUI' },
+    { type: 'delay', value: 800 },
     { type: 'text', value: name },
+    { type: 'delay', value: 200 },
     { type: 'key', value: 'ENTER' },
     { type: 'delay', value: 2000 }
   ];
