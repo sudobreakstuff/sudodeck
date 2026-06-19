@@ -261,6 +261,19 @@
           <div id="flowActions" style="display:none;gap:6px;margin-top:6px">
             <button class="btn pri" id="btnFlowAddGrid">Add to Grid</button>
           </div>
+          <details id="flowHelp" style="margin-top:8px;font-size:0.7rem;color:var(--dim)">
+            <summary style="cursor:pointer;user-select:none">Syntax &amp; Supported Apps</summary>
+            <div style="margin-top:6px;line-height:1.6">
+              <b>Commands:</b><br>
+              <code>open &lt;app&gt;</code> — launch an app<br>
+              <code>press &lt;key&gt;</code> — press a key/ combo (<code>CTRL+S</code>, <code>GUI+LEFT</code>)<br>
+              <code>type &lt;text&gt;</code> — type text<br>
+              <code>wait &lt;n&gt;s</code> — wait N seconds<br>
+              <code>go to &lt;url&gt;</code> — type URL + Enter<br><br>
+              <b>Supported Apps (<span id="flowAppCount"></span>):</b><br>
+              <span id="flowAppList"></span>
+            </div>
+          </details>
         </div>
       </div>
     </div>

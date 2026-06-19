@@ -1435,3 +1435,18 @@ async function fwFlash() {
   }
   btn.disabled = false; btn.textContent = 'Flash';
 }
+
+// Populate flow builder app list from SHORTCUTS
+(function() {
+  var names = Object.keys(SHORTCUTS).sort();
+  var el = document.getElementById('flowAppCount');
+  if (el) el.textContent = names.length;
+  var list = document.getElementById('flowAppList');
+  if (list) {
+    list.innerHTML = names.map(function(n) {
+      var a = SHORTCUTS[n];
+      var aliases = (a.aliases || []).join(', ');
+      return '<span title="' + esc(aliases) + '" style="cursor:help;display:inline-block;margin:0 6px 2px 0">' + esc(n) + '</span>';
+    }).join('');
+  }
+})();
