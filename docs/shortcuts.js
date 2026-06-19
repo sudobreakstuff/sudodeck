@@ -9299,10 +9299,20 @@ var GENERIC_ACTIONS = {
     "mod": "CTRL",
     "key": "s"
   },
+  "save as": {
+    "type": "combo",
+    "mod": "CTRL_SHIFT",
+    "key": "s"
+  },
   "find": {
     "type": "combo",
     "mod": "CTRL",
     "key": "f"
+  },
+  "replace": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "h"
   },
   "select all": {
     "type": "combo",
@@ -9412,6 +9422,161 @@ var GENERIC_ACTIONS = {
   "page down": {
     "type": "key",
     "value": "PAGE_DOWN"
+  },
+  "close window": {
+    "type": "combo",
+    "mod": "ALT",
+    "key": "F4"
+  },
+  "close tab": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "w"
+  },
+  "close app": {
+    "type": "combo",
+    "mod": "ALT",
+    "key": "F4"
+  },
+  "close": {
+    "type": "combo",
+    "mod": "ALT",
+    "key": "F4"
+  },
+  "quit": {
+    "type": "combo",
+    "mod": "ALT",
+    "key": "F4"
+  },
+  "exit": {
+    "type": "combo",
+    "mod": "ALT",
+    "key": "F4"
+  },
+  "minimize": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "DOWN"
+  },
+  "maximize": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "UP"
+  },
+  "restore": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "DOWN"
+  },
+  "show desktop": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "d"
+  },
+  "run": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "r"
+  },
+  "file explorer": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "e"
+  },
+  "settings": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "i"
+  },
+  "task view": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "TAB"
+  },
+  "task manager": {
+    "type": "combo",
+    "mod": "CTRL_SHIFT",
+    "key": "ESC"
+  },
+  "search windows": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "s"
+  },
+  "search": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "f"
+  },
+  "clipboard": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "v"
+  },
+  "emoji panel": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "."
+  },
+  "switch window": {
+    "type": "combo",
+    "mod": "ALT",
+    "key": "TAB"
+  },
+  "project": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "p"
+  },
+  "magnifier": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "="
+  },
+  "record screen": {
+    "type": "combo",
+    "mod": "GUI_ALT",
+    "key": "r"
+  },
+  "game bar": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "g"
+  },
+  "snap left": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "LEFT"
+  },
+  "snap right": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "RIGHT"
+  },
+  "snap up": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "UP"
+  },
+  "snap down": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "DOWN"
+  },
+  "new desktop": {
+    "type": "combo",
+    "mod": "GUI_CTRL",
+    "key": "d"
+  },
+  "switch desktop right": {
+    "type": "combo",
+    "mod": "GUI_CTRL",
+    "key": "RIGHT"
+  },
+  "switch desktop left": {
+    "type": "combo",
+    "mod": "GUI_CTRL",
+    "key": "LEFT"
   }
 };
 
@@ -9436,10 +9601,20 @@ var GENERIC_ACTIONS_MAC = {
     "mod": "GUI",
     "key": "s"
   },
+  "save as": {
+    "type": "combo",
+    "mod": "GUI_SHIFT",
+    "key": "s"
+  },
   "find": {
     "type": "combo",
     "mod": "GUI",
     "key": "f"
+  },
+  "replace": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "h"
   },
   "select all": {
     "type": "combo",
@@ -9549,5 +9724,159 @@ var GENERIC_ACTIONS_MAC = {
   "page down": {
     "type": "key",
     "value": "PAGE_DOWN"
+  },
+  "close window": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "w"
+  },
+  "close tab": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "w"
+  },
+  "close app": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "q"
+  },
+  "close": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "w"
+  },
+  "quit": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "q"
+  },
+  "exit": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "q"
+  },
+  "minimize": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "m"
+  },
+  "maximize": {
+    "type": "combo",
+    "mod": "GUI_SHIFT",
+    "key": "f"
+  },
+  "restore": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "m"
+  },
+  "show desktop": {
+    "type": "key",
+    "value": "F11"
+  },
+  "run": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "SPACE"
+  },
+  "file explorer": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "TAB"
+  },
+  "settings": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": ","
+  },
+  "task view": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "UP"
+  },
+  "task manager": {
+    "type": "combo",
+    "mod": "GUI_ALT",
+    "key": "ESC"
+  },
+  "search windows": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "s"
+  },
+  "search": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "f"
+  },
+  "clipboard": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "v"
+  },
+  "emoji panel": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "."
+  },
+  "switch window": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "`"
+  },
+  "project": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "p"
+  },
+  "magnifier": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "="
+  },
+  "record screen": {
+    "type": "combo",
+    "mod": "GUI_ALT",
+    "key": "r"
+  },
+  "game bar": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "g"
+  },
+  "snap left": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "LEFT"
+  },
+  "snap right": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "RIGHT"
+  },
+  "snap up": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "UP"
+  },
+  "snap down": {
+    "type": "combo",
+    "mod": "GUI",
+    "key": "DOWN"
+  },
+  "new desktop": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "RIGHT"
+  },
+  "switch desktop right": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "RIGHT"
+  },
+  "switch desktop left": {
+    "type": "combo",
+    "mod": "CTRL",
+    "key": "LEFT"
   }
 };

@@ -898,8 +898,10 @@ output.append("})();\n")
 # Also add GENERIC_ACTIONS
 output.append("\nvar GENERIC_ACTIONS = {\n")
 gen = {
-    "copy": C("CTRL","c"),"paste": C("CTRL","v"),"cut": C("CTRL","x"),"save": C("CTRL","s"),
-    "find": C("CTRL","f"),"select all": C("CTRL","a"),"undo": C("CTRL","z"),"redo": C("CTRL","y"),
+    "copy": C("CTRL","c"),"paste": C("CTRL","v"),"cut": C("CTRL","x"),
+    "save": C("CTRL","s"),"save as": C("CTRL_SHIFT","s"),
+    "find": C("CTRL","f"),"replace": C("CTRL","h"),
+    "select all": C("CTRL","a"),"undo": C("CTRL","z"),"redo": C("CTRL","y"),
     "screenshot": C("GUI_SHIFT","s"),"lock": C("GUI","l"),
     "play": K("MEDIA_PLAY_PAUSE"),"pause": K("MEDIA_PLAY_PAUSE"),"play pause": K("MEDIA_PLAY_PAUSE"),
     "next": K("MEDIA_NEXT_TRACK"),"next track": K("MEDIA_NEXT_TRACK"),
@@ -908,6 +910,21 @@ gen = {
     "enter": K("ENTER"),"tab": K("TAB"),"escape": K("ESC"),"esc": K("ESC"),
     "space": K("SPACE"),"delete": K("DELETE"),"backspace": K("BACKSPACE"),
     "home": K("HOME"),"end": K("END"),"page up": K("PAGE_UP"),"page down": K("PAGE_DOWN"),
+    "close window": C("ALT","F4"),"close tab": C("CTRL","w"),"close app": C("ALT","F4"),
+    "close": C("ALT","F4"),"quit": C("ALT","F4"),"exit": C("ALT","F4"),
+    "minimize": C("GUI","DOWN"),"maximize": C("GUI","UP"),"restore": C("GUI","DOWN"),
+    "show desktop": C("GUI","d"),"run": C("GUI","r"),
+    "file explorer": C("GUI","e"),"settings": C("GUI","i"),
+    "task view": C("GUI","TAB"),"task manager": C("CTRL_SHIFT","ESC"),
+    "search windows": C("GUI","s"),"search": C("CTRL","f"),
+    "clipboard": C("GUI","v"),
+    "emoji panel": C("GUI","."),"switch window": C("ALT","TAB"),
+    "project": C("GUI","p"),"magnifier": C("GUI","="),
+    "record screen": C("GUI_ALT","r"),"game bar": C("GUI","g"),
+    "snap left": C("GUI","LEFT"),"snap right": C("GUI","RIGHT"),
+    "snap up": C("GUI","UP"),"snap down": C("GUI","DOWN"),
+    "new desktop": C("GUI_CTRL","d"),"switch desktop right": C("GUI_CTRL","RIGHT"),
+    "switch desktop left": C("GUI_CTRL","LEFT"),
 }
 for i, (k, v) in enumerate(gen.items()):
     comma = "," if i < len(gen) - 1 else ""
@@ -919,6 +936,26 @@ output.append("\nvar GENERIC_ACTIONS_MAC = {\n")
 gen_mac = {k: C(v["mod"].replace("CTRL","GUI"), v["key"]) if v.get("type") == "combo" else v for k,v in gen.items()}
 gen_mac["screenshot"] = C("GUI_SHIFT","4")
 gen_mac["lock"] = C("CTRL_GUI","q")
+gen_mac["close window"] = C("GUI","w")
+gen_mac["close tab"] = C("GUI","w")
+gen_mac["close app"] = C("GUI","q")
+gen_mac["close"] = C("GUI","w")
+gen_mac["quit"] = C("GUI","q")
+gen_mac["exit"] = C("GUI","q")
+gen_mac["minimize"] = C("GUI","m")
+gen_mac["maximize"] = C("GUI_SHIFT","f")
+gen_mac["restore"] = C("GUI","m")
+gen_mac["show desktop"] = K("F11")
+gen_mac["run"] = C("GUI","SPACE")
+gen_mac["file explorer"] = C("GUI","TAB")
+gen_mac["settings"] = C("GUI",",")
+gen_mac["task view"] = C("CTRL","UP")
+gen_mac["task manager"] = C("GUI_ALT","ESC")
+gen_mac["clipboard"] = C("GUI","v")
+gen_mac["switch window"] = C("GUI","`")
+gen_mac["new desktop"] = C("CTRL","RIGHT")
+gen_mac["switch desktop right"] = C("CTRL","RIGHT")
+gen_mac["switch desktop left"] = C("CTRL","LEFT")
 for i, (k, v) in enumerate(gen_mac.items()):
     comma = "," if i < len(gen_mac) - 1 else ""
     output.append(f'  "{k}": {js_val(v, 1)}{comma}\n')

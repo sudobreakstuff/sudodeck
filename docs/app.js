@@ -847,7 +847,37 @@ function parseFlow(text) {
       continue;
     }
 
+    // App-context NL patterns with argument extraction
+    // (checked before shortcut lookup so "search hello world" becomes search+type, not just search)
+    if (appCtx) {
+      var osMod = navigator.platform.indexOf('Mac') >= 0 ? 'GUI' : 'CTRL';
+
+      // join|goto <channel> in chat apps -> quick switcher + type + enter
+      m = lower.match(/^(?:join|goto)\s+(.+)/);
+      if (m && (appCtx === 'discord' || appCtx === 'slack' || appCtx === 'microsoft teams')) {
+        steps.push({ type: 'combo', mod: osMod, key: 'k' });
+        steps.push({ type: 'delay', value: 400 });
+        steps.push({ type: 'text', value: m[1] });
+        steps.push({ type: 'delay', value: 300 });
+        steps.push({ type: 'key', value: 'ENTER' });
+        steps.push({ type: 'delay', value: 500 });
+        continue;
+      }
+
+      // search <query> in any app -> open search + type query
+      m = lower.match(/^search\s+(.+)/);
+      if (m) {
+        var searchKey = (appCtx === 'chrome' || appCtx === 'firefox') ? 'e' : 'f';
+        steps.push({ type: 'combo', mod: osMod, key: searchKey });
+        steps.push({ type: 'delay', value: 400 });
+        steps.push({ type: 'text', value: m[1] });
+        steps.push({ type: 'delay', value: 300 });
+        continue;
+      }
+    }
+
     // Shortcut lookup with app context
+    var matchedShortcut = false;
     if (appCtx && SHORTCUTS[appCtx]) {
       var sc = SHORTCUTS[appCtx];
       var osKey = navigator.platform.indexOf('Mac') >= 0 ? 'macos' : 'windows';
@@ -860,10 +890,26 @@ function parseFlow(text) {
           if (db[sk].value) action.value = db[sk].value;
           steps.push(action);
           steps.push({ type: 'delay', value: 300 });
+          matchedShortcut = true;
           break;
         }
       }
-      if (steps.length > 0 && steps[steps.length - 1].type !== 'delay') continue;
+    }
+    if (matchedShortcut) continue;
+
+    // GENERIC_ACTIONS lookup
+    var ga = GENERIC_ACTIONS;
+    if (navigator.platform.indexOf('Mac') >= 0 && typeof GENERIC_ACTIONS_MAC !== 'undefined') {
+      ga = GENERIC_ACTIONS_MAC;
+    }
+    if (ga[lower]) {
+      var gact = { type: ga[lower].type };
+      if (ga[lower].mod) gact.mod = ga[lower].mod;
+      if (ga[lower].key) gact.key = ga[lower].key;
+      if (ga[lower].value) gact.value = ga[lower].value;
+      steps.push(gact);
+      steps.push({ type: 'delay', value: 300 });
+      continue;
     }
 
     // Fallback: single key
