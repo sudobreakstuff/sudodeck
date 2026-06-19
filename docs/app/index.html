@@ -207,8 +207,9 @@
   var m = document.getElementById('flowMarquee');
   if (m) {
     function logo(n) {
+      var slug = n.toLowerCase().replace(/\s+/g, '');
       var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
-      return '<span class="flow-logo"><span class="flow-logo-i">' + initials + '</span><span class="flow-logo-n">' + n + '</span></span>';
+      return '<span class="flow-logo"><span class="flow-logo-i"><img src="https://cdn.simpleicons.org/' + slug + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initials + '\'" loading="lazy"></span><span class="flow-logo-n">' + n + '</span></span>';
     }
     m.innerHTML = names.map(logo).join('') + names.map(logo).join('');
   }

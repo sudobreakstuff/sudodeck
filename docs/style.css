@@ -912,10 +912,13 @@
     height: 20px;
     border-radius: 50%;
     background: var(--acc-dim);
-    color: var(--acc);
-    font-size: 0.55rem;
-    font-weight: 700;
     flex-shrink: 0;
+    overflow: hidden;
+  }
+  .flow-logo-i img {
+    width: 14px;
+    height: 14px;
+    display: block;
   }
   .flow-logo-n { color: var(--dim); }
   .cfg-box {
