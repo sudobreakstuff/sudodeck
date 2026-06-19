@@ -25,7 +25,17 @@
   </ul>
 </nav>
 
-<section id="firmware" class="section-reveal" style="padding-top:120px">
+<div class="nav-blocks">
+  <a href="#firmware" class="nav-block">Firmware</a>
+  <a href="#config" class="nav-block">Grid</a>
+  <a href="#screensaver" class="nav-block">Screensaver</a>
+  <a href="#theme" class="nav-block">Theme</a>
+  <a href="#widgets" class="nav-block">Widgets</a>
+  <a href="#automations" class="nav-block">Automations</a>
+  <a href="#flow" class="nav-block">Flow Builder</a>
+</div>
+
+<section id="firmware" class="section-reveal" style="padding-top:80px">
   <div class="sec">
     <h2><span class="g">Firmware</span></h2>
     <p class="sd">Back up or update your SudoDeck firmware directly from the browser.</p>
@@ -164,7 +174,7 @@
         <button class="btn" id="btnWifiSet" style="display:none">Set WiFi</button>
       </div>
 
-      <div class="saver-fold">
+      <div class="saver-fold" id="screensaver">
         <div class="saver-hdr" id="saverToggle">
           <span>Screensaver</span>
           <span class="saver-hint" id="saverHint">off</span>
@@ -190,7 +200,7 @@
           </div>
         </div>
       </div>
-      <div class="saver-fold">
+      <div class="saver-fold" id="theme">
         <div class="saver-hdr" id="themeToggle">
           <span>Theme</span>
           <span class="saver-hint" id="themeHint">default</span>
@@ -226,7 +236,7 @@
           <button class="btn pri" id="btnThemeSet" style="margin-top:8px">Set Theme</button>
         </div>
       </div>
-      <div class="saver-fold" style="margin-top:6px">
+      <div class="saver-fold" style="margin-top:6px" id="widgets">
         <div class="saver-hdr" id="widgetToggle">
           <span>Custom Widgets</span>
           <span class="saver-hint" id="widgetHint">0 configured</span>
@@ -236,7 +246,7 @@
           <button class="btn pri" id="btnWidgetAdd" style="margin-top:8px">+ Add Widget</button>
         </div>
       </div>
-      <div class="saver-fold" style="margin-top:6px">
+      <div class="saver-fold" style="margin-top:6px" id="automations">
         <div class="saver-hdr" id="autoToggle">
           <span>Automations</span>
           <span class="saver-hint" id="autoHint">0</span>
@@ -246,36 +256,42 @@
           <button class="btn pri" id="btnAutoAdd" style="margin-top:8px">+ Add Automation</button>
         </div>
       </div>
-      <div class="saver-fold" style="margin-top:6px">
-        <div class="saver-hdr" id="flowToggle">
-          <span>Flow Builder</span>
-          <span class="saver-hint" id="flowHint">0 steps</span>
-        </div>
-        <div class="saver-body" id="flowBody">
-          <textarea id="flowInput" rows="4" placeholder="unmute discord&#10;open obs&#10;start recording&#10;wait 2s&#10;stop recording" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:8px;font-family:var(--mono);font-size:0.75rem;resize:vertical"></textarea>
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="btn pri" id="btnFlowParse">Parse</button>
-            <button class="btn" id="btnFlowClear">Clear</button>
-          </div>
-          <div id="flowResult"></div>
-          <div id="flowActions" style="display:none;gap:6px;margin-top:6px">
-            <button class="btn pri" id="btnFlowAddGrid">Add to Grid</button>
-          </div>
-          <details id="flowHelp" style="margin-top:8px;font-size:0.7rem;color:var(--dim)">
-            <summary style="cursor:pointer;user-select:none">Syntax &amp; Supported Apps</summary>
-            <div style="margin-top:6px;line-height:1.6">
-              <b>Commands:</b><br>
-              <code>open &lt;app&gt;</code> — launch an app<br>
-              <code>press &lt;key&gt;</code> — press a key/ combo (<code>CTRL+S</code>, <code>GUI+LEFT</code>)<br>
-              <code>type &lt;text&gt;</code> — type text<br>
-              <code>wait &lt;n&gt;s</code> — wait N seconds<br>
-              <code>go to &lt;url&gt;</code> — type URL + Enter<br><br>
-              <b>Supported Apps (<span id="flowAppCount"></span>):</b><br>
-              <span id="flowAppList"></span>
-            </div>
-          </details>
-        </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="flow" class="section-reveal">
+  <div class="inner">
+    <h2>Flow Builder</h2>
+    <p class="sd">Describe what you want in plain English — the parser turns it into button actions.</p>
+    <div class="flow-box">
+      <textarea id="flowInput" rows="4" placeholder="unmute discord&#10;open chrome&#10;go to youtube.com&#10;wait 3s&#10;press f" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:8px;font-family:var(--mono);font-size:0.75rem;resize:vertical"></textarea>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn pri" id="btnFlowParse">Parse</button>
+        <button class="btn" id="btnFlowClear">Clear</button>
       </div>
+      <div id="flowResult" style="margin-top:8px"></div>
+      <div id="flowActions" style="display:none;gap:6px;margin-top:8px">
+        <button class="btn pri" id="btnFlowAddGrid">Add to Grid</button>
+      </div>
+      <details id="flowHelp" style="margin-top:12px;font-size:0.8rem;color:var(--dim)">
+        <summary style="cursor:pointer;user-select:none;font-weight:600">Syntax &amp; Supported Apps (<span id="flowAppCount"></span>)</summary>
+        <div style="margin-top:8px;line-height:1.8">
+          <b>Commands:</b><br>
+          <code>open &lt;app&gt;</code> — launch an app via Start menu<br>
+          <code>press &lt;key&gt;</code> — press a single key (ENTER, F1, SPACE)<br>
+          <code>press &lt;mod+key&gt;</code> — key combo (CTRL+S, GUI+LEFT, ALT_TAB)<br>
+          <code>type &lt;text&gt;</code> — type a string<br>
+          <code>wait &lt;n&gt;s</code> — pause for N seconds<br>
+          <code>go to &lt;url&gt;</code> — type a URL and press Enter<br>
+          <code>delay &lt;ms&gt;</code> — pause for N milliseconds<br>
+          Also recognizes app-specific shortcuts by name after <code>open</code> (e.g. <code>unmute</code> after <code>open discord</code>).<br><br>
+          <b>Supported Apps:</b><br>
+          <span id="flowAppList"></span>
+        </div>
+      </details>
     </div>
   </div>
 </section>

@@ -679,6 +679,37 @@
     margin: 0 auto;
   }
 
+  /* ─── nav blocks ─── */
+  .nav-blocks {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 24px 16px 8px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .nav-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--dim);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .nav-block:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+    background: color-mix(in srgb, var(--acc) 8%, var(--surface));
+  }
+
   /* ─── config tool ─── */
   .cfg-box {
     max-width: 1040px;
@@ -1607,6 +1638,15 @@
   .gb.drag-over { outline:2px dashed var(--acc); outline-offset:-2px; transform:scale(1.08); }
 
   /* ─── flow builder ─── */
+  /* ─── flow builder ─── */
+  .flow-box {
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
   .fc {
     background:var(--bg); border:1px solid var(--border); border-radius:6px;
     margin-top:6px; overflow:hidden;

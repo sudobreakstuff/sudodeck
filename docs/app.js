@@ -920,11 +920,9 @@ function renderFlowSteps(steps) {
   if (!steps || steps.length === 0) {
     el.innerHTML = '<div style="color:var(--dim);font-size:0.75rem;padding:8px">No steps parsed.</div>';
     document.getElementById('flowActions').style.display = 'none';
-    document.getElementById('flowHint').textContent = '0 steps';
     return;
   }
   document.getElementById('flowActions').style.display = 'flex';
-  document.getElementById('flowHint').textContent = steps.length + (steps.length > 1 ? ' steps' : ' step');
   var typeLabels = { key: 'Key', combo: 'Combo', text: 'Text', delay: 'Delay', app: 'App' };
   steps.forEach(function(s, i) {
     var c = document.createElement('div');
@@ -979,10 +977,6 @@ function renderFlowStepBody(idx, s) {
 }
 
 // Flow Builder event handlers
-document.getElementById('flowToggle').addEventListener('click', function() {
-  document.getElementById('flowBody').classList.toggle('open');
-});
-
 document.getElementById('btnFlowParse').addEventListener('click', function() {
   var text = document.getElementById('flowInput').value;
   if (!text.trim()) { tm('Enter a flow description first', 'ng'); return; }
