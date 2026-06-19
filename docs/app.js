@@ -1012,7 +1012,8 @@ document.getElementById('btnFlowAddGrid').addEventListener('click', function() {
     p.buttons[idx].label = suggestLabel(flowSteps[0]);
     p.buttons[idx].action = flowSteps[0];
   } else {
-    // Expand app steps into concrete keystrokes for macro context
+    // Expand app steps into concrete keystrokes for macro context,
+    // then merge consecutive delays
     var macroSteps = [];
     for (var si = 0; si < flowSteps.length; si++) {
       var fs = flowSteps[si];
@@ -1023,8 +1024,17 @@ document.getElementById('btnFlowAddGrid').addEventListener('click', function() {
         macroSteps.push(JSON.parse(JSON.stringify(fs)));
       }
     }
+    // Merge consecutive delays
+    var merged = [];
+    for (var mi = 0; mi < macroSteps.length; mi++) {
+      if (macroSteps[mi].type === 'delay' && merged.length > 0 && merged[merged.length - 1].type === 'delay') {
+        merged[merged.length - 1].value += macroSteps[mi].value;
+      } else {
+        merged.push(macroSteps[mi]);
+      }
+    }
     p.buttons[idx].label = suggestMacroLabel(flowSteps);
-    p.buttons[idx].action = { type: 'macro', steps: macroSteps };
+    p.buttons[idx].action = { type: 'macro', steps: merged };
   }
   ra();
   sb = idx; rg(); se(idx);
@@ -1043,14 +1053,14 @@ function expandAppLaunch(step) {
       { type: 'delay', value: 2000 }
     ];
   }
-  // windows / linux: Win key → wait → type name → Enter
+  // windows / linux: Win key → wait for Start → type name → wait → Enter → wait for launch
   return [
     { type: 'key', value: 'GUI' },
-    { type: 'delay', value: 800 },
+    { type: 'delay', value: 600 },
     { type: 'text', value: name },
-    { type: 'delay', value: 200 },
+    { type: 'delay', value: 500 },
     { type: 'key', value: 'ENTER' },
-    { type: 'delay', value: 2000 }
+    { type: 'delay', value: 2500 }
   ];
 }
 
