@@ -1012,13 +1012,45 @@ document.getElementById('btnFlowAddGrid').addEventListener('click', function() {
     p.buttons[idx].label = suggestLabel(flowSteps[0]);
     p.buttons[idx].action = flowSteps[0];
   } else {
+    // Expand app steps into concrete keystrokes for macro context
+    var macroSteps = [];
+    for (var si = 0; si < flowSteps.length; si++) {
+      var fs = flowSteps[si];
+      if (fs.type === 'app') {
+        var expanded = expandAppLaunch(fs);
+        for (var ei = 0; ei < expanded.length; ei++) macroSteps.push(expanded[ei]);
+      } else {
+        macroSteps.push(JSON.parse(JSON.stringify(fs)));
+      }
+    }
     p.buttons[idx].label = suggestMacroLabel(flowSteps);
-    p.buttons[idx].action = { type: 'macro', steps: JSON.parse(JSON.stringify(flowSteps)) };
+    p.buttons[idx].action = { type: 'macro', steps: macroSteps };
   }
   ra();
   sb = idx; rg(); se(idx);
   tm('Flow added to button ' + (idx + 1));
 });
+
+function expandAppLaunch(step) {
+  if (step.type !== 'app') return [step];
+  var os = (step.os || 'windows').toLowerCase();
+  var name = step.name || '';
+  if (os === 'macos') {
+    return [
+      { type: 'combo', mod: 'GUI', key: 'SPACE' },
+      { type: 'text', value: name },
+      { type: 'key', value: 'ENTER' },
+      { type: 'delay', value: 2000 }
+    ];
+  }
+  // windows / linux
+  return [
+    { type: 'key', value: 'GUI' },
+    { type: 'text', value: name },
+    { type: 'key', value: 'ENTER' },
+    { type: 'delay', value: 2000 }
+  ];
+}
 
 function suggestLabel(step) {
   if (step.type === 'key') return step.value || 'Key';
