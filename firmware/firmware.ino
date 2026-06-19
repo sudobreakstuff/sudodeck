@@ -206,6 +206,7 @@ uint8_t mod_mask(const char* s) {
 
 void do_action(JsonObject a) {
   if (!ble_ready) return;
+  if (!ble.isPaired()) return;
   const char* t = a["type"]|"";
   if (!strcmp(t,"key")) {
     uint16_t c; bool m; if (key_lookup(a["value"]|"",&c,&m)) { if (m) ble.tap(c); else ble.tap((uint8_t)c); }
@@ -917,7 +918,7 @@ void proc_serial(const String& l) {
   }
   else if (!strcmp(cmd,"get_info")) {
     JsonDocument r;
-    r["name"]="SudoDeck"; r["version"]="2.2.1";
+    r["name"]="SudoDeck"; r["version"]="2.2.2";
     r["ble"]=ble_ready && ble.isConnected();
     r["free"]=SPIFFS.totalBytes()-SPIFFS.usedBytes();
     r["total"]=SPIFFS.totalBytes();
@@ -1081,8 +1082,10 @@ void draw_header() {
   tft.fillRect(0, 0, SCR_W, HEAD_H, c_hdr);
   tft.setTextColor(c_acc, c_hdr);
   tft.setCursor(4, 4);
-  if (ble_ready && ble.isConnected())
+  if (ble_ready && ble.isPaired())
     tft.print("SudoDeck | BLE: ON");
+  else if (ble_ready && ble.isConnected())
+    tft.print("SudoDeck | BLE: pair");
   else if (ble_ready)
     tft.print("SudoDeck | BLE: ...");
   else
@@ -1605,6 +1608,7 @@ void setup() {
 
   ble.setLogLevel(HIDLogLevel::Off);
   ble.setSecurityMode(BLEKeyboardSecurity::JustWorks);
+  ble.setRandomAddress(false);
   ble.onPairingComplete([](bool s) {
     (void)s;
   });
@@ -1672,11 +1676,23 @@ void loop() {
     }
 
     // BLE health check
-    if (ble_ready && !ble.isConnected()) {
-      static unsigned long last_ble_check = 0;
-      if (now - last_ble_check > 10000) {
-        last_ble_check = now;
-        NimBLEDevice::startAdvertising();
+    if (ble_ready) {
+      if (!ble.isConnected()) {
+        static unsigned long last_ble_check = 0;
+        if (now - last_ble_check > 10000) {
+          last_ble_check = now;
+          NimBLEDevice::startAdvertising();
+        }
+      } else if (!ble.isPaired()) {
+        // Connected but not authenticated for >10s → force reconnect
+        static unsigned long pair_wait_start = 0;
+        if (pair_wait_start == 0) pair_wait_start = now;
+        else if (now - pair_wait_start > 10000) {
+          pair_wait_start = 0;
+          ble.disconnect();
+          delay(100);
+          NimBLEDevice::startAdvertising();
+        }
       }
     }
   }

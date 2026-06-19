@@ -2,16 +2,16 @@
   "version": 1,
   "versions": [
     {
-      "version": "2.2.1",
-      "label": "v2.2.1 (BLE)",
-      "file": "firmware-ble-v2.2.1.bin",
+      "version": "2.2.2",
+      "label": "v2.2.2 (BLE)",
+      "file": "firmware-ble-v2.2.2.bin",
       "address": 0,
       "variant": "ble"
     },
     {
-      "version": "2.2.1",
-      "label": "v2.2.1 (Wired Serial)",
-      "file": "firmware-wired-v2.2.1.bin",
+      "version": "2.2.2",
+      "label": "v2.2.2 (Wired Serial)",
+      "file": "firmware-wired-v2.2.2.bin",
       "address": 0,
       "variant": "wired"
     },
