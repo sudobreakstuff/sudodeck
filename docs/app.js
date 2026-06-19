@@ -1416,7 +1416,7 @@ async function fwFlash() {
 }
 
 // Populate flow builder supported apps marquee
-(function() {
+(function populateMarquee() {
   var names = Object.keys(SHORTCUTS).sort();
   var el = document.getElementById('flowAppCount');
   if (el) el.textContent = names.length;
@@ -1438,18 +1438,18 @@ async function fwFlash() {
   var sections = document.querySelectorAll('.section');
   function showSection(id) {
     sections.forEach(function(s) { s.style.display = s.id === 'section-' + id ? '' : 'none'; });
-    // grid always visible
     var grid = document.getElementById('section-grid');
     if (grid) grid.style.display = '';
     items.forEach(function(it) { it.classList.toggle('active', it.dataset.section === id); });
-    // restart flow marquee animation when section becomes visible
     if (id === 'flow') {
-      var marquee = document.getElementById('flowMarquee');
-      if (marquee) {
-        marquee.style.animation = 'none';
-        void marquee.offsetHeight;
-        marquee.style.animation = '';
-      }
+      setTimeout(function() {
+        var m = document.getElementById('flowMarquee');
+        if (m) {
+          m.style.animation = 'none';
+          void m.offsetHeight;
+          m.style.animation = '';
+        }
+      }, 50);
     }
   }
   items.forEach(function(item) {
@@ -1458,6 +1458,5 @@ async function fwFlash() {
       showSection(this.dataset.section);
     });
   });
-  // Show grid by default
   showSection('grid');
 })();

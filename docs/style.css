@@ -682,13 +682,14 @@
   /* ─── app layout (sidebar + main content) ─── */
   .app-layout {
     display: flex;
-    min-height: calc(100vh - var(--nav-h));
+    height: calc(100vh - var(--nav-h));
     padding-top: var(--nav-h);
   }
   .sidebar {
     width: 140px;
     flex-shrink: 0;
     padding: 20px 4px 20px 12px;
+    overflow-y: auto;
   }
   .sidebar-items {
     display: flex;
@@ -719,16 +720,17 @@
   }
   .main-content {
     flex: 1;
-    padding: 20px 24px 40px 32px;
+    padding: 16px 24px 0 28px;
     min-width: 0;
+    overflow-y: auto;
   }
   .section {
     background: var(--surface);
     border-radius: 12px;
-    padding: 22px;
+    padding: 16px;
   }
   .section + .section {
-    margin-top: 12px;
+    margin-top: 10px;
   }
   .section-grid {
     border: 1px solid var(--acc-dim);
@@ -933,9 +935,9 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--border);
   }
   .badge {
@@ -970,7 +972,7 @@
   .btn.dan { border-color: var(--danger); color: var(--danger); }
   .btn.dan:hover { background: var(--danger); color: var(--bg); box-shadow: 0 2px 12px rgba(255,68,102,0.3); }
 
-  .p-bar { display: flex; gap: 4px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .p-bar { display: flex; gap: 4px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
   .p-tab {
     padding: 5px 14px; border-radius: 4px; cursor: pointer;
     font-size: 0.7rem; font-weight: 600;
@@ -982,20 +984,20 @@
   .p-tab:hover:not(.on) { color: var(--text); border-color: var(--dim); background: rgba(255,255,255,0.02); }
 
   #gp {
-    display: grid; gap: 8px; padding: 16px;
+    display: grid; gap: 6px; padding: 12px;
     background: var(--surface2); border-radius: 0 var(--radius) var(--radius) var(--radius);
-    min-height: 220px; align-content: start;
-    margin-bottom: 12px;
+    min-height: 140px; align-content: start;
+    margin-bottom: 8px;
     border: 1px solid var(--border);
   }
   .gb {
-    aspect-ratio: 1.3;
-    border: none; border-radius: 8px; cursor: pointer;
+    aspect-ratio: 1.5;
+    border: none; border-radius: 6px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font); font-size: 0.75rem; font-weight: 700;
+    font-family: var(--font); font-size: 0.68rem; font-weight: 700;
     color: #fff; transition: all 0.15s; position: relative;
-    min-width: 52px; min-height: 40px;
-    overflow: hidden; padding: 4px 6px;
+    min-width: 40px; min-height: 28px;
+    overflow: hidden; padding: 2px 4px;
     white-space: nowrap; text-overflow: ellipsis;
   }
   .gb::before {
@@ -1055,8 +1057,8 @@
   }
 
   .lc {
-    display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px;
-    padding: 16px; background: var(--surface2); border-radius: var(--radius);
+    display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;
+    padding: 12px; background: var(--surface2); border-radius: var(--radius);
     align-items: flex-end; border: 1px solid var(--border);
   }
   .cg { display: flex; flex-direction: column; gap: 4px; }
@@ -1191,7 +1193,7 @@
       padding: 6px 12px;
       font-size: 0.7rem;
     }
-    .main-content { padding: 12px 12px 24px; }
+    .main-content { padding: 10px 12px 0; }
     .section { padding: 14px; }
   }
 
