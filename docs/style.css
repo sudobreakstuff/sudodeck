@@ -689,7 +689,6 @@
     width: 140px;
     flex-shrink: 0;
     padding: 20px 4px 20px 12px;
-    border-right: 1px solid var(--border);
   }
   .sidebar-items {
     display: flex;
@@ -722,11 +721,9 @@
     flex: 1;
     padding: 20px 24px 40px 32px;
     min-width: 0;
-    max-width: 1000px;
   }
   .section {
     background: var(--surface);
-    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 22px;
   }
@@ -734,7 +731,7 @@
     margin-top: 12px;
   }
   .section-grid {
-    border-color: var(--acc-dim);
+    border: 1px solid var(--acc-dim);
   }
   .section-hdr {
     font-size: 0.8rem;
@@ -1181,8 +1178,6 @@
     .app-layout { flex-direction: column; }
     .sidebar {
       width: 100%;
-      border-right: none;
-      border-bottom: 1px solid var(--border);
       padding: 10px 12px;
       overflow-x: auto;
     }
@@ -1196,7 +1191,7 @@
       padding: 6px 12px;
       font-size: 0.7rem;
     }
-    .main-content { padding: 12px 12px 24px; max-width: none; }
+    .main-content { padding: 12px 12px 24px; }
     .section { padding: 14px; }
   }
 

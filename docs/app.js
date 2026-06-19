@@ -1416,12 +1416,12 @@ async function fwFlash() {
 }
 
 // Populate flow builder supported apps marquee
-function populateFlowMarquee() {
+(function() {
   var names = Object.keys(SHORTCUTS).sort();
   var el = document.getElementById('flowAppCount');
   if (el) el.textContent = names.length;
   var marquee = document.getElementById('flowMarquee');
-  if (marquee && !marquee.dataset.populated) {
+  if (marquee) {
     var logos = names.map(function(n) {
       var a = SHORTCUTS[n];
       var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
@@ -1429,9 +1429,8 @@ function populateFlowMarquee() {
       return '<span class="flow-logo" title="' + esc(n) + (aliases ? ' (' + aliases + ')' : '') + '"><span class="flow-logo-i">' + initials + '</span><span class="flow-logo-n">' + esc(n) + '</span></span>';
     }).join('');
     marquee.innerHTML = logos + logos;
-    marquee.dataset.populated = '1';
   }
-}
+})();
 
 // Sidebar navigation
 (function() {
@@ -1443,8 +1442,15 @@ function populateFlowMarquee() {
     var grid = document.getElementById('section-grid');
     if (grid) grid.style.display = '';
     items.forEach(function(it) { it.classList.toggle('active', it.dataset.section === id); });
-    // populate flow marquee when flow section is shown
-    if (id === 'flow') populateFlowMarquee();
+    // restart flow marquee animation when section becomes visible
+    if (id === 'flow') {
+      var marquee = document.getElementById('flowMarquee');
+      if (marquee) {
+        marquee.style.animation = 'none';
+        void marquee.offsetHeight;
+        marquee.style.animation = '';
+      }
+    }
   }
   items.forEach(function(item) {
     item.addEventListener('click', function(e) {
