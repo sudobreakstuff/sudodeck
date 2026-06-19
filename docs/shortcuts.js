@@ -8332,6 +8332,289 @@ var SHORTCUTS = {  "discord": {
     }
   }
   },
+  "notepad": {
+    "aliases": [
+    "np",
+    "notepad++",
+    "npp"
+  ],
+    "windows": {
+    "new": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "n"
+    },
+    "new file": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "n"
+    },
+    "open": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "o"
+    },
+    "open file": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "o"
+    },
+    "save": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "s"
+    },
+    "save as": {
+      "type": "combo",
+      "mod": "CTRL_SHIFT",
+      "key": "s"
+    },
+    "print": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "p"
+    },
+    "undo": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "z"
+    },
+    "redo": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "y"
+    },
+    "cut": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "x"
+    },
+    "copy": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "c"
+    },
+    "paste": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "v"
+    },
+    "delete": {
+      "type": "key",
+      "value": "DELETE"
+    },
+    "select all": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "a"
+    },
+    "find": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "f"
+    },
+    "find next": {
+      "type": "key",
+      "value": "F3"
+    },
+    "find prev": {
+      "type": "combo",
+      "mod": "SHIFT",
+      "key": "F3"
+    },
+    "replace": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "h"
+    },
+    "go to": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "g"
+    },
+    "go to line": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "g"
+    },
+    "time date": {
+      "type": "key",
+      "value": "F5"
+    },
+    "insert time": {
+      "type": "key",
+      "value": "F5"
+    },
+    "word wrap": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "w"
+    },
+    "toggle wrap": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "w"
+    },
+    "font": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "="
+    },
+    "zoom in": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "="
+    },
+    "zoom out": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "-"
+    },
+    "status bar": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "s"
+    },
+    "toggle status": {
+      "type": "combo",
+      "mod": "CTRL",
+      "key": "s"
+    }
+  },
+    "macos": {
+    "new": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "n"
+    },
+    "new file": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "n"
+    },
+    "open": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "o"
+    },
+    "open file": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "o"
+    },
+    "save": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "s"
+    },
+    "save as": {
+      "type": "combo",
+      "mod": "GUI_SHIFT",
+      "key": "s"
+    },
+    "print": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "p"
+    },
+    "undo": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "z"
+    },
+    "redo": {
+      "type": "combo",
+      "mod": "GUI_SHIFT",
+      "key": "z"
+    },
+    "cut": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "x"
+    },
+    "copy": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "c"
+    },
+    "paste": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "v"
+    },
+    "delete": {
+      "type": "key",
+      "value": "DELETE"
+    },
+    "select all": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "a"
+    },
+    "find": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "f"
+    },
+    "find next": {
+      "type": "key",
+      "value": "F3"
+    },
+    "find prev": {
+      "type": "combo",
+      "mod": "SHIFT",
+      "key": "F3"
+    },
+    "replace": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "h"
+    },
+    "go to": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "g"
+    },
+    "go to line": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "g"
+    },
+    "time date": {
+      "type": "key",
+      "value": "F5"
+    },
+    "insert time": {
+      "type": "key",
+      "value": "F5"
+    },
+    "word wrap": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "w"
+    },
+    "toggle wrap": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "w"
+    },
+    "font": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "="
+    },
+    "zoom in": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "="
+    },
+    "zoom out": {
+      "type": "combo",
+      "mod": "GUI",
+      "key": "-"
+    }
+  }
+  },
   "windows": {
     "aliases": [
     "windows 11",

@@ -429,6 +429,14 @@ document.getElementById('bae').addEventListener('click', function() {
   document.getElementById('ep').style.display = 'none';
   ra(); tm('Button updated');
 });
+document.getElementById('bde').addEventListener('click', function() {
+  var pg = curPage(); if (!pg) return;
+  var idx = sb; if (idx < 0 || idx >= pg.buttons.length) return;
+  pg.buttons.splice(idx, 1);
+  pg.buttons.push({ label: '', color: '#16213E', action: { type: 'key', value: '' } });
+  document.getElementById('ep').style.display = 'none';
+  sb = -1; rg(); tm('Button deleted');
+});
 document.getElementById('bce').addEventListener('click', function() {
   document.getElementById('ep').style.display = 'none';
   sb = -1; rg();
@@ -809,12 +817,10 @@ function parseFlow(text) {
     if (m) {
       var appName = m[2].trim();
       var normalized = normalizeAppName(appName);
-      if (SHORTCUTS[normalized]) {
-        steps.push({ type: 'app', os: 'windows', name: appName });
-        steps.push({ type: 'delay', value: 1500 });
-        appCtx = normalized;
-        continue;
-      }
+      steps.push({ type: 'app', os: 'windows', name: appName });
+      steps.push({ type: 'delay', value: 1500 });
+      if (SHORTCUTS[normalized]) appCtx = normalized;
+      continue;
     }
 
     // Press <key/combo>

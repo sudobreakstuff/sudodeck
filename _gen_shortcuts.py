@@ -784,6 +784,38 @@ app("outlook",["microsoft outlook","ms outlook"],{
     "attach file":C("GUI_SHIFT","a")
 })
 
+# ── NOTEPAD ──
+app("notepad",["np","notepad++","npp"],{
+    "new":C("CTRL","n"),"new file":C("CTRL","n"),
+    "open":C("CTRL","o"),"open file":C("CTRL","o"),
+    "save":C("CTRL","s"),"save as":C("CTRL_SHIFT","s"),
+    "print":C("CTRL","p"),
+    "undo":C("CTRL","z"),"redo":C("CTRL","y"),
+    "cut":C("CTRL","x"),"copy":C("CTRL","c"),"paste":C("CTRL","v"),
+    "delete":K("DELETE"),"select all":C("CTRL","a"),
+    "find":C("CTRL","f"),"find next":K("F3"),"find prev":C("SHIFT","F3"),
+    "replace":C("CTRL","h"),
+    "go to":C("CTRL","g"),"go to line":C("CTRL","g"),
+    "time date":K("F5"),"insert time":K("F5"),
+    "word wrap":C("CTRL","w"),"toggle wrap":C("CTRL","w"),
+    "font":C("CTRL","="),"zoom in":C("CTRL","="),"zoom out":C("CTRL","-"),
+    "status bar":C("CTRL","s"),"toggle status":C("CTRL","s")
+},{
+    "new":C("GUI","n"),"new file":C("GUI","n"),
+    "open":C("GUI","o"),"open file":C("GUI","o"),
+    "save":C("GUI","s"),"save as":C("GUI_SHIFT","s"),
+    "print":C("GUI","p"),
+    "undo":C("GUI","z"),"redo":C("GUI_SHIFT","z"),
+    "cut":C("GUI","x"),"copy":C("GUI","c"),"paste":C("GUI","v"),
+    "delete":K("DELETE"),"select all":C("GUI","a"),
+    "find":C("GUI","f"),"find next":K("F3"),"find prev":C("SHIFT","F3"),
+    "replace":C("GUI","h"),
+    "go to":C("GUI","g"),"go to line":C("GUI","g"),
+    "time date":K("F5"),"insert time":K("F5"),
+    "word wrap":C("GUI","w"),"toggle wrap":C("GUI","w"),
+    "font":C("GUI","="),"zoom in":C("GUI","="),"zoom out":C("GUI","-")
+})
+
 # ── WINDOWS 11 ──
 app("windows",["windows 11","win","windows os"],{
     "lock":C("GUI","l"),"screenshot snip":C("GUI_SHIFT","s"),
