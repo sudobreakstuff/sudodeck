@@ -206,10 +206,13 @@
   if (c) c.textContent = names.length;
   var m = document.getElementById('flowMarquee');
   if (m) {
+    var slugMap = {
+"discord":"discord","slack":"slack","microsoft teams":"microsoftteams","zoom":"zoom","google meet":"googlemeet","obs":"obsstudio","twitch":"twitch","photoshop":"adobephotoshop","premiere pro":"adobepremierepro","after effects":"aftereffects","illustrator":"adobeillustrator","davinci resolve":"davinciresolve","spotify":"spotify","youtube music":"youtubemusic","ableton live":"abletonlive","fl studio":"flstudio","audacity":"audacity","chrome":"googlechrome","firefox":"firefoxbrowser","vscode":"visualstudiocode","obsidian":"obsidian","notion":"notion","excel":"microsoftexcel","outlook":"microsoftoutlook","windows":"windows","macos":"macos"
+    };
     function logo(n) {
-      var slug = n.toLowerCase().replace(/\s+/g, '');
+      var slug = slugMap[n.toLowerCase()] || n.toLowerCase().replace(/\s+/g, '');
       var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
-      return '<span class="flow-logo"><span class="flow-logo-i"><img src="https://cdn.simpleicons.org/' + slug + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initials + '\'" loading="lazy"></span><span class="flow-logo-n">' + n + '</span></span>';
+      return '<span class="flow-logo"><span class="flow-logo-i"><img src="https://cdn.simpleicons.org/' + slug + '" alt="" onerror="this.style.display=\'none\';this.parentNode.textContent=\'' + initials + '\'" loading="lazy" crossorigin="anonymous"></span><span class="flow-logo-n">' + n + '</span></span>';
     }
     m.innerHTML = names.map(logo).join('') + names.map(logo).join('');
   }

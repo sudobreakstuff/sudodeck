@@ -883,9 +883,9 @@
   }
   .flow-marquee {
     display: inline-flex;
-    gap: 6px;
+    gap: 0;
     width: max-content;
-    animation: marqueeScroll 40s linear infinite;
+    animation: marqueeScroll 45s linear infinite;
     padding: 6px 0;
   }
   @keyframes marqueeScroll {
@@ -895,31 +895,35 @@
   .flow-logo {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 2px 8px 2px 2px;
+    gap: 6px;
+    padding: 4px 12px 4px 4px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    font-size: 0.68rem;
+    border-radius: 18px;
+    font-size: 0.78rem;
     white-space: nowrap;
-    margin-right: 6px;
+    margin-right: 8px;
   }
   .flow-logo-i {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: var(--acc-dim);
+    color: var(--acc);
+    font-size: 0.65rem;
+    font-weight: 700;
     flex-shrink: 0;
     overflow: hidden;
   }
   .flow-logo-i img {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
     display: block;
   }
+  .flow-logo-n { color: var(--dim); }
   .flow-logo-n { color: var(--dim); }
   .cfg-box {
     max-width: 1040px;
