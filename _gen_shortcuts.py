@@ -6,7 +6,10 @@ def app(name, aliases, win, mac=None):
 
 # ── HELPERS ──
 K = lambda v: {"type":"key","value":v}
-C = lambda m,k: {"type":"combo","mod":m,"key":k}
+def C(*args):
+    if len(args) == 2:
+        return {"type":"combo","mod":args[0],"key":args[1]}
+    return {"type":"combo","mod":"_".join(args[:-1]),"key":args[-1]}
 
 # ── DISCORD ──
 app("discord",["disc","dc","discordapp"],{
@@ -738,7 +741,7 @@ app("excel",["microsoft excel","ms excel"],{
     "bold":C("CTRL","b"),"italic":C("CTRL","i"),"underline":C("CTRL","u"),
     "go to":C("CTRL","g"),"go to cell":C("CTRL","g"),
     "insert chart":K("F11"),"insert function":C("SHIFT","F3"),
-    "create table":C("CTRL","t"),"create pivot":C("ALT","n"),"sum":"C(ALT,"=")",
+    "create table":C("CTRL","t"),"create pivot":C("ALT","n"),"sum":C("ALT","="),
     "format cells":C("CTRL","1"),"fill right":C("CTRL","r"),"fill down":C("CTRL","d"),
     "filter":C("CTRL_SHIFT","l"),"sort ascending":C("ALT_SHIFT","s"),
     "group":C("ALT_SHIFT","RIGHT"),"ungroup":C("ALT_SHIFT","LEFT"),
@@ -786,8 +789,8 @@ app("windows",["windows 11","win","windows os"],{
     "lock":C("GUI","l"),"screenshot snip":C("GUI_SHIFT","s"),
     "full screenshot":C("GUI","PRINTSCREEN"),"snipping tool":C("GUI_SHIFT","s"),
     "clipboard":C("GUI","v"),"task manager":C("CTRL_SHIFT","ESC"),
-    "task view":C("GUI","TAB"),"new desktop":C("GUI","CTRL_d"),
-    "switch desktop right":C("GUI","CTRL_RIGHT"),"switch desktop left":C("GUI","CTRL_LEFT"),
+    "task view":C("GUI","TAB"),"new desktop":C("GUI_CTRL","d"),
+    "switch desktop right":C("GUI_CTRL","RIGHT"),"switch desktop left":C("GUI_CTRL","LEFT"),
     "snap left":C("GUI","LEFT"),"snap right":C("GUI","RIGHT"),
     "snap up":C("GUI","UP"),"snap down":C("GUI","DOWN"),
     "file explorer":C("GUI","e"),"run":C("GUI","r"),"settings":C("GUI","i"),
