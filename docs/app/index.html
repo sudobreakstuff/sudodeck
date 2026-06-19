@@ -206,11 +206,11 @@
   if (c) c.textContent = names.length;
   var m = document.getElementById('flowMarquee');
   if (m) {
-    m.innerHTML = names.map(function(n) {
-      return '<span class="flow-logo">' + n + '</span>';
-    }).join('') + names.map(function(n) {
-      return '<span class="flow-logo">' + n + '</span>';
-    }).join('');
+    function logo(n) {
+      var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+      return '<span class="flow-logo"><span class="flow-logo-i">' + initials + '</span><span class="flow-logo-n">' + n + '</span></span>';
+    }
+    m.innerHTML = names.map(logo).join('') + names.map(logo).join('');
   }
 })();
 </script>

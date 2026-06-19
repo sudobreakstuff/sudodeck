@@ -895,15 +895,29 @@
   .flow-logo {
     display: inline-flex;
     align-items: center;
-    padding: 3px 10px;
+    gap: 5px;
+    padding: 2px 8px 2px 2px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    font-size: 0.7rem;
-    color: var(--acc);
+    border-radius: 14px;
+    font-size: 0.68rem;
     white-space: nowrap;
     margin-right: 6px;
   }
+  .flow-logo-i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--acc-dim);
+    color: var(--acc);
+    font-size: 0.55rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .flow-logo-n { color: var(--dim); }
   .cfg-box {
     max-width: 1040px;
     margin: 0 auto;
@@ -977,10 +991,10 @@
   .gb {
     border: none; border-radius: 5px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font); font-size: 0.65rem; font-weight: 700;
+    font-family: var(--font); font-size: 0.7rem; font-weight: 700;
     color: #fff; transition: all 0.15s; position: relative;
-    height: 52px; width: 100%;
-    overflow: hidden; padding: 2px 4px;
+    height: 62px; width: 100%;
+    overflow: hidden; padding: 2px 6px;
     white-space: nowrap; text-overflow: ellipsis;
   }
   .gb::before {
