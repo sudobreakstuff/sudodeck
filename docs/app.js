@@ -260,6 +260,7 @@ function rg() {
   if (!cd || !cd.grid) return;
   var cols = cd.grid.cols, rows = cd.grid.rows;
   g.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+  g.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
   var p = curPage();
   if (!p) { g.innerHTML = ''; return; }
   g.innerHTML = '';
@@ -1425,14 +1426,8 @@ async function fwFlash() {
     if (grid) grid.style.display = '';
     items.forEach(function(it) { it.classList.toggle('active', it.dataset.section === id); });
     if (id === 'flow') {
-      setTimeout(function() {
-        var m = document.getElementById('flowMarquee');
-        if (m) {
-          m.style.animation = 'none';
-          void m.offsetHeight;
-          m.style.animation = '';
-        }
-      }, 50);
+      var m = document.getElementById('flowMarquee');
+      if (m) { m.style.animation = 'none'; void m.offsetHeight; m.style.animation = ''; }
     }
   }
   items.forEach(function(item) {
