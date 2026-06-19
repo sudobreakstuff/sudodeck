@@ -478,10 +478,6 @@ if (hero) {
 
 // ── Screensaver ──
 
-document.getElementById('saverToggle').addEventListener('click', function() {
-  var b = document.getElementById('saverBody');
-  b.classList.toggle('open');
-});
 async function saverSync() {
   if (!dw) return;
   try { var r = await sc({ cmd: 'get_saver' });
@@ -556,15 +552,8 @@ document.getElementById('btnThemeSet').addEventListener('click', async function(
   syncTheme();
   try { await sc({ cmd: 'set_theme', theme: cd.theme }); tm('Theme: ' + cd.theme.name + ', ' + cd.theme.button_style); } catch (e) { tm('Theme command failed', 'ng'); }
 });
-document.getElementById('themeToggle').addEventListener('click', function() {
-  document.getElementById('themeBody').classList.toggle('open');
-});
 
 // ── Widgets ──
-
-document.getElementById('widgetToggle').addEventListener('click', function() {
-  document.getElementById('widgetBody').classList.toggle('open');
-});
 document.getElementById('btnWidgetAdd').addEventListener('click', function() {
   if (!cd) return;
   if (!cd.widgets) cd.widgets = [];
@@ -702,10 +691,6 @@ function renderAutoActionFields(idx, action) {
   }
   el.innerHTML = h;
 }
-
-document.getElementById('autoToggle').addEventListener('click', function() {
-  document.getElementById('autoBody').classList.toggle('open');
-});
 
 document.getElementById('btnAutoAdd').addEventListener('click', function() {
   if (!cd) return;
@@ -1430,17 +1415,27 @@ async function fwFlash() {
   btn.disabled = false; btn.textContent = 'Flash';
 }
 
-// Populate flow builder app list from SHORTCUTS
+// Card toggle
+function tc(hdr) {
+  var card = hdr.closest('.card');
+  if (!card) return;
+  card.classList.toggle('open');
+}
+
+// Populate flow builder supported apps marquee
 (function() {
   var names = Object.keys(SHORTCUTS).sort();
   var el = document.getElementById('flowAppCount');
   if (el) el.textContent = names.length;
-  var list = document.getElementById('flowAppList');
-  if (list) {
-    list.innerHTML = names.map(function(n) {
+  var marquee = document.getElementById('flowMarquee');
+  if (marquee) {
+    // Duplicate for seamless scroll
+    var logos = names.map(function(n) {
       var a = SHORTCUTS[n];
+      var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
       var aliases = (a.aliases || []).join(', ');
-      return '<span title="' + esc(aliases) + '" style="cursor:help;display:inline-block;margin:0 6px 2px 0">' + esc(n) + '</span>';
+      return '<span class="flow-logo" title="' + esc(n) + (aliases ? ' (' + aliases + ')' : '') + '"><span class="flow-logo-i">' + initials + '</span><span class="flow-logo-n">' + esc(n) + '</span></span>';
     }).join('');
+    marquee.innerHTML = logos + logos;
   }
 })();

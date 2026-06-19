@@ -679,38 +679,210 @@
     margin: 0 auto;
   }
 
-  /* ─── nav blocks ─── */
-  .nav-blocks {
+  /* ─── nav pills ─── */
+  .nav-pills {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
     flex-wrap: wrap;
-    padding: 24px 16px 8px;
+    padding: 20px 16px 0;
     max-width: 1040px;
     margin: 0 auto;
   }
-  .nav-block {
+  .nav-pill {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px;
+    padding: 8px 16px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 20px;
     color: var(--dim);
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 500;
     text-decoration: none;
     transition: all 0.2s;
-    cursor: pointer;
   }
-  .nav-block:hover {
+  .nav-pill:hover {
     border-color: var(--acc);
     color: var(--acc);
     background: color-mix(in srgb, var(--acc) 8%, var(--surface));
   }
 
-  /* ─── config tool ─── */
+  /* ─── app cards ─── */
+  .app-section {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .card-hdr:hover { background: rgba(255,255,255,0.02); }
+  .card-hdr-l {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--acc) 12%, var(--surface));
+    color: var(--acc);
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .card-desc {
+    font-size: 0.72rem;
+    color: var(--dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card-arrow {
+    font-size: 0.6rem;
+    color: var(--dim);
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .card.open .card-arrow { transform: rotate(180deg); }
+  .card-body {
+    display: none;
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .card.open .card-body { display: block; }
+
+  /* ─── flow syntax reference ─── */
+  .flow-syntax {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .flow-syntax-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .flow-syntax-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px 16px;
+  }
+  .flow-syntax-grid > div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    padding: 3px 0;
+  }
+  .flow-syntax-grid code {
+    font-size: 0.7rem;
+    background: var(--surface);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--acc);
+    white-space: nowrap;
+  }
+  .flow-syntax-grid span {
+    color: var(--dim);
+  }
+
+  /* ─── app logo marquee ─── */
+  .flow-marquee-wrap {
+    overflow: hidden;
+    position: relative;
+    margin-top: 4px;
+  }
+  .flow-marquee-wrap::before,
+  .flow-marquee-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .flow-marquee-wrap::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg), transparent);
+  }
+  .flow-marquee-wrap::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg), transparent);
+  }
+  .flow-marquee {
+    display: flex;
+    gap: 8px;
+    width: max-content;
+    animation: marqueeScroll 40s linear infinite;
+    padding: 6px 0;
+  }
+  @keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .flow-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.68rem;
+    white-space: nowrap;
+    cursor: help;
+    transition: border-color 0.15s;
+  }
+  .flow-logo:hover { border-color: var(--acc); }
+  .flow-logo-i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--acc) 20%, var(--surface));
+    color: var(--acc);
+    font-size: 0.55rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .flow-logo-n { color: var(--dim); }
   .cfg-box {
     max-width: 1040px;
     margin: 0 auto;
