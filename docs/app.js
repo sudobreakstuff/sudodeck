@@ -260,7 +260,6 @@ function rg() {
   if (!cd || !cd.grid) return;
   var cols = cd.grid.cols, rows = cd.grid.rows;
   g.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
-  g.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
   var p = curPage();
   if (!p) { g.innerHTML = ''; return; }
   g.innerHTML = '';
