@@ -679,34 +679,73 @@
     margin: 0 auto;
   }
 
-  /* ─── nav pills ─── */
-  .nav-pills {
+  /* ─── app layout (sidebar + main content) ─── */
+  .app-layout {
     display: flex;
-    gap: 6px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 20px 16px 0;
-    max-width: 1040px;
+    min-height: calc(100vh - var(--nav-h));
+    padding-top: var(--nav-h);
+    max-width: 1200px;
     margin: 0 auto;
   }
-  .nav-pill {
+  .sidebar {
+    width: 160px;
+    flex-shrink: 0;
+    padding: 20px 8px;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-items {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
+    flex-direction: column;
+    gap: 2px;
+    position: sticky;
+    top: calc(var(--nav-h) + 20px);
+  }
+  .sidebar-item {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+  }
+  .sidebar-item:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+  .sidebar-item.active {
+    color: var(--acc);
+    background: var(--acc-dim);
+  }
+  .main-content {
+    flex: 1;
+    padding: 20px 24px 40px;
+    min-width: 0;
+  }
+  .section {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--dim);
-    font-size: 0.78rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s;
+    border-radius: 12px;
+    padding: 18px;
   }
-  .nav-pill:hover {
-    border-color: var(--acc);
+  .section + .section {
+    margin-top: 10px;
+  }
+  .section-grid {
+    border-color: var(--acc-dim);
+  }
+  .section-hdr {
+    font-size: 0.8rem;
+    font-weight: 700;
     color: var(--acc);
-    background: color-mix(in srgb, var(--acc) 8%, var(--surface));
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
   }
 
   /* ─── app cards ─── */
@@ -1138,6 +1177,29 @@
   .d4 { transition-delay: 0.2s; }
   .d5 { transition-delay: 0.25s; }
   .d6 { transition-delay: 0.3s; }
+
+  @media (max-width: 760px) {
+    .app-layout { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 12px;
+      overflow-x: auto;
+    }
+    .sidebar-items {
+      flex-direction: row;
+      position: static;
+      gap: 4px;
+    }
+    .sidebar-item {
+      white-space: nowrap;
+      padding: 6px 12px;
+      font-size: 0.7rem;
+    }
+    .main-content { padding: 12px 12px 24px; }
+    .section { padding: 12px; }
+  }
 
   @media (max-width: 640px) {
     section { padding: 40px 16px; }

@@ -195,7 +195,7 @@ function syncWidgets() {
   var el = document.getElementById('widgetList');
   el.innerHTML = '';
   var h = document.getElementById('widgetHint');
-  h.textContent = cd.widgets.length + ' configured';
+  if (h) h.textContent = cd.widgets.length + ' configured';
   cd.widgets.forEach(function(w,i) {
     var c = document.createElement('div');
     c.className = 'widget-card';
@@ -483,7 +483,7 @@ async function saverSync() {
   try { var r = await sc({ cmd: 'get_saver' });
     document.getElementById('saverTimeout').value = r.timeout || 30;
     document.getElementById('saverSleep').value = r.sleep != null ? r.sleep : 60;
-    document.getElementById('saverHint').textContent = r.timeout + 's / sleep ' + (r.sleep || 'off');
+    var sh = document.getElementById('saverHint'); if (sh) sh.textContent = r.timeout + 's / sleep ' + (r.sleep || 'off');
     if (r.mode) document.getElementById('saverMode').value = r.mode;
     if (cd && cd.saver) { cd.saver.timeout = r.timeout || 30; cd.saver.sleep = r.sleep || 60; cd.saver.mode = modeToInt(r.mode || 'matrix'); }
   } catch (e) {}
@@ -627,7 +627,7 @@ function syncAutoUI() {
   if (!cd) return;
   syncAutomations();
   var h = document.getElementById('autoHint');
-  h.textContent = cd.automations.length;
+  if (h) h.textContent = cd.automations.length;
   var el = document.getElementById('autoList');
   el.innerHTML = '';
   cd.automations.forEach(function(a, i) {
@@ -1415,21 +1415,13 @@ async function fwFlash() {
   btn.disabled = false; btn.textContent = 'Flash';
 }
 
-// Card toggle
-function tc(hdr) {
-  var card = hdr.closest('.card');
-  if (!card) return;
-  card.classList.toggle('open');
-}
-
 // Populate flow builder supported apps marquee
-(function() {
+function populateFlowMarquee() {
   var names = Object.keys(SHORTCUTS).sort();
   var el = document.getElementById('flowAppCount');
   if (el) el.textContent = names.length;
   var marquee = document.getElementById('flowMarquee');
-  if (marquee) {
-    // Duplicate for seamless scroll
+  if (marquee && !marquee.dataset.populated) {
     var logos = names.map(function(n) {
       var a = SHORTCUTS[n];
       var initials = n.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
@@ -1437,5 +1429,29 @@ function tc(hdr) {
       return '<span class="flow-logo" title="' + esc(n) + (aliases ? ' (' + aliases + ')' : '') + '"><span class="flow-logo-i">' + initials + '</span><span class="flow-logo-n">' + esc(n) + '</span></span>';
     }).join('');
     marquee.innerHTML = logos + logos;
+    marquee.dataset.populated = '1';
   }
+}
+
+// Sidebar navigation
+(function() {
+  var items = document.querySelectorAll('.sidebar-item');
+  var sections = document.querySelectorAll('.section');
+  function showSection(id) {
+    sections.forEach(function(s) { s.style.display = s.id === 'section-' + id ? '' : 'none'; });
+    // grid always visible
+    var grid = document.getElementById('section-grid');
+    if (grid) grid.style.display = '';
+    items.forEach(function(it) { it.classList.toggle('active', it.dataset.section === id); });
+    // populate flow marquee when flow section is shown
+    if (id === 'flow') populateFlowMarquee();
+  }
+  items.forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      showSection(this.dataset.section);
+    });
+  });
+  // Show grid by default
+  showSection('grid');
 })();

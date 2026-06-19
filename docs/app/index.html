@@ -25,76 +25,26 @@
   </ul>
 </nav>
 
-<!-- ─── Nav Pills ─── -->
-<div class="nav-pills">
-  <a href="#card-firmware" class="nav-pill">Firmware</a>
-  <a href="#card-grid" class="nav-pill">Grid</a>
-  <a href="#card-screensaver" class="nav-pill">Screensaver</a>
-  <a href="#card-theme" class="nav-pill">Theme</a>
-  <a href="#card-widgets" class="nav-pill">Widgets</a>
-  <a href="#card-automations" class="nav-pill">Automations</a>
-  <a href="#card-flow" class="nav-pill">Flow Builder</a>
-</div>
+<div class="app-layout">
 
-<div class="app-section">
-
-  <!-- ─── Firmware Card ─── -->
-  <div class="card" id="card-firmware">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="15" y2="22"/><line x1="12" y1="18" x2="12" y2="22"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-        <span class="card-title">Firmware</span>
-        <span class="card-desc">Back up, update, or flash your SudoDeck</span>
-      </div>
-      <span class="card-arrow">&#9660;</span>
-    </div>
-    <div class="card-body">
-      <div class="fmw">
-        <div class="fmw-hdr">
-          <p class="fmw-note">Hold BOOT + tap RESET, release BOOT — then click Connect.</p>
-          <button class="btn pri" id="btnFwConnect" onclick="fwConnect()">Connect</button>
-          <span class="fmw-st" id="fwStatus">Disconnected</span>
-        </div>
-        <div class="fmw-variant">
-          <label class="fmw-vl"><input type="radio" name="fwVariant" value="ble" checked onchange="fwApplyVariant()"> Standard (BLE)</label>
-          <label class="fmw-vl"><input type="radio" name="fwVariant" value="wired" onchange="fwApplyVariant()"> Wired (Serial)</label>
-          <span class="fmw-vn" id="fwVariantNote">Bluetooth keyboard — no extra software.</span>
-        </div>
-        <div class="fmw-actions">
-          <button class="btn" id="btnFwBackup" onclick="fwBackup()" disabled>Backup</button>
-          <div class="fmw-flash">
-            <select id="fwVersion" onchange="fwVersionChanged()"><option value="">Select version</option></select>
-            <span class="fw-or">or</span>
-            <label class="btn" id="btnFwFlashLabel"><input type="file" id="btnFwFile" accept=".bin" onchange="fwFileSelected()" hidden>Custom .bin</label>
-            <button class="btn dan" id="btnFwFlash" onclick="fwFlash()" disabled>Flash</button>
-          </div>
-        </div>
-        <pre class="fmw-log" id="fwLog">Ready.</pre>
-        <div class="fmw-bar-wrap"><div class="fmw-bar" id="fwBar"></div></div>
-      </div>
-      <div class="fmw" id="daemonSetup" style="margin-top:12px;display:none">
-        <div class="fmw-hdr"><h3 style="margin:0;font-size:0.9rem">Daemon <span class="fmw-vn">ADVANCED</span></h3></div>
-        <p style="color:var(--dim);font-size:0.82rem;margin-bottom:8px">Injects keystrokes over USB. Installs silently — plug and play.</p>
-        <div class="fmw-actions" style="margin-bottom:0">
-          <button class="btn pri" id="btnDaemonDownload" onclick="daemonDownload()">Download for <span id="daemonOs">your OS</span></button>
-          <span style="font-size:0.78rem;color:var(--dim)" id="daemonFileName"></span>
-        </div>
-        <pre class="fmw-log" id="daemonLog" style="height:auto;min-height:50px;margin-top:8px;font-size:0.8rem">Select Wired (Serial) above to see daemon options.</pre>
-      </div>
+  <!-- ─── Sidebar ─── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-items">
+      <a class="sidebar-item active" data-section="grid">Grid</a>
+      <a class="sidebar-item" data-section="firmware">Firmware</a>
+      <a class="sidebar-item" data-section="screensaver">Screensaver</a>
+      <a class="sidebar-item" data-section="theme">Theme</a>
+      <a class="sidebar-item" data-section="widgets">Widgets</a>
+      <a class="sidebar-item" data-section="automations">Automations</a>
+      <a class="sidebar-item" data-section="flow">Flow Builder</a>
     </div>
   </div>
 
-  <!-- ─── Grid Card ─── -->
-  <div class="card" id="card-grid">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
-        <span class="card-title">Grid</span>
-        <span class="card-desc">Edit buttons, layout, pages, and WiFi</span>
-      </div>
-      <span class="card-arrow">&#9660;</span>
-    </div>
-    <div class="card-body">
+  <!-- ─── Main Content ─── -->
+  <div class="main-content">
+
+    <!-- ─── Grid Section (always visible) ─── -->
+    <div class="section section-grid" id="section-grid">
       <div class="cfg-bar">
         <div id="sb" class="badge off"><div class="dot r"></div><span>DISCONNECTED</span></div>
         <div class="tb" style="margin:0;">
@@ -133,94 +83,86 @@
         <button class="btn" id="btnWifiSet" style="display:none">Set WiFi</button>
       </div>
     </div>
-  </div>
 
-  <!-- ─── Screensaver Card ─── -->
-  <div class="card" id="card-screensaver">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
-        <span class="card-title">Screensaver</span>
-        <span class="card-desc">Set idle timeout, sleep delay, and display mode</span>
+    <!-- ─── Firmware Section ─── -->
+    <div class="section" id="section-firmware" style="display:none">
+      <div class="section-hdr">Firmware</div>
+      <div class="fmw">
+        <div class="fmw-hdr">
+          <p class="fmw-note">Hold BOOT + tap RESET, release BOOT — then click Connect.</p>
+          <button class="btn pri" id="btnFwConnect" onclick="fwConnect()">Connect</button>
+          <span class="fmw-st" id="fwStatus">Disconnected</span>
+        </div>
+        <div class="fmw-variant">
+          <label class="fmw-vl"><input type="radio" name="fwVariant" value="ble" checked onchange="fwApplyVariant()"> Standard (BLE)</label>
+          <label class="fmw-vl"><input type="radio" name="fwVariant" value="wired" onchange="fwApplyVariant()"> Wired (Serial)</label>
+          <span class="fmw-vn" id="fwVariantNote">Bluetooth keyboard — no extra software.</span>
+        </div>
+        <div class="fmw-actions">
+          <button class="btn" id="btnFwBackup" onclick="fwBackup()" disabled>Backup</button>
+          <div class="fmw-flash">
+            <select id="fwVersion" onchange="fwVersionChanged()"><option value="">Select version</option></select>
+            <span class="fw-or">or</span>
+            <label class="btn" id="btnFwFlashLabel"><input type="file" id="btnFwFile" accept=".bin" onchange="fwFileSelected()" hidden>Custom .bin</label>
+            <button class="btn dan" id="btnFwFlash" onclick="fwFlash()" disabled>Flash</button>
+          </div>
+        </div>
+        <pre class="fmw-log" id="fwLog">Ready.</pre>
+        <div class="fmw-bar-wrap"><div class="fmw-bar" id="fwBar"></div></div>
       </div>
-      <span class="card-arrow">&#9660;</span>
+      <div class="fmw" id="daemonSetup" style="margin-top:12px;display:none">
+        <div class="fmw-hdr"><h3 style="margin:0;font-size:0.9rem">Daemon <span class="fmw-vn">ADVANCED</span></h3></div>
+        <p style="color:var(--dim);font-size:0.82rem;margin-bottom:8px">Injects keystrokes over USB. Installs silently — plug and play.</p>
+        <div class="fmw-actions" style="margin-bottom:0">
+          <button class="btn pri" id="btnDaemonDownload" onclick="daemonDownload()">Download for <span id="daemonOs">your OS</span></button>
+          <span style="font-size:0.78rem;color:var(--dim)" id="daemonFileName"></span>
+        </div>
+        <pre class="fmw-log" id="daemonLog" style="height:auto;min-height:50px;margin-top:8px;font-size:0.8rem">Select Wired (Serial) above to see daemon options.</pre>
+      </div>
     </div>
-    <div class="card-body">
+
+    <!-- ─── Screensaver Section ─── -->
+    <div class="section" id="section-screensaver" style="display:none">
+      <div class="section-hdr">Screensaver</div>
       <div class="er">
         <label>Timeout</label><input type="number" id="saverTimeout" min="5" max="600" value="30"><span style="font-size:0.7rem;color:var(--dim)">sec</span>
         <label style="min-width:auto;margin-left:8px">Sleep</label><input type="number" id="saverSleep" min="0" max="600" value="60" style="width:60px"><span style="font-size:0.7rem;color:var(--dim)">sec (0=off)</span>
         <button class="btn pri" id="btnSaverSet" style="margin-left:auto">Set</button>
       </div>
-      <div class="er" style="margin-bottom:0">
+      <div class="er" style="margin-bottom:0;margin-top:8px">
         <label>Mode</label>
         <select id="saverMode" style="flex:1"><option value="matrix">Matrix Rain</option><option value="f1">F1 Standings</option><option value="custom">Custom Widgets</option></select>
         <button class="btn pri" id="btnSaverModeSet" style="margin-left:auto">Set</button>
       </div>
     </div>
-  </div>
 
-  <!-- ─── Theme Card ─── -->
-  <div class="card" id="card-theme">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
-        <span class="card-title">Theme</span>
-        <span class="card-desc">Change colours, button style, and preview</span>
-      </div>
-      <span class="card-arrow">&#9660;</span>
-    </div>
-    <div class="card-body">
+    <!-- ─── Theme Section ─── -->
+    <div class="section" id="section-theme" style="display:none">
+      <div class="section-hdr">Theme</div>
       <div id="themePreview"></div>
-      <div class="er"><label>Theme</label><select id="themeName"><option value="default">Default (green)</option><option value="midnight">Midnight (purple)</option><option value="forest">Forest (green)</option><option value="amber">Amber (orange)</option><option value="cyberpunk">Cyberpunk (pink)</option><option value="monochrome">Monochrome (grey)</option><option value="ocean">Ocean (cyan)</option><option value="blood">Blood (red)</option><option value="nord">Nord (ice blue)</option><option value="dracula">Dracula (pink)</option></select></div>
+      <div class="er" style="margin-top:8px"><label>Theme</label><select id="themeName"><option value="default">Default (green)</option><option value="midnight">Midnight (purple)</option><option value="forest">Forest (green)</option><option value="amber">Amber (orange)</option><option value="cyberpunk">Cyberpunk (pink)</option><option value="monochrome">Monochrome (grey)</option><option value="ocean">Ocean (cyan)</option><option value="blood">Blood (red)</option><option value="nord">Nord (ice blue)</option><option value="dracula">Dracula (pink)</option></select></div>
       <div class="er"><label>Button Style</label><select id="themeStyle"><option value="flat">Flat</option><option value="outlined">Outlined</option><option value="neon">Neon</option><option value="soft">Soft</option><option value="shadow">Shadow</option></select></div>
       <div id="themeStylePreview" style="display:flex;gap:4px;margin-top:4px"></div>
       <button class="btn pri" id="btnThemeSet" style="margin-top:8px">Set Theme</button>
     </div>
-  </div>
 
-  <!-- ─── Widgets Card ─── -->
-  <div class="card" id="card-widgets">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg></span>
-        <span class="card-title">Custom Widgets</span>
-        <span class="card-desc">Add live data displays — weather, stats, anything API</span>
-      </div>
-      <span class="card-arrow">&#9660;</span>
-    </div>
-    <div class="card-body">
+    <!-- ─── Widgets Section ─── -->
+    <div class="section" id="section-widgets" style="display:none">
+      <div class="section-hdr">Custom Widgets</div>
       <div id="widgetList"></div>
       <button class="btn pri" id="btnWidgetAdd" style="margin-top:8px">+ Add Widget</button>
     </div>
-  </div>
 
-  <!-- ─── Automations Card ─── -->
-  <div class="card" id="card-automations">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
-        <span class="card-title">Automations</span>
-        <span class="card-desc">Schedule button presses at specific times or days</span>
-      </div>
-      <span class="card-arrow">&#9660;</span>
-    </div>
-    <div class="card-body">
+    <!-- ─── Automations Section ─── -->
+    <div class="section" id="section-automations" style="display:none">
+      <div class="section-hdr">Automations</div>
       <div id="autoList"></div>
       <button class="btn pri" id="btnAutoAdd" style="margin-top:8px">+ Add Automation</button>
     </div>
-  </div>
 
-  <!-- ─── Flow Builder Card ─── -->
-  <div class="card" id="card-flow">
-    <div class="card-hdr" onclick="tc(this)">
-      <div class="card-hdr-l">
-        <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
-        <span class="card-title">Flow Builder</span>
-        <span class="card-desc">Describe actions in plain English — auto-converts to button macros</span>
-      </div>
-      <span class="card-arrow">&#9660;</span>
-    </div>
-    <div class="card-body">
+    <!-- ─── Flow Builder Section ─── -->
+    <div class="section" id="section-flow" style="display:none">
+      <div class="section-hdr">Flow Builder</div>
       <textarea id="flowInput" rows="4" placeholder="unmute discord&#10;open chrome&#10;go to youtube.com&#10;wait 3s&#10;press f" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:10px;font-family:var(--mono);font-size:0.82rem;resize:vertical"></textarea>
       <div style="display:flex;gap:6px;margin-top:8px">
         <button class="btn pri" id="btnFlowParse">Parse</button>
@@ -230,8 +172,6 @@
       <div id="flowActions" style="display:none;gap:6px;margin-top:8px">
         <button class="btn pri" id="btnFlowAddGrid">Add to Grid</button>
       </div>
-
-      <!-- ─── Syntax reference (always visible) ─── -->
       <div class="flow-syntax">
         <div class="flow-syntax-title">Commands</div>
         <div class="flow-syntax-grid">
@@ -250,8 +190,8 @@
         </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
 
 <footer>
