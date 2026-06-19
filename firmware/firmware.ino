@@ -1604,6 +1604,21 @@ void setup() {
     (void)s;
   });
   ble.begin();
+  // Derive a static BLE address from the chip's unique efuse MAC so Windows
+  // always sees the same device after power-cycle (fixes re-pair on replug).
+  {
+    uint64_t chipId = ESP.getEfuseMac();
+    uint8_t btaddr[6] = {
+      uint8_t(chipId >> 40),
+      uint8_t(chipId >> 32),
+      uint8_t(chipId >> 24),
+      uint8_t(chipId >> 16),
+      uint8_t(chipId >> 8),
+      uint8_t(chipId)
+    };
+    btaddr[0] = 0xC0 | (btaddr[0] & 0x3F); // mark as static random address
+    NimBLEDevice::setOwnAddr(btaddr);
+  }
   NimBLEDevice::startAdvertising();
   ble_ready = true;
   draw_header();

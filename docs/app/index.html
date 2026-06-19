@@ -245,6 +245,23 @@
           <button class="btn pri" id="btnAutoAdd" style="margin-top:8px">+ Add Automation</button>
         </div>
       </div>
+      <div class="saver-fold" style="margin-top:6px">
+        <div class="saver-hdr" id="flowToggle">
+          <span>Flow Builder</span>
+          <span class="saver-hint" id="flowHint">0 steps</span>
+        </div>
+        <div class="saver-body" id="flowBody">
+          <textarea id="flowInput" rows="4" placeholder="unmute discord&#10;open obs&#10;start recording&#10;wait 2s&#10;stop recording" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:8px;font-family:var(--mono);font-size:0.75rem;resize:vertical"></textarea>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn pri" id="btnFlowParse">Parse</button>
+            <button class="btn" id="btnFlowClear">Clear</button>
+          </div>
+          <div id="flowResult"></div>
+          <div id="flowActions" style="display:none;gap:6px;margin-top:6px">
+            <button class="btn pri" id="btnFlowAddGrid">Add to Grid</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -253,6 +270,7 @@
   <a href="https://github.com/sudobreakstuff/sudodeck">SudoDeck</a> &mdash; cheap. open. yours. &mdash; R1,099 in SA &mdash; built by Shahid Singh
 </footer>
 
+<script src="../shortcuts.js"></script>
 <script src="../app.js"></script>
 </body>
 </html>

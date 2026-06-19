@@ -263,6 +263,7 @@ function rg() {
   var p = curPage();
   if (!p) { g.innerHTML = ''; return; }
   g.innerHTML = '';
+  var dragSrc = null;
   for (var i = 0; i < cols * rows; i++) {
     var b = document.createElement('div');
     b.className = 'gb';
@@ -271,6 +272,15 @@ function rg() {
     var d = p.buttons[i] || { label: '', color: '#16213E' };
     b.style.backgroundColor = d.color || '#16213E';
     b.innerHTML = '<span class="ix">' + (i + 1) + '</span>' + (d.label || '...');
+    b.draggable = true;
+    (function(el, idx) {
+      el.addEventListener('dragstart', function(e) { dragSrc = idx; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', idx); el.classList.add('drag-src'); });
+      el.addEventListener('dragenter', function(e) { e.preventDefault(); if (dragSrc !== idx) el.classList.add('drag-over'); });
+      el.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+      el.addEventListener('dragleave', function(e) { el.classList.remove('drag-over'); });
+      el.addEventListener('drop', function(e) { e.preventDefault(); el.classList.remove('drag-over'); if (dragSrc === null || dragSrc === idx) return; var pg = curPage(); if (!pg) return; var tmp = pg.buttons[dragSrc]; pg.buttons[dragSrc] = pg.buttons[idx]; pg.buttons[idx] = tmp; sb = idx; rg(); se(idx); dragSrc = null; });
+      el.addEventListener('dragend', function() { g.querySelectorAll('.gb').forEach(function(el2) { el2.classList.remove('drag-src', 'drag-over'); }); dragSrc = null; });
+    })(b, i);
     b.addEventListener('click', function(idx) { return function() { sb = idx; rg(); se(idx); }; }(i));
     g.appendChild(b);
   }
@@ -769,6 +779,338 @@ document.getElementById('autoList').addEventListener('change', function(e) {
 });
 
 ic(); ra();
+
+/* ── Flow Builder ── */
+var flowSteps = [];
+
+function normalizeAppName(name) {
+  var n = name.trim().toLowerCase();
+  for (var k in SHORTCUTS) {
+    if (k === n) return k;
+    var aliases = SHORTCUTS[k].aliases || [];
+    for (var a = 0; a < aliases.length; a++) {
+      if (aliases[a] === n) return k;
+    }
+  }
+  return n;
+}
+
+function parseFlow(text) {
+  var lines = text.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+  var steps = [];
+  var appCtx = null;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var lower = line.toLowerCase();
+    var m;
+
+    // App launch: open/launch/start <app>
+    m = lower.match(/^(open|launch|start)\s+(.+)/);
+    if (m) {
+      var appName = m[2].trim();
+      var normalized = normalizeAppName(appName);
+      if (SHORTCUTS[normalized]) {
+        steps.push({ type: 'app', os: 'windows', name: appName });
+        steps.push({ type: 'delay', value: 1500 });
+        appCtx = normalized;
+        continue;
+      }
+    }
+
+    // Press <key/combo>
+    m = lower.match(/^press\s+(.+)/);
+    if (m) {
+      var comboStr = m[1].trim();
+      var parsed = parseKeyCombo(comboStr);
+      steps.push(parsed);
+      continue;
+    }
+
+    // Type <text>
+    m = lower.match(/^type\s+(.+)/);
+    if (m) {
+      steps.push({ type: 'text', value: m[1] });
+      steps.push({ type: 'delay', value: 500 });
+      continue;
+    }
+
+    // Go to <url/text>
+    m = lower.match(/^go\s+to\s+(.+)/);
+    if (m) {
+      steps.push({ type: 'text', value: m[1] });
+      steps.push({ type: 'key', value: 'ENTER' });
+      continue;
+    }
+
+    // Wait <n>s or <n> second(s)
+    m = lower.match(/^wait\s+([\d.]+)\s*s(?:ec(?:ond)?s?)?/);
+    if (m) {
+      steps.push({ type: 'delay', value: Math.round(parseFloat(m[1]) * 1000) });
+      continue;
+    }
+
+    // Delay <ms>
+    m = lower.match(/^delay\s+(\d+)/);
+    if (m) {
+      steps.push({ type: 'delay', value: parseInt(m[1]) });
+      continue;
+    }
+
+    // Shortcut lookup with app context
+    if (appCtx && SHORTCUTS[appCtx]) {
+      var sc = SHORTCUTS[appCtx];
+      var osKey = navigator.platform.indexOf('Mac') >= 0 ? 'macos' : 'windows';
+      var db = sc[osKey] || sc.windows;
+      for (var sk in db) {
+        if (lower.indexOf(sk) >= 0 || sk.indexOf(lower) >= 0) {
+          var action = { type: db[sk].type };
+          if (db[sk].mod) action.mod = db[sk].mod;
+          if (db[sk].key) action.key = db[sk].key;
+          if (db[sk].value) action.value = db[sk].value;
+          steps.push(action);
+          steps.push({ type: 'delay', value: 300 });
+          break;
+        }
+      }
+      if (steps.length > 0 && steps[steps.length - 1].type !== 'delay') continue;
+    }
+
+    // Fallback: single key
+    var singleKey = line.toUpperCase();
+    if (singleKey === 'ENTER' || singleKey === 'ESC' || singleKey === 'TAB' || singleKey === 'SPACE' || singleKey === 'UP' || singleKey === 'DOWN' || singleKey === 'LEFT' || singleKey === 'RIGHT' || singleKey === 'F1' || singleKey === 'F2' || singleKey === 'F3' || singleKey === 'F4' || singleKey === 'F5' || singleKey === 'F6' || singleKey === 'F7' || singleKey === 'F8' || singleKey === 'F9' || singleKey === 'F10' || singleKey === 'F11' || singleKey === 'F12') {
+      steps.push({ type: 'key', value: singleKey });
+      steps.push({ type: 'delay', value: 300 });
+    } else {
+      steps.push({ type: 'text', value: line });
+      steps.push({ type: 'delay', value: 500 });
+    }
+  }
+  return steps;
+}
+
+function parseKeyCombo(str) {
+  var modMap = { ctrl: 'CTRL', alt: 'ALT', shift: 'SHIFT', gui: 'GUI', win: 'GUI', cmd: 'GUI', command: 'GUI', meta: 'GUI' };
+  var parts = str.split(/[\s+]+/).filter(function(p) { return p.length > 0; });
+  var mods = [];
+  var key = '';
+  for (var p = 0; p < parts.length; p++) {
+    var lp = parts[p].toLowerCase();
+    if (modMap[lp]) {
+      mods.push(modMap[lp]);
+    } else {
+      key = parts[p].toUpperCase();
+    }
+  }
+  if (mods.length > 0) {
+    return { type: 'combo', mod: mods.join('_'), key: key || '' };
+  }
+  return { type: 'key', value: key || str.toUpperCase() };
+}
+
+function renderFlowSteps(steps) {
+  var el = document.getElementById('flowResult');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!steps || steps.length === 0) {
+    el.innerHTML = '<div style="color:var(--dim);font-size:0.75rem;padding:8px">No steps parsed.</div>';
+    document.getElementById('flowActions').style.display = 'none';
+    document.getElementById('flowHint').textContent = '0 steps';
+    return;
+  }
+  document.getElementById('flowActions').style.display = 'flex';
+  document.getElementById('flowHint').textContent = steps.length + (steps.length > 1 ? ' steps' : ' step');
+  var typeLabels = { key: 'Key', combo: 'Combo', text: 'Text', delay: 'Delay', app: 'App' };
+  steps.forEach(function(s, i) {
+    var c = document.createElement('div');
+    c.className = 'fc';
+    var summary = '';
+    if (s.type === 'key') summary = s.value || '';
+    else if (s.type === 'combo') summary = (s.mod || '').replace(/_/g, '+') + '+' + (s.key || '');
+    else if (s.type === 'text') summary = '"' + (s.value || '').substring(0, 40) + '"';
+    else if (s.type === 'delay') summary = s.value + 'ms';
+    else if (s.type === 'app') summary = s.name + ' (' + s.os + ')';
+    c.innerHTML =
+      '<div class="fc-hdr">' +
+        '<span class="fc-idx">#' + (i + 1) + '</span>' +
+        '<select class="fc-type" data-i="' + i + '">' +
+          Object.keys(typeLabels).map(function(t) { return '<option value="' + t + '"' + (s.type === t ? ' selected' : '') + '>' + typeLabels[t] + '</option>'; }).join('') +
+        '</select>' +
+        '<span class="fc-summary">' + esc(summary) + '</span>' +
+        '<button class="btn dan fc-del" data-i="' + i + '" style="padding:2px 8px;font-size:0.6rem">X</button>' +
+      '</div>' +
+      '<div class="fc-edit" id="fcEdit' + i + '">' +
+        '<div class="fc-body" id="fcBody' + i + '"></div>' +
+        '<div class="fc-raw">' +
+          '<label style="font-size:0.6rem;color:var(--dim)">Raw JSON</label>' +
+          '<textarea class="fc-json" data-i="' + i + '" rows="2">' + esc(JSON.stringify(s)) + '</textarea>' +
+        '</div>' +
+      '</div>';
+    el.appendChild(c);
+    renderFlowStepBody(i, s);
+  });
+}
+
+function renderFlowStepBody(idx, s) {
+  var el = document.getElementById('fcBody' + idx);
+  if (!el) return;
+  var h = '';
+  if (s.type === 'key') {
+    h = '<div class="fc-field"><label>Key</label><input class="fc-fv" data-i="' + idx + '" data-f="value" value="' + esc(s.value || '') + '"></div>';
+  } else if (s.type === 'combo') {
+    h = '<div class="fc-field"><label>Mod</label><select class="fc-fv" data-i="' + idx + '" data-f="mod">' +
+      ['CTRL', 'ALT', 'SHIFT', 'GUI', 'CTRL_SHIFT', 'CTRL_ALT', 'CTRL_GUI', 'ALT_SHIFT', 'ALT_GUI', 'SHIFT_GUI', 'CTRL_ALT_SHIFT', 'CTRL_ALT_GUI', 'CTRL_SHIFT_GUI', 'ALT_SHIFT_GUI', 'CTRL_ALT_SHIFT_GUI'].map(function(m) { return '<option value="' + m + '"' + (s.mod === m ? ' selected' : '') + '>' + m.replace(/_/g, '+') + '</option>'; }).join('') +
+      '</select><label>Key</label><input class="fc-fv" data-i="' + idx + '" data-f="key" value="' + esc(s.key || '') + '"></div>';
+  } else if (s.type === 'text') {
+    h = '<div class="fc-field"><label>Text</label><input class="fc-fv" data-i="' + idx + '" data-f="value" value="' + esc(s.value || '') + '"></div>';
+  } else if (s.type === 'delay') {
+    h = '<div class="fc-field"><label>Delay</label><input class="fc-fv" data-i="' + idx + '" data-f="value" value="' + (s.value || 100) + '"> <span style="font-size:0.65rem;color:var(--dim)">ms</span></div>';
+  } else if (s.type === 'app') {
+    h = '<div class="fc-field"><label>OS</label><select class="fc-fv" data-i="' + idx + '" data-f="os">' +
+      ['windows', 'macos', 'linux'].map(function(o) { return '<option value="' + o + '"' + (s.os === o ? ' selected' : '') + '>' + o.charAt(0).toUpperCase() + o.slice(1) + '</option>'; }).join('') +
+      '</select><label>Name</label><input class="fc-fv" data-i="' + idx + '" data-f="name" value="' + esc(s.name || '') + '"></div>';
+  }
+  el.innerHTML = h;
+}
+
+// Flow Builder event handlers
+document.getElementById('flowToggle').addEventListener('click', function() {
+  document.getElementById('flowBody').classList.toggle('open');
+});
+
+document.getElementById('btnFlowParse').addEventListener('click', function() {
+  var text = document.getElementById('flowInput').value;
+  if (!text.trim()) { tm('Enter a flow description first', 'ng'); return; }
+  flowSteps = parseFlow(text);
+  renderFlowSteps(flowSteps);
+  // Auto-open first step edit
+  var fc = document.querySelector('#flowResult .fc');
+  if (fc) {
+    var ed = fc.querySelector('.fc-edit');
+    if (ed) ed.classList.add('open');
+  }
+});
+
+document.getElementById('btnFlowClear').addEventListener('click', function() {
+  document.getElementById('flowInput').value = '';
+  flowSteps = [];
+  renderFlowSteps([]);
+});
+
+document.getElementById('btnFlowAddGrid').addEventListener('click', function() {
+  if (!flowSteps || flowSteps.length === 0) { tm('No steps to add', 'ng'); return; }
+  var p = curPage();
+  if (!p) { tm('No active page', 'ng'); return; }
+  // Find first empty slot
+  var idx = -1;
+  for (var i = 0; i < p.buttons.length; i++) {
+    if (!p.buttons[i].label && p.buttons[i].action.type === 'key' && !p.buttons[i].action.value) {
+      idx = i; break;
+    }
+  }
+  if (idx < 0) { tm('No empty button slot on this page', 'ng'); return; }
+  if (flowSteps.length === 1) {
+    p.buttons[idx].label = suggestLabel(flowSteps[0]);
+    p.buttons[idx].action = flowSteps[0];
+  } else {
+    p.buttons[idx].label = suggestMacroLabel(flowSteps);
+    p.buttons[idx].action = { type: 'macro', steps: JSON.parse(JSON.stringify(flowSteps)) };
+  }
+  ra();
+  sb = idx; rg(); se(idx);
+  tm('Flow added to button ' + (idx + 1));
+});
+
+function suggestLabel(step) {
+  if (step.type === 'key') return step.value || 'Key';
+  if (step.type === 'combo') return (step.mod || '').replace(/_/g, '+').substring(0, 6) + '+' + (step.key || '');
+  if (step.type === 'text') return 'Type';
+  if (step.type === 'delay') return step.value + 'ms';
+  if (step.type === 'app') return (step.name || '').substring(0, 8);
+  return 'Action';
+}
+
+function suggestMacroLabel(steps) {
+  var first = steps[0];
+  if (first && first.type === 'app') return (first.name || 'Macro').substring(0, 8);
+  return 'Flow ' + steps.length;
+}
+
+// Flow step edit events (delegated)
+document.getElementById('flowResult').addEventListener('click', function(e) {
+  var el = e.target.closest('.fc-hdr');
+  if (el) {
+    var idx = parseInt(el.querySelector('.fc-type')?.getAttribute('data-i'));
+    if (!isNaN(idx)) {
+      var ed = document.getElementById('fcEdit' + idx);
+      if (ed) ed.classList.toggle('open');
+    }
+    return;
+  }
+  var delBtn = e.target.closest('.fc-del');
+  if (delBtn) {
+    var idx = parseInt(delBtn.getAttribute('data-i'));
+    if (!isNaN(idx) && idx >= 0 && idx < flowSteps.length) {
+      flowSteps.splice(idx, 1);
+      renderFlowSteps(flowSteps);
+    }
+    return;
+  }
+});
+
+document.getElementById('flowResult').addEventListener('change', function(e) {
+  var typeSel = e.target.closest('.fc-type');
+  if (typeSel) {
+    var idx = parseInt(typeSel.getAttribute('data-i'));
+    if (!isNaN(idx) && idx >= 0 && idx < flowSteps.length) {
+      var nt = typeSel.value;
+      var na = { type: nt };
+      if (nt === 'key' || nt === 'text') na.value = '';
+      else if (nt === 'combo') { na.mod = 'CTRL'; na.key = ''; }
+      else if (nt === 'delay') na.value = 100;
+      else if (nt === 'app') { na.os = 'windows'; na.name = ''; }
+      flowSteps[idx] = na;
+      renderFlowSteps(flowSteps);
+    }
+    return;
+  }
+  var fv = e.target.closest('.fc-fv');
+  if (fv) {
+    var idx = parseInt(fv.getAttribute('data-i'));
+    var field = fv.getAttribute('data-f');
+    if (!isNaN(idx) && idx >= 0 && idx < flowSteps.length && field) {
+      if (field === 'value' || field === 'key' || field === 'name') flowSteps[idx][field] = fv.value;
+      else if (field === 'mod' || field === 'os') flowSteps[idx][field] = fv.value;
+      else if (field === 'value' && (flowSteps[idx].type === 'delay')) flowSteps[idx][field] = parseInt(fv.value) || 100;
+      // Update JSON textarea
+      var jsonTa = document.querySelector('.fc-json[data-i="' + idx + '"]');
+      if (jsonTa) jsonTa.value = JSON.stringify(flowSteps[idx]);
+      // Update summary
+      var summary = '';
+      var s = flowSteps[idx];
+      if (s.type === 'key') summary = s.value || '';
+      else if (s.type === 'combo') summary = (s.mod || '').replace(/_/g, '+') + '+' + (s.key || '');
+      else if (s.type === 'text') summary = '"' + (s.value || '').substring(0, 40) + '"';
+      else if (s.type === 'delay') summary = s.value + 'ms';
+      else if (s.type === 'app') summary = s.name + ' (' + s.os + ')';
+      var fcEl = (typeSel || fv).closest('.fc');
+      var summaryEl = fcEl ? fcEl.querySelector('.fc-summary') : null;
+      if (summaryEl) summaryEl.textContent = esc(summary);
+    }
+    return;
+  }
+  var jsonTa = e.target.closest('.fc-json');
+  if (jsonTa) {
+    var idx = parseInt(jsonTa.getAttribute('data-i'));
+    if (!isNaN(idx) && idx >= 0 && idx < flowSteps.length) {
+      try {
+        var parsed = JSON.parse(jsonTa.value);
+        flowSteps[idx] = parsed;
+        renderFlowSteps(flowSteps);
+      } catch (err) {}
+    }
+    return;
+  }
+});
 
 /* ── Daemon coordination ── */
 function tryReleaseDaemon() {
